@@ -17,7 +17,7 @@
       --text: #3e2f26;
       --muted: #7c685a;
       --primary: #b84a27;
-      --primary-weak: #f9efe0;
+      --primary-weak: #f7ead7;
       --warm: #de6f38;
       --ginkgo: #f3c86b;
       --ok: #2c7a47;
@@ -28,358 +28,392 @@
       --danger-bg: #fee2e2;
       --stamp: #c8372d;
       --border: #e6cfb0;
-      --dash: #d9be9c;
-      --radius: 20px;
+      --dash: #dec5a4;
+      --radius: 18px;
+      --nav-h: 46px;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 0 0 88px 0;
+      padding: 0 0 calc(100px + env(safe-area-inset-bottom, 0px)) 0;
       font-family: 'Huninn', -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
       background-color: var(--bg);
       background-image:
-        radial-gradient(rgba(217, 107, 52, 0.08) 1.5px, transparent 1.5px),
-        radial-gradient(rgba(243, 200, 107, 0.12) 1.5px, transparent 1.5px);
-      background-size: 32px 32px;
-      background-position: 0 0, 16px 16px;
+        radial-gradient(rgba(217, 107, 52, 0.05) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(243, 200, 107, 0.07) 1.5px, transparent 1.5px);
+      background-size: 34px 34px;
+      background-position: 0 0, 17px 17px;
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
+    /* 頂部橘色區塊瘦身：緊湊一行 + 11px 淡化版本同步資訊 */
     header.topbar {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: linear-gradient(135deg, #b84a27 0%, #d86734 65%, #e28444 100%);
+      background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
       color: #fffaf2;
-      padding: 12px 16px 13px;
-      border-bottom: 2.5px dashed rgba(255, 250, 242, 0.55);
-      box-shadow: 0 4px 14px rgba(130, 62, 32, 0.18);
+      padding: calc(8px + env(safe-area-inset-top, 0px)) 14px 8px;
+      border-bottom: 2px dashed rgba(255, 250, 242, 0.45);
+      box-shadow: 0 2px 10px rgba(120, 58, 30, 0.14);
     }
 
     .topbar-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex-wrap: nowrap;
     }
 
     .brand-left {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
     }
 
     .topbar-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       margin: 0;
-      letter-spacing: 0.4px;
-      text-shadow: 0 1px 2px rgba(62, 47, 38, 0.2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mascot-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     .mascot-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: #fffdf9;
       color: var(--primary);
-      border: 2px solid #f7d8b4;
+      border: 1.5px solid #f5d6b3;
       border-radius: 999px;
-      padding: 3px 12px 3px 6px;
-      font-size: 12.5px;
+      padding: 2px 9px 2px 4px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 3px 8px rgba(62, 47, 38, 0.18);
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 6px rgba(62, 47, 38, 0.14);
+      transition: transform 0.15s ease;
+      max-width: 195px;
     }
 
-    .mascot-pill:hover {
-      transform: translateY(-1px);
+    .mascot-pill span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mascot-pill:active {
-      transform: scale(0.92) rotate(-4deg);
+      transform: scale(0.94) rotate(-3deg);
     }
 
-    .mascot-bird {
-      animation: bird-bob 2.8s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-
-    @keyframes bird-bob {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-2px) rotate(-3deg); }
-    }
-
-    .badge-net {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 11px;
-      border-radius: 999px;
+    .phrase-mini-btn {
       background: rgba(255, 250, 242, 0.22);
-      border: 1.5px solid rgba(255, 250, 242, 0.45);
+      color: #fffaf2;
+      border: 1px solid rgba(255, 250, 242, 0.45);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
       white-space: nowrap;
     }
 
+    .badge-net {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.2);
+      border: 1px solid rgba(255, 250, 242, 0.38);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .sub-info {
-      font-size: 12px;
-      opacity: 0.95;
-      margin-top: 6px;
+      font-size: 11px;
+      color: rgba(255, 250, 242, 0.78);
+      margin-top: 3px;
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
 
     main {
       max-width: 780px;
       margin: 0 auto;
-      padding: 14px 12px;
+      padding: 10px 12px 12px;
     }
 
     .banner {
-      padding: 10px 14px;
-      border-radius: 16px;
-      margin-bottom: 12px;
-      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
       display: none;
     }
     .banner.show { display: block; }
     .banner.info { background: var(--primary-weak); color: var(--primary); border: 1.5px dashed var(--dash); }
-    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1.5px solid #96dfb0; }
-    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1.5px solid #fcd34d; }
-    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1.5px solid #fca5a5; }
+    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #96dfb0; }
+    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
+    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1px solid #fca5a5; }
 
+    /* 控制面板：第一排控制列 + 第二排團子進度與摘要 */
     .controls-card {
       background: var(--card);
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 16px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 4px 14px rgba(122, 74, 42, 0.06);
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
     }
 
     .controls-line {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
 
     select, input[type="text"], input[type="number"], textarea {
       font-family: inherit;
-      font-size: 14px;
-      padding: 7px 12px;
+      font-size: 13.5px;
+      padding: 6px 10px;
       border: 1.5px solid var(--dash);
-      border-radius: 12px;
+      border-radius: 11px;
       background: #fffaf2;
       color: var(--text);
     }
 
     button {
       font-family: inherit;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
-      padding: 7px 13px;
+      padding: 6px 12px;
       border-radius: 999px;
       border: 1.5px solid var(--dash);
       background: var(--soft);
       color: var(--text);
       cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      transition: transform 0.12s ease;
     }
     button:active { transform: scale(0.96); }
-    button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); box-shadow: 0 2px 6px rgba(184, 74, 39, 0.22); }
-    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); box-shadow: 0 2px 6px rgba(44, 122, 71, 0.22); }
-    button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); box-shadow: 0 2px 6px rgba(222, 111, 56, 0.22); }
+    button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); }
+    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+    button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); }
     button.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-    button.btn-sm { padding: 6px 11px; font-size: 12.5px; }
+    button.btn-muted { background: #f2ece6; color: #5f5147; border-color: #d8cdc2; }
+    button.btn-ghost { background: transparent; color: var(--muted); border-color: var(--dash); }
+    button.btn-sm { padding: 5px 10px; font-size: 12px; }
 
     .stats-bar {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
       gap: 8px;
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--muted);
-      border-top: 1.5px dashed var(--dash);
-      padding-top: 10px;
+      border-top: 1px dashed var(--dash);
+      padding-top: 7px;
+    }
+
+    .dango-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .dango-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1.5px solid #c9ad8b;
+      background: #ffffff;
+      color: var(--text);
+    }
+    .dango-dot.done {
+      background: #fde8e6;
+      border-color: var(--stamp);
+      color: var(--stamp);
+    }
+    .dango-dot.skipped {
+      background: #efece8;
+      border-style: dashed;
+      color: #8c7b70;
+      opacity: 0.75;
+    }
+
+    .stats-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11.5px;
     }
     .pill {
       background: var(--primary-weak);
-      border: 1.5px dashed var(--dash);
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 999px;
       color: var(--text);
     }
-    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; border-style: solid; }
-    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; border-style: solid; }
+    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
+    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; }
 
-    /* 手帳卡片＋頂部和紙膠帶裝飾 */
+    /* 行程卡片：降噪、4.5px 左邊框、淡奶茶備註、縮小地址字級 */
     .timeline-item {
       position: relative;
       background: var(--card);
-      border: 2px solid var(--border);
-      border-left: 6px solid var(--primary);
+      border: 1.5px solid var(--border);
+      border-left: 4.5px solid var(--primary);
       border-radius: var(--radius);
-      padding: 16px 14px 13px;
-      margin-top: 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(122, 74, 42, 0.06);
+      padding: 12px 13px 11px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
     }
-    .timeline-item::before {
-      content: "";
-      position: absolute;
-      top: -8px;
-      left: 22px;
-      width: 68px;
-      height: 15px;
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(243, 200, 107, 0.55),
-        rgba(243, 200, 107, 0.55) 6px,
-        rgba(232, 148, 92, 0.45) 6px,
-        rgba(232, 148, 92, 0.45) 12px
-      );
-      border-left: 1px dashed rgba(184, 74, 39, 0.25);
-      border-right: 1px dashed rgba(184, 74, 39, 0.25);
-      transform: rotate(-2deg);
-      pointer-events: none;
+    .timeline-item.highlight-target {
+      box-shadow: 0 0 0 3px rgba(243, 200, 107, 0.85), 0 6px 16px rgba(184, 74, 39, 0.16);
+      border-color: var(--warm);
     }
-    .timeline-item:nth-child(even)::before {
-      left: auto;
-      right: 64px;
-      background: repeating-linear-gradient(
-        -45deg,
-        rgba(232, 132, 107, 0.48),
-        rgba(232, 132, 107, 0.48) 6px,
-        rgba(250, 214, 150, 0.55) 6px,
-        rgba(250, 214, 150, 0.55) 12px
-      );
-      transform: rotate(2.5deg);
-    }
-
-    .timeline-item.status-done { border-left-color: var(--ok); background: #fcfbf7; }
+    .timeline-item.status-done { border-left-color: var(--ok); background: #fcfbf8; }
     .timeline-item.status-done::after {
       content: "済";
       position: absolute;
-      top: 12px;
-      right: 14px;
-      width: 44px;
-      height: 44px;
+      top: 10px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
       border-radius: 999px;
-      border: 2.5px solid rgba(200, 55, 45, 0.8);
-      box-shadow: inset 0 0 0 1.5px rgba(200, 55, 45, 0.35);
-      color: rgba(200, 55, 45, 0.9);
+      border: 2px solid rgba(200, 55, 45, 0.78);
+      color: rgba(200, 55, 45, 0.88);
       font-weight: 800;
-      font-size: 20px;
+      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: rotate(-15deg);
-      background: radial-gradient(circle, rgba(200, 55, 45, 0.08) 0%, rgba(200, 55, 45, 0.02) 70%);
+      transform: rotate(-14deg);
+      background: rgba(200, 55, 45, 0.05);
       pointer-events: none;
     }
-    .timeline-item.status-skipped { border-left-color: #b5a89e; opacity: 0.72; border-style: dashed; }
+    .timeline-item.status-skipped { border-left-color: #b5a89e; opacity: 0.7; border-style: dashed; }
     .timeline-item.is-late { border-left-color: var(--danger); }
 
     .item-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
-      padding-right: 48px;
+      padding-right: 44px;
     }
     .item-time {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--primary);
-      background: var(--primary-weak);
+      color: #8c3b20;
+      background: #f8efe2;
       padding: 2px 9px;
       border-radius: 999px;
-      display: inline-block;
     }
     .item-title {
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 700;
-      margin: 6px 0 3px 0;
+      margin: 5px 0 2px 0;
       color: #2f221b;
     }
     .step-badge {
       display: inline-block;
-      background: var(--ginkgo);
-      color: #4a3219;
-      font-size: 12px;
-      padding: 1px 8px;
+      background: #fae2ae;
+      color: #56391b;
+      font-size: 11px;
+      padding: 1px 7px;
       border-radius: 999px;
       margin-right: 6px;
       vertical-align: 1px;
     }
-    .item-sub {
-      font-size: 13px;
+    .item-jp {
+      font-size: 12.5px;
       color: var(--muted);
     }
-    .note-bubble {
+    .item-addr {
+      font-size: 11.5px;
+      color: #938073;
+      margin-top: 1px;
+    }
+    .note-soft {
       margin-top: 6px;
       padding: 6px 10px;
-      background: #fff9ee;
-      border: 1.5px dashed var(--dash);
-      border-radius: 12px;
-      font-size: 12.5px;
-      color: #5c493c;
+      background: #f5ead9;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #564437;
     }
     .tag {
       display: inline-block;
-      font-size: 11.5px;
-      padding: 2px 8px;
+      font-size: 11px;
+      padding: 1.5px 7px;
       border-radius: 999px;
       margin-right: 4px;
       margin-top: 5px;
-      background: var(--primary-weak);
+      background: #f7ead7;
       color: var(--text);
-      border: 1px dashed var(--dash);
     }
-    .tag.override { background: #dbeafe; color: #1d4ed8; border-color: transparent; }
-    .tag.inserted { background: #ede9fe; color: #6d28d9; border-color: transparent; }
-    .tag.late { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+    .tag.override { background: #dbeafe; color: #1d4ed8; }
+    .tag.inserted { background: #ede9fe; color: #6d28d9; }
+    .tag.late { background: var(--danger-bg); color: var(--danger); }
 
     .alert-box {
-      margin-top: 8px;
-      padding: 7px 10px;
-      border-radius: 10px;
+      margin-top: 7px;
+      padding: 6px 10px;
+      border-radius: 9px;
       font-size: 12px;
       background: var(--danger-bg);
       color: var(--danger);
     }
     .warn-box {
-      margin-top: 8px;
-      padding: 7px 10px;
-      border-radius: 10px;
+      margin-top: 7px;
+      padding: 6px 10px;
+      border-radius: 9px;
       font-size: 12px;
       background: var(--warn-bg);
       color: var(--warn);
     }
 
     .item-actions {
-      margin-top: 10px;
-      padding-top: 9px;
-      border-top: 1.5px dashed var(--dash);
+      margin-top: 9px;
+      padding-top: 7px;
+      border-top: 1px dashed #ead8c0;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
     }
 
     .edit-panel {
-      margin-top: 10px;
+      margin-top: 9px;
       padding: 10px;
-      background: var(--primary-weak);
-      border: 1.5px dashed var(--dash);
+      background: #f9efe0;
+      border: 1px dashed var(--dash);
       border-radius: 12px;
       display: none;
     }
@@ -407,58 +441,105 @@
 
     .section-card {
       background: var(--card);
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 3px 10px rgba(122, 74, 42, 0.05);
+      padding: 13px;
+      margin-bottom: 11px;
+      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
     }
     .section-card h3 {
-      margin: 0 0 8px 0;
-      font-size: 15.5px;
+      margin: 0 0 6px 0;
+      font-size: 15px;
     }
     .muted-note {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--muted);
-      margin: 4px 0 10px 0;
+      margin: 4px 0 8px 0;
     }
 
     .tab-page { display: none; }
     .tab-page.active { display: block; }
 
+    /* 底部導覽列：約 46px + iPhone Safe Area */
     nav.bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       z-index: 30;
-      background: var(--card);
-      border-top: 2px solid var(--border);
+      min-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: #fffdf9;
+      border-top: 1.5px solid var(--border);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      box-shadow: 0 -3px 12px rgba(122, 74, 42, 0.08);
+      box-shadow: 0 -2px 10px rgba(122, 74, 42, 0.06);
     }
     nav.bottom-nav button {
       border: none;
       border-radius: 0;
-      padding: 10px 4px;
-      font-size: 12.5px;
+      padding: 6px 4px;
+      height: var(--nav-h);
+      font-size: 12px;
       background: transparent;
       color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
     }
     nav.bottom-nav button.active {
       color: var(--primary);
-      background: var(--primary-weak);
+      background: #f9efe0;
       font-weight: 700;
     }
 
     .empty-state {
       text-align: center;
-      padding: 32px 16px;
+      padding: 28px 16px;
       background: var(--card);
-      border: 2px dashed var(--dash);
+      border: 1.5px dashed var(--dash);
       border-radius: var(--radius);
       color: var(--muted);
+    }
+
+    /* 日文指指通舉牌彈窗 */
+    .phrase-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(62, 47, 38, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .phrase-backdrop.open { display: flex; }
+    .phrase-modal {
+      width: 100%;
+      max-width: 420px;
+      background: #fffdf9;
+      border: 2.5px solid var(--primary);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(62, 47, 38, 0.25);
+      text-align: center;
+    }
+    .phrase-jp-big {
+      margin: 12px 0;
+      padding: 14px 12px;
+      background: #fbf5ea;
+      border: 1.5px dashed var(--dash);
+      border-radius: 16px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #2f221b;
+      line-height: 1.45;
+    }
+    .phrase-zh-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -467,30 +548,25 @@
     <div class="topbar-row">
       <div class="brand-left">
         <h1 class="topbar-title">🍁 家庭旅遊離線電子手帳</h1>
-        <button type="button" id="mascotBtn" class="mascot-pill" title="點我聽雪之妖精說悄悄話">
-          <!-- 圓滾滾銀喉長尾山雀 SVG -->
-          <svg class="mascot-bird" width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
-            <!-- 蓬鬆長尾巴 -->
-            <path d="M29 25 L38 19 L36 24 L30 28 Z" fill="#4a372c" />
-            <path d="M30 26 L38 22 L37 25 L31 28 Z" fill="#ffffff" />
-            <!-- 圓身體 -->
-            <ellipse cx="19" cy="23" rx="12" ry="11" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-            <!-- 小翅膀 -->
-            <path d="M22 21 Q29 22 27 28 Q22 28 21 24 Z" fill="#8b6f5e" />
-            <!-- 豆豆眼與橘色小嘴 -->
-            <circle cx="14" cy="20" r="1.9" fill="#2b1e16" />
-            <circle cx="13.4" cy="19.3" r="0.6" fill="#ffffff" />
-            <circle cx="21.5" cy="20" r="1.9" fill="#2b1e16" />
-            <circle cx="20.9" cy="19.3" r="0.6" fill="#ffffff" />
-            <polygon points="17.8,21 16.2,23.5 19.4,23.5" fill="#e67e3c" />
-            <!-- 粉紅腮紅 -->
-            <ellipse cx="11.5" cy="22.8" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.85" />
-            <ellipse cx="24" cy="22.8" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.85" />
-            <!-- 頭頂小楓葉 -->
-            <path d="M18 6 L19.5 10 L23 9 L20.5 11.8 L21.5 14 L18 12.2 L14.5 14 L15.5 11.8 L13 9 L16.5 10 Z" fill="#c8372d" />
-          </svg>
-          <span id="mascotQuote">啾！賞楓出發～</span>
-        </button>
+        <div class="mascot-group">
+          <button type="button" id="mascotBtn" class="mascot-pill" title="點我跳到下一站並換台詞（長按開指指通）">
+            <svg id="birdSvg" class="mascot-bird" width="22" height="22" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M29 25 L38 19 L36 24 L30 28 Z" fill="#4a372c" />
+              <ellipse cx="19" cy="23" rx="12" ry="11" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
+              <path d="M22 21 Q29 22 27 28 Q22 28 21 24 Z" fill="#8b6f5e" />
+              <circle id="birdEyeL" cx="14" cy="20" r="1.8" fill="#2b1e16" />
+              <circle id="birdEyeR" cx="21.5" cy="20" r="1.8" fill="#2b1e16" />
+              <polygon points="17.8,21 16.2,23.5 19.4,23.5" fill="#e67e3c" />
+              <ellipse cx="11.5" cy="22.8" rx="2" ry="1.1" fill="#f7a8a0" opacity="0.85" />
+              <ellipse cx="24" cy="22.8" rx="2" ry="1.1" fill="#f7a8a0" opacity="0.85" />
+              <g id="birdAccessory">
+                <path d="M18 6 L19.5 10 L23 9 L20.5 11.8 L21.5 14 L18 12.2 L14.5 14 L15.5 11.8 L13 9 L16.5 10 Z" fill="#c8372d" />
+              </g>
+            </svg>
+            <span id="mascotQuote">啾！找下一站～</span>
+          </button>
+          <button type="button" id="openPhraseBtn" class="phrase-mini-btn" title="日文指指通大字卡">🪧 指指通</button>
+        </div>
       </div>
       <span id="netBadge" class="badge-net">檢查中</span>
     </div>
@@ -581,6 +657,21 @@
     </section>
   </main>
 
+  <!-- 日文指指通大字卡 Modal -->
+  <div id="phraseBackdrop" class="phrase-backdrop" role="dialog" aria-modal="true" aria-label="日文指指通">
+    <div class="phrase-modal">
+      <div style="font-size:14px;font-weight:700;color:var(--primary);">🐦 長尾山雀舉牌指指通</div>
+      <div class="controls-line" style="justify-content:center;margin-top:8px;">
+        <button type="button" class="btn-sm btn-primary" data-phrase="no-beef">不吃牛／牛油</button>
+        <button type="button" class="btn-sm" data-phrase="bill">麻煩結帳</button>
+        <button type="button" class="btn-sm" data-phrase="station">車站在哪？</button>
+      </div>
+      <div id="phraseJpText" class="phrase-jp-big">牛肉・牛脂・ホルモンは<br>食べられません。</div>
+      <div id="phraseZhText" class="phrase-zh-sub">我不能吃牛肉、牛油與內臟，請問餐點有含嗎？</div>
+      <button type="button" id="closePhraseBtn" class="btn-sm btn-ok">收起牌子</button>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
     <button class="active" data-tab="tab-schedule">🍁 每日行程</button>
     <button data-tab="tab-pocket">🎒 備選口袋</button>
@@ -599,25 +690,24 @@
         SELECTED_DATE: 'trip_pwa_selected_date'
       };
 
-      const mascotQuotes = [
-        '啾！賞楓出發～',
-        '帶好保暖外套了嗎？',
-        '慢慢散步不趕路唷！',
-        '下午來杯熱茶或點心吧～',
-        '離線也能看行程，安心玩！'
-      ];
-      let mascotIdx = 0;
-      const mascotBtn = document.getElementById('mascotBtn');
-      const mascotQuote = document.getElementById('mascotQuote');
-      if (mascotBtn && mascotQuote) {
-        mascotBtn.addEventListener('click', () => {
-          mascotIdx = (mascotIdx + 1) % mascotQuotes.length;
-          mascotQuote.textContent = mascotQuotes[mascotIdx];
-        });
-      }
+      const PHRASES = {
+        'no-beef': {
+          jp: '牛肉・牛脂・ホルモンは<br>食べられません。',
+          zh: '我不能吃牛肉、牛油與內臟（豚肉・鶏肉・海鮮 OK）。'
+        },
+        'bill': {
+          jp: 'お会計をお願いします。',
+          zh: '麻煩幫我們結帳，謝謝！'
+        },
+        'station': {
+          jp: '最寄りの駅はどちらですか？',
+          zh: '請問最近的車站在哪一個方向？'
+        }
+      };
 
       let currentDate = '';
       let currentSchedule = null;
+      let quoteToggle = 0;
 
       function showBanner(type, text) {
         const el = document.getElementById('globalBanner');
@@ -636,8 +726,111 @@
       function updateNetworkBadge() {
         const badge = document.getElementById('netBadge');
         const online = navigator.onLine;
-        badge.textContent = online ? '🟢 線上' : '🟠 離線模式';
-        badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.7)';
+        badge.textContent = online ? '🟢 線上' : '🟠 離線';
+        badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.72)';
+      }
+
+      function syncMascotWithSchedule(sched, cycleQuote) {
+        const quoteEl = document.getElementById('mascotQuote');
+        const accEl = document.getElementById('birdAccessory');
+        if (!quoteEl || !accEl) return;
+
+        const items = (sched && sched.items) || [];
+        const firstArea = (items[0] && items[0].area) || '';
+        const st = (sched && sched.stats) || { total: 0, done: 0, pending: 0, lateCount: 0 };
+
+        // 區域頭飾
+        if (firstArea.indexOf('嵐山') !== -1) {
+          accEl.innerHTML = '<path d="M18 12 Q24 6 29 10 Q23 14 18 12 Z" fill="#68a357" />';
+        } else if (firstArea.indexOf('天橋立') !== -1) {
+          accEl.innerHTML = '<path d="M13 10 Q16 7 18 10 Q20 7 23 10" stroke="#ffffff" stroke-width="2" fill="none" />';
+        } else if (firstArea.indexOf('大阪') !== -1) {
+          accEl.innerHTML = '<circle cx="18" cy="10" r="3.5" fill="#e67e3c" stroke="#5a4336" stroke-width="1.2" />';
+        } else {
+          accEl.innerHTML = '<path d="M18 6 L19.5 10 L23 9 L20.5 11.8 L21.5 14 L18 12.2 L14.5 14 L15.5 11.8 L13 9 L16.5 10 Z" fill="#c8372d" />';
+        }
+
+        // 情境台詞
+        if (sched && sched.isStopped) {
+          quoteEl.textContent = '啾～今日收工休息💤';
+          return;
+        }
+        if (st.total > 0 && st.done === st.total) {
+          quoteEl.textContent = '本日全制霸！去吃好料🍁';
+          return;
+        }
+        if (st.lateCount > 0) {
+          quoteEl.textContent = '啾！這站有點趕，留意時間';
+          return;
+        }
+        if (sched && sched.weatherMode === 'rain') {
+          quoteEl.textContent = cycleQuote ? '撐傘慢慢逛雨景☂️' : '雨天備案啟動～';
+          return;
+        }
+        const idleQuotes = ['啾！點我跳下一站', '帶好保暖外套了嗎？', '慢慢散步不趕路唷～'];
+        if (cycleQuote) quoteToggle = (quoteToggle + 1) % idleQuotes.length;
+        quoteEl.textContent = idleQuotes[quoteToggle];
+      }
+
+      function jumpToNextPendingCard() {
+        const cards = Array.from(document.querySelectorAll('#scheduleList .timeline-item'));
+        const target = cards.find((c) => !c.classList.contains('status-done') && !c.classList.contains('status-skipped'));
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('highlight-target');
+        setTimeout(() => target.classList.remove('highlight-target'), 1400);
+      }
+
+      const mascotBtn = document.getElementById('mascotBtn');
+      const phraseBackdrop = document.getElementById('phraseBackdrop');
+      let pressTimer = null;
+
+      if (mascotBtn) {
+        mascotBtn.addEventListener('pointerdown', () => {
+          pressTimer = setTimeout(() => {
+            pressTimer = null;
+            if (phraseBackdrop) phraseBackdrop.classList.add('open');
+          }, 550);
+        });
+        const cancelPress = () => {
+          if (pressTimer) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        };
+        mascotBtn.addEventListener('pointerup', cancelPress);
+        mascotBtn.addEventListener('pointerleave', cancelPress);
+        mascotBtn.addEventListener('click', () => {
+          syncMascotWithSchedule(currentSchedule, true);
+          jumpToNextPendingCard();
+        });
+      }
+
+      if (document.getElementById('openPhraseBtn') && phraseBackdrop) {
+        document.getElementById('openPhraseBtn').addEventListener('click', () => {
+          phraseBackdrop.classList.add('open');
+        });
+      }
+      if (document.getElementById('closePhraseBtn') && phraseBackdrop) {
+        document.getElementById('closePhraseBtn').addEventListener('click', () => {
+          phraseBackdrop.classList.remove('open');
+        });
+      }
+      if (phraseBackdrop) {
+        phraseBackdrop.addEventListener('click', (e) => {
+          if (e.target === phraseBackdrop) phraseBackdrop.classList.remove('open');
+        });
+        phraseBackdrop.querySelectorAll('[data-phrase]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            phraseBackdrop.querySelectorAll('[data-phrase]').forEach((b) => b.classList.remove('btn-primary'));
+            btn.classList.add('btn-primary');
+            const p = PHRASES[btn.dataset.phrase];
+            if (p) {
+              document.getElementById('phraseJpText').innerHTML = p.jp;
+              document.getElementById('phraseZhText').textContent = p.zh;
+            }
+          });
+        });
       }
 
       function loadPrefsToInputs() {
@@ -719,12 +912,14 @@
 
         if (!currentDate) {
           statsEl.innerHTML = '';
+          syncMascotWithSchedule(null, false);
           listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，請先切換至下方「設定備份」輸入網址與 Token 並執行同步。</div>';
           return;
         }
 
         const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
         currentSchedule = sched;
+        syncMascotWithSchedule(sched, false);
 
         if (!sched.hasBaseline) {
           statsEl.innerHTML = '';
@@ -737,13 +932,23 @@
         btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
 
         const st = sched.stats;
+        const dangos = (sched.items || []).map((it, i) => {
+          const s = it.status || 'pending';
+          if (s === 'done') return `<span class="dango-dot done" title="第 ${i + 1} 站已完成">🍁</span>`;
+          if (s === 'skipped') return `<span class="dango-dot skipped" title="第 ${i + 1} 站已跳過">☁️</span>`;
+          return `<span class="dango-dot" title="第 ${i + 1} 站待執行">${i + 1}</span>`;
+        }).join('');
+
         statsEl.innerHTML =
-          `<span class="pill">總站數：${st.total}</span>` +
-          `<span class="pill">已完成：${st.done}</span>` +
-          `<span class="pill">已跳過：${st.skipped}</span>` +
-          `<span class="pill">待執行：${st.pending}</span>` +
-          (st.lateCount > 0 ? `<span class="pill late">逾時警示：${st.lateCount}</span>` : '') +
-          (sched.isStopped ? `<span class="pill stop">已啟用「今天就到這裡」（未執行維持 pending）</span>` : '');
+          `<div class="dango-track">${dangos}</div>` +
+          `<div class="stats-summary">` +
+            `<span class="pill">總 ${st.total}</span>` +
+            `<span class="pill">完 ${st.done}</span>` +
+            `<span class="pill">跳 ${st.skipped}</span>` +
+            `<span class="pill">待 ${st.pending}</span>` +
+            (st.lateCount > 0 ? `<span class="pill late">逾時 ${st.lateCount}</span>` : '') +
+            (sched.isStopped ? `<span class="pill stop">已收工</span>` : '') +
+          `</div>`;
 
         if (!sched.visibleItems || sched.visibleItems.length === 0) {
           listEl.innerHTML = sched.isStopped
@@ -756,17 +961,31 @@
           const statusClass = 'status-' + (it.status || 'pending');
           const lateClass = it.isLate ? ' is-late' : '';
           const timeRange = it.isLastOfDay
-            ? `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，當日最後一站）`
+            ? `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，末站）`
             : `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`;
 
           const statusBadge = it.status === 'done'
-            ? '<span class="tag" style="background:#e7f6ec;color:#2c7a47;border-color:transparent;">✅ 已完成</span>'
+            ? '<span class="tag" style="background:#e7f6ec;color:#2c7a47;">已完成</span>'
             : (it.status === 'skipped'
-              ? '<span class="tag" style="background:#e5e7eb;color:#374151;border-color:transparent;">⏭️ 已跳過</span>'
+              ? '<span class="tag" style="background:#efece8;color:#6e6056;">已跳過</span>'
               : '<span class="tag">待執行</span>');
 
           const isBaseline = it._sourceType === 'baseline';
           const actKey = encodeURIComponent(it.activity_id);
+
+          let actionButtons = '';
+          if (it.status === 'pending') {
+            actionButtons += `<button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>`;
+            actionButtons += `<button class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>`;
+          } else {
+            actionButtons += `<button class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'pending')">↩️ 改待執行</button>`;
+          }
+          if (isBaseline) {
+            actionButtons += `<button class="btn-sm btn-ghost" onclick="window.__app.onToggleEdit('${actKey}')">編輯／還原</button>`;
+          }
+          if (it._sourceType === 'inserted') {
+            actionButtons += `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>`;
+          }
 
           return `
             <article class="timeline-item ${statusClass}${lateClass}" data-act-id="${escapeHtml(it.activity_id)}">
@@ -775,11 +994,9 @@
                 <div>${statusBadge}</div>
               </div>
               <div class="item-title"><span class="step-badge">第 ${idx + 1} 站</span>${escapeHtml(it.title_zh)}</div>
-              <div class="item-sub">
-                ${it.title_jp ? '🇯🇵 ' + escapeHtml(it.title_jp) + '｜' : ''}${escapeHtml(it.area || '')}
-                ${it.address_jp ? '<br>📍 ' + escapeHtml(it.address_jp) : ''}
-              </div>
-              ${it.note ? `<div class="note-bubble">📝 ${escapeHtml(it.note)}</div>` : ''}
+              ${it.title_jp ? `<div class="item-jp">🇯🇵 ${escapeHtml(it.title_jp)}${it.area ? '｜' + escapeHtml(it.area) : ''}</div>` : (it.area ? `<div class="item-jp">${escapeHtml(it.area)}</div>` : '')}
+              ${it.address_jp ? `<div class="item-addr">📍 ${escapeHtml(it.address_jp)}</div>` : ''}
+              ${it.note ? `<div class="note-soft">📝 ${escapeHtml(it.note)}</div>` : ''}
               <div>
                 ${it._sourceType === 'inserted' ? '<span class="tag inserted">本機插入備選</span>' : ''}
                 ${it._hasOverrides ? '<span class="tag override">已微調：' + escapeHtml((it._overriddenFields || []).join(', ')) + '</span>' : ''}
@@ -788,13 +1005,7 @@
               ${it.isLate ? `<div class="alert-box">${escapeHtml(it.lateReason)}</div>` : ''}
               ${it._anchorMissing ? `<div class="warn-box">原插入錨點（${escapeHtml(it._afterActivityId)}）已不存在，已自動接在當日行程末端。</div>` : ''}
 
-              <div class="item-actions">
-                <button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>
-                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>
-                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'pending')">改待執行</button>
-                ${isBaseline ? `<button class="btn-sm" onclick="window.__app.onToggleEdit('${actKey}')">✏️ 微調／單欄還原</button>` : ''}
-                ${it._sourceType === 'inserted' ? `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>` : ''}
-              </div>
+              <div class="item-actions">${actionButtons}</div>
 
               ${isBaseline ? `
                 <div id="edit-${escapeHtml(it.activity_id)}" class="edit-panel">
@@ -874,12 +1085,12 @@
             <div class="item-top" style="padding-right:0;">
               <div>
                 <strong>${escapeHtml(sp.title_zh)}</strong>
-                <div class="item-sub">
+                <div class="item-jp">
                   ${sp.title_jp ? '🇯🇵 ' + escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
-                  <br>預設停留 ${sp.default_dwell_min} 分｜建議交通 ${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
-                  ${sp.address_jp ? '<br>📍 ' + escapeHtml(sp.address_jp) : ''}
+                  ｜停留 ${sp.default_dwell_min} 分｜${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
                 </div>
-                ${sp.note ? `<div class="note-bubble">📝 ${escapeHtml(sp.note)}</div>` : ''}
+                ${sp.address_jp ? `<div class="item-addr">📍 ${escapeHtml(sp.address_jp)}</div>` : ''}
+                ${sp.note ? `<div class="note-soft">📝 ${escapeHtml(sp.note)}</div>` : ''}
               </div>
               <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">＋ 插入本日</button>
             </div>
@@ -901,11 +1112,9 @@
           <div class="section-card">
             <div class="item-time">${escapeHtml(m.trip_date || '通用')} ・ ${escapeHtml(m.category || '')}</div>
             <div class="item-title">${escapeHtml(m.title_zh)}</div>
-            <div class="item-sub">
-              ${m.title_jp ? '🇯🇵 ' + escapeHtml(m.title_jp) + '<br>' : ''}
-              ${m.address_jp ? '📍 ' + escapeHtml(m.address_jp) + '<br>' : ''}
-            </div>
-            ${m.info_text ? `<div class="note-bubble">${escapeHtml(m.info_text)}</div>` : ''}
+            ${m.title_jp ? `<div class="item-jp">🇯🇵 ${escapeHtml(m.title_jp)}</div>` : ''}
+            ${m.address_jp ? `<div class="item-addr">📍 ${escapeHtml(m.address_jp)}</div>` : ''}
+            ${m.info_text ? `<div class="note-soft">${escapeHtml(m.info_text)}</div>` : ''}
           </div>
         `).join('');
       }
@@ -918,7 +1127,7 @@
           return;
         }
         el.innerHTML = list.map((r) => `
-          <div style="padding:8px; border:1.5px dashed var(--dash); border-radius:10px; margin-bottom:6px; font-size:12px;">
+          <div style="padding:8px; border:1px dashed var(--dash); border-radius:10px; margin-bottom:6px; font-size:12px;">
             <strong>${escapeHtml(r.title_zh || r.activity_id)}</strong>（${escapeHtml(r.activity_id)}｜${escapeHtml(r.trip_date || '')}）
             <div>移除時間：${escapeHtml(r.removedAt || '')}</div>
             <div>本機曾修改欄位：<code>${escapeHtml(JSON.stringify(r.overrideFields || {}))}</code></div>
