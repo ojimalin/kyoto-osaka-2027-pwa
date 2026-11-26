@@ -1,1 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#FFFCF6" />
+<title>2027 京阪秋楓旅遊手帳</title>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#FFFCF6;--ink:#3E3A39;--coral:#F2A497;--yellow:#F6D27A;--sky:#A8D3E6;--bamboo:#B9DAA5;--card:#FFFDF9;--soft:#F5EFE4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:0 0 40px;background:var(--paper);color:var(--ink);font:16px/1.55 'Huninn',-apple-system,'Noto Sans TC',sans-serif;overflow-x:hidden}
+.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:3px solid var(--ink);padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-weight:700;white-space:nowrap}
+.nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tab{background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:8px 12px;min-height:40px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--yellow)}
+.wrap{max-width:680px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px;margin-bottom:12px}
+.hero{display:grid;grid-template-columns:1fr 84px;gap:10px;align-items:center}
+.hero h1{margin:6px 0;font-size:20px}
+.badge{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;background:var(--yellow)}
+.badge.coral{background:var(--coral)}.badge.sky{background:var(--sky)}.badge.bamboo{background:var(--bamboo)}.badge.soft{background:var(--soft)}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+.chip{flex:0 0 auto;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:8px 12px;min-height:44px;font:inherit;color:var(--ink);text-align:center;cursor:pointer}
+.chip.active{background:var(--coral)}
+.chip b{display:block;font-size:14px}.chip small{font-size:12px}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.seg{display:inline-flex;border:2.5px solid var(--ink);border-radius:16px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:700;padding:10px 14px;min-height:44px;cursor:pointer}
+.seg .on-sun{background:var(--yellow)}.seg .on-rain{background:var(--sky)}
+.item{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px;margin-bottom:12px}
+.item.done{opacity:.6}.item.skipped{opacity:.45;border-style:dashed}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:6px}
+.time{font-weight:700;background:var(--soft);border:2px solid var(--ink);border-radius:12px;padding:2px 9px}
+.title{margin:4px 0 2px;font-size:18px}
+.jp{font-size:15px;margin-bottom:2px}.addr{font-size:13px;color:#5a5452;margin-bottom:8px}
+.note{background:var(--paper);border:2px dashed var(--ink);border-radius:14px;padding:8px 10px;font-size:14px;margin-bottom:10px}
+.alert{background:var(--coral);border:2.5px solid var(--ink);border-radius:14px;padding:8px 10px;font-size:14px;font-weight:700;margin-bottom:10px}
+.move{background:var(--bamboo);border:2.5px solid var(--ink);border-radius:16px;padding:8px 12px;margin:-4px 0 12px 14px;font-size:14px;font-weight:700}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:8px 12px;min-height:44px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn:active{background:var(--yellow)}
+.todo{display:flex;gap:10px;padding:10px;border:2.5px solid var(--ink);border-radius:16px;background:var(--paper);margin-bottom:8px;cursor:pointer}
+.todo input{width:22px;height:22px;accent-color:var(--ink);flex:0 0 auto}
+.struck{text-decoration:line-through;opacity:.65}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:14px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.hidden{display:none!important}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.bob{animation:bob 3.6s ease-in-out infinite}
+@keyframes pop{from{transform:scale(.97);opacity:.6}to{transform:scale(1);opacity:1}}
+.pop{animation:pop .25s ease-out}
+@media (prefers-reduced-motion:reduce){body:not(.motion-normal) .bob,body:not(.motion-normal) .pop{animation:none!important}}
+body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🍁 京阪 2027</div>
+  <nav class="nav">
+    <button class="tab active" data-view="schedule">每日行程</button>
+    <button class="tab" data-view="pocket">備選口袋</button>
+    <button class="tab" data-view="meta">航班住宿待辦</button>
+    <button class="tab" data-view="settings">設定</button>
+  </nav>
+</header>
+<main class="wrap">
+  <section class="card hero">
+    <div>
+      <span class="badge bamboo" id="countdown"></span>
+      <h1>2027 京阪秋楓手帳</h1>
+      <span class="badge soft" id="syncInfo"></span>
+    </div>
+    <svg class="bob" viewBox="0 0 96 96" width="84" height="84" fill="none" aria-hidden="true">
+      <circle cx="48" cy="48" r="40" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
+      <path d="M22 36H74M26 45H70M35 36V74M61 36V74" stroke="#3E3A39" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M72 22C78 24 80 30 74 34 72 29 70 25 72 22Z" fill="#F2A497" stroke="#3E3A39" stroke-width="2.5"/>
+    </svg>
+  </section>
 
+  <section id="view-schedule" class="pop">
+    <div class="strip" id="dateStrip"></div>
+    <div class="row">
+      <div class="seg"><button id="btnSun">☀️ 晴天路線</button><button id="btnRain">🌧️ 雨天路線</button></div>
+      <span class="badge sky" id="daySummary"></span>
+    </div>
+    <div id="timeline"></div>
+  </section>
+
+  <section id="view-pocket" class="hidden pop">
+    <div class="card">
+      <h2 style="margin:0 0 8px;font-size:18px">🎒 備選口袋景點</h2>
+      <div class="acts" id="ioFilter" style="margin-bottom:10px"></div>
+      <div class="acts" id="areaFilter" style="margin-bottom:12px"></div>
+      <div id="pocketList"></div>
+    </div>
+  </section>
+
+  <section id="view-meta" class="hidden pop">
+    <div class="card"><h2 style="margin:0 0 8px;font-size:18px">✈️ 航班與住宿</h2><div id="travelInfo"></div></div>
+    <div class="card"><h2 style="margin:0 0 8px;font-size:18px">✅ 待辦清單</h2><div id="todoList"></div></div>
+  </section>
+
+  <section id="view-settings" class="hidden pop">
+    <div class="card">
+      <h2 style="margin:0 0 8px;font-size:18px">⚙️ 設定</h2>
+      <div class="acts">
+        <button class="btn" id="motionBtn"></button>
+        <button class="btn" id="resetStateBtn">清除完成／跳過狀態</button>
+        <button class="btn" id="resetAllBtn">重設為範例資料</button>
+      </div>
+      <p class="note" style="margin-top:12px">目前為原型：資料存於本機 localStorage，尚未連接試算表同步與離線快取。</p>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="./tripEngine.js"></script>
+<script>
+(function () {
+  'use strict';
+  const K = { bundle: 'KO2027_BUNDLE_V2', state: 'KO2027_STATE_V2', pref: 'KO2027_PREF_V2' };
+  const E = window.TripEngine;
+
+  /* 範例資料：欄位與格式對齊轉檔輸出（ID 格式、交通枚舉、末站交通留空且為 0、通用日期為空字串） */
+  const SAMPLE = {
+    itinerary: [
+      { slot_id: 'SLOT-0001', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0001', title_zh: '關西機場入境與搭 HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '通關、領行李後搭 HARUKA 前往京都車站' },
+      { slot_id: 'SLOT-0002', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 20, activity_id: 'ACT-0002', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', coords: '', note: '夜楓名所' },
+      { slot_id: 'SLOT-0002', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 20, activity_id: 'ACT-0003', title_zh: '京都車站與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', coords: '', note: '雨天備案' },
+      { slot_id: 'SLOT-0003', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 75, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0004', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', coords: '', note: '需事先預約' },
+      { slot_id: 'SLOT-0003', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'rain', time_type: 'flexible', start_time: '10:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0005', title_zh: '天龍寺大方丈迴廊', title_jp: '天龍寺', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町68', coords: '', note: '雨天替代，室內迴廊賞庭' },
+      { slot_id: 'SLOT-0004', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '12:30', deadline_time: '', deadline_type: '', dwell_min: 45, travel_min: 0, buffer_min: 0, transport_mode: '', area: '嵐山', sort_order: 20, activity_id: 'ACT-0006', title_zh: '竹林小徑散步', title_jp: '竹林の小径', address_jp: '京都市右京区嵯峨小倉山田渕山町', coords: '', note: '' },
+      { slot_id: 'SLOT-0005', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'fixed', start_time: '08:45', deadline_time: '09:00', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 0, buffer_min: 0, transport_mode: '', area: '洛北', sort_order: 10, activity_id: 'ACT-0007', title_zh: '八瀬瑠璃光院預約賞楓', title_jp: '瑠璃光院', address_jp: '京都市左京区上高野東山55', coords: '', note: '秋季特別拜觀需預約' }
+    ],
+    pocket_spots: [
+      { pocket_id: 'PK-0001', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 90, default_travel_min: 25, transport_mode: '巴士', title_zh: '大原三千院', title_jp: '三千院', address_jp: '京都市左京区大原来迎院町540', coords: '', note: '苔庭與秋楓' },
+      { pocket_id: 'PK-0002', area: '洛北', indoor_outdoor: 'indoor', default_dwell_min: 75, default_travel_min: 25, transport_mode: '巴士', title_zh: '實相院床紅葉', title_jp: '実相院', address_jp: '京都市左京区岩倉上蔵町121', coords: '', note: '地板倒映楓紅' },
+      { pocket_id: 'PK-0003', area: '大阪難波', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 10, transport_mode: '步行', title_zh: '難波 Parks', title_jp: 'なんばパークス', address_jp: '大阪市浪速区難波中2-10-70', coords: '', note: '雨天購物備案' }
+    ],
+    trip_meta: [
+      { meta_id: 'META-0001', trip_date: '2027-11-25', category: 'flight', title_zh: '去程 桃園 → 關西', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', info_text: '預約狀態：已訂；抵達後搭 HARUKA' },
+      { meta_id: 'META-0002', trip_date: '2027-11-28', category: 'hotel', title_zh: '天橋立溫泉旅館', title_jp: '天橋立温泉', address_jp: '京都府宮津市文珠', info_text: '預約狀態：已訂；飲食備註請提前告知' },
+      { meta_id: 'META-0003', trip_date: '', category: 'todo', title_zh: '預約祐齋亭與瑠璃光院', title_jp: '', address_jp: '', info_text: '依官方開放時間提前預約' }
+    ]
+  };
+
+  /* 安全的儲存存取 */
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (_) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (_) {} }
+  };
+  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const $ = (id) => document.getElementById(id);
+
+  let bundle = E.normalizeBundle(store.get(K.bundle) || SAMPLE);
+  if (!bundle.itinerary.length) bundle = E.normalizeBundle(SAMPLE);
+  let rt = Object.assign({ status: {}, actualEnd: {}, weather: {}, todo: {} }, store.get(K.state) || {});
+  const dates = Array.from(new Set(bundle.itinerary.map((i) => i.tripDate).filter(Boolean))).sort();
+  let activeDate = dates[0] || '';
+  let pocketIo = 'all', pocketArea = 'ALL', motion = (store.get(K.pref) || {}).motion || 'system';
+  const saveRt = () => store.set(K.state, rt);
+
+  function toast(msg) {
+    const el = $('toast'); el.textContent = msg; el.classList.add('show');
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+  async function copy(text, label) {
+    if (!text) return toast('沒有可複製的內容');
+    try { await navigator.clipboard.writeText(text); toast('已複製' + label); }
+    catch (_) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (__) {} t.remove(); toast('已複製' + label); }
+  }
+  const mapUrl = (a, b, c) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a || b || c || '');
+  const copyBtn = (text, label) => text ? '<button class="btn" data-copy="' + encodeURIComponent(text) + '" data-label="' + label + '">複製' + label + '</button>' : '';
+  const mapBtn = (jp, addr, zh) => '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + esc(mapUrl(addr, jp, zh)) + '">🗺️ 地圖</a>';
+  const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+
+  function renderCountdown() {
+    const start = bundle.meta.tripStartDate || dates[0];
+    const el = $('countdown');
+    if (!start) { el.textContent = '尚無行程日期'; return; }
+    const diff = Math.ceil((new Date(start + 'T00:00:00+09:00').getTime() - Date.now()) / 86400000);
+    el.textContent = diff > 0 ? '距離出發還有 ' + diff + ' 天' : diff === 0 ? '今天出發！' : '旅程進行中／已結束';
+    $('syncInfo').textContent = '資料：' + (store.get(K.bundle) ? '本機快取' : '範例資料');
+  }
+
+  function renderDates() {
+    $('dateStrip').innerHTML = dates.map((d) => {
+      const s = bundle.itinerary.find((i) => i.tripDate === d);
+      return '<button class="chip ' + (d === activeDate ? 'active' : '') + '" data-date="' + esc(d) + '"><b>' + esc(s ? s.dayLabel : '') + '</b><small>' + esc(d.slice(5)) + '</small></button>';
+    }).join('');
+  }
+
+  function renderSchedule() {
+    const mode = rt.weather[activeDate] || 'sun';
+    $('btnSun').className = mode === 'sun' ? 'on-sun' : '';
+    $('btnRain').className = mode === 'rain' ? 'on-rain' : '';
+    const route = E.buildDayRoute(bundle.itinerary, activeDate, mode);
+    const tl = E.computeTimeline(route, { status: rt.status, actualEnd: rt.actualEnd });
+    $('daySummary').textContent = (mode === 'sun' ? '☀️ 晴天' : '🌧️ 雨天') + '・' + tl.length + ' 站';
+    if (!tl.length) { $('timeline').innerHTML = '<div class="card">這一天此天氣模式下尚無行程。</div>'; return; }
+
+    $('timeline').innerHTML = tl.map((r) => {
+      const st = r.status;
+      const timeStr = st === 'skipped' ? '已跳過' : (r.startFormatted.text || '未定時間') + (r.departFormatted.text ? ' → ' + r.departFormatted.text : '') + (r.departFormatted.isNextDay ? '（跨日）' : '');
+      const delay = r.delayMin > 0 && st !== 'skipped' ? '<span class="badge coral">較預定晚 ' + r.delayMin + ' 分</span>' : '';
+      const alt = r.isWeatherAlternative ? '<span class="badge ' + (r.weatherMode === 'rain' ? 'sky' : '') + '">' + (r.weatherMode === 'rain' ? '雨天替代' : '晴天替代') + '</span>' : '';
+      const fixed = r.timeType === 'fixed' ? '<span class="badge coral">固定時段</span>' : '';
+      let al = '';
+      if (r.deadlineAlert) {
+        const a = r.deadlineAlert;
+        al = a.isLate
+          ? '<div class="alert">⚠️ 預計 ' + esc(a.actualFormatted) + '，晚於截止 ' + esc(a.deadlineTime) + '（+' + a.diffMin + ' 分）</div>'
+          : '<div class="note">⏰ 截止 ' + esc(a.deadlineTime) + '，預計 ' + esc(a.actualFormatted) + '，時間充裕</div>';
+      }
+      const next = r.nextArrivalFormatted.text ? '（預計 ' + r.nextArrivalFormatted.text + ' 抵達下一站）' : '';
+      const move = r.hasMoveToNext && st !== 'skipped'
+        ? '<div class="move">交通：' + esc(r.transportMode || '移動') + '（' + r.travelUsed + ' 分 + 緩衝 ' + r.bufferUsed + ' 分）' + next + '</div>' : '';
+      const ctl = st === 'pending'
+        ? '<button class="btn" data-act="done" data-id="' + esc(r.activityId) + '">✅ 完成</button><button class="btn" data-act="skip" data-id="' + esc(r.activityId) + '">⏭️ 跳過</button>'
+        : '<button class="btn" data-act="undo" data-id="' + esc(r.activityId) + '">↩️ 還原</button>';
+      return '<article class="item ' + (st !== 'pending' ? st : '') + '">' +
+        '<div class="head"><span class="time">🕒 ' + esc(timeStr) + '</span><span>' + '<span class="badge soft">' + esc(r.area || '未標示') + '</span> ' + fixed + ' ' + alt + ' ' + delay + '</span></div>' +
+        '<h3 class="title">' + r.stepIndex + '. ' + esc(r.titleZh || '未命名') + '</h3>' +
+        (r.titleJp ? '<div class="jp">🇯🇵 ' + esc(r.titleJp) + '</div>' : '') +
+        (r.addressJp ? '<div class="addr">📍 ' + esc(r.addressJp) + '</div>' : '') +
+        (r.note ? '<div class="note">📝 ' + esc(r.note) + '</div>' : '') + al +
+        '<div class="acts">' + ctl + copyBtn(r.titleJp, '日文') + copyBtn(r.addressJp, '地址') + mapBtn(r.titleJp, r.addressJp, r.titleZh) + '</div></article>' + move;
+    }).join('');
+  }
+
+  function renderPocket() {
+    const ioMap = { all: '全部', indoor: '🏠 室內', outdoor: '🍂 戶外', mixed: '🌤️ 混合' };
+    $('ioFilter').innerHTML = Object.keys(ioMap).map((k) => '<button class="tab ' + (pocketIo === k ? 'active' : '') + '" data-io="' + k + '">' + ioMap[k] + '</button>').join('');
+    const areas = ['ALL'].concat(Array.from(new Set(bundle.pocketSpots.map((x) => x.area).filter(Boolean))));
+    $('areaFilter').innerHTML = areas.map((a) => '<button class="tab ' + (pocketArea === a ? 'active' : '') + '" data-area="' + esc(a) + '">' + (a === 'ALL' ? '全部區域' : esc(a)) + '</button>').join('');
+    const list = E.filterPocket(bundle.pocketSpots, { area: pocketArea, indoorOutdoor: pocketIo });
+    $('pocketList').innerHTML = list.length ? list.map((x) =>
+      '<div class="item"><div class="head"><span class="badge soft">' + esc(x.area) + '</span><span class="badge sky">' + esc(ioMap[x.indoorOutdoor] || x.indoorOutdoor) + '</span><span class="badge bamboo">停留 ' + x.defaultDwellMin + ' 分・' + esc(x.transportMode || '移動') + ' ' + x.defaultTravelMin + ' 分</span></div>' +
+      '<h3 class="title">' + esc(x.titleZh) + '</h3>' +
+      (x.titleJp ? '<div class="jp">🇯🇵 ' + esc(x.titleJp) + '</div>' : '') +
+      (x.addressJp ? '<div class="addr">📍 ' + esc(x.addressJp) + '</div>' : '') +
+      (x.note ? '<div class="note">📝 ' + esc(x.note) + '</div>' : '') +
+      '<div class="acts">' + copyBtn(x.titleJp, '日文') + copyBtn(x.addressJp, '地址') + mapBtn(x.titleJp, x.addressJp, x.titleZh) + '</div></div>'
+    ).join('') : '<p>目前篩選條件下沒有口袋景點。</p>';
+  }
+
+  function renderMeta() {
+    const trips = bundle.tripMeta.filter((m) => m.category !== 'todo').sort((a, b) => a.tripDate.localeCompare(b.tripDate));
+    $('travelInfo').innerHTML = trips.length ? trips.map((m) =>
+      '<div class="note" style="border-style:solid"><div class="head"><strong>' + esc(m.titleZh) + '</strong><span class="badge ' + (m.category === 'flight' ? 'sky' : '') + '">' + (m.category === 'flight' ? '航班' : '住宿') + '・' + esc(m.tripDate) + '</span></div>' +
+      (m.titleJp ? '<div class="jp">🇯🇵 ' + esc(m.titleJp) + '</div>' : '') +
+      (m.addressJp ? '<div class="addr">📍 ' + esc(m.addressJp) + '</div>' : '') +
+      (m.infoText ? '<div style="font-size:14px;margin-bottom:8px">' + esc(m.infoText) + '</div>' : '') +
+      '<div class="acts">' + copyBtn(m.titleJp, '日文') + copyBtn(m.addressJp, '地址') + (m.addressJp || m.titleJp ? mapBtn(m.titleJp, m.addressJp, m.titleZh) : '') + '</div></div>'
+    ).join('') : '<p>尚無航班或住宿資料。</p>';
+    const todos = bundle.tripMeta.filter((m) => m.category === 'todo');
+    $('todoList').innerHTML = todos.length ? todos.map((t) => {
+      const c = !!rt.todo[t.metaId];
+      return '<label class="todo"><input type="checkbox" data-meta="' + esc(t.metaId) + '" ' + (c ? 'checked' : '') + '><span class="' + (c ? 'struck' : '') + '"><strong>' + esc(t.titleZh) + '</strong>' + (t.infoText ? '<br><small>' + esc(t.infoText) + '</small>' : '') + '</span></label>';
+    }).join('') : '<p>沒有待辦事項。</p>';
+  }
+
+  function applyMotion() {
+    document.body.classList.toggle('reduced-motion', motion === 'reduce');
+    document.body.classList.toggle('motion-normal', motion === 'normal');
+    $('motionBtn').textContent = '動畫：' + ({ system: '跟隨系統', reduce: '已減少', normal: '完整' }[motion]);
+  }
+
+  /* 事件 */
+  document.querySelectorAll('.tab[data-view]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tab[data-view]').forEach((x) => x.classList.toggle('active', x === b));
+    ['schedule', 'pocket', 'meta', 'settings'].forEach((v) => $('view-' + v).classList.toggle('hidden', v !== b.dataset.view));
+  }));
+  $('dateStrip').addEventListener('click', (e) => { const b = e.target.closest('[data-date]'); if (!b) return; activeDate = b.dataset.date; renderDates(); renderSchedule(); });
+  $('btnSun').addEventListener('click', () => { rt.weather[activeDate] = 'sun'; saveRt(); renderSchedule(); });
+  $('btnRain').addEventListener('click', () => { rt.weather[activeDate] = 'rain'; saveRt(); renderSchedule(); });
+  $('timeline').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const id = b.dataset.id, act = b.dataset.act;
+    if (act === 'done') { rt.status[id] = 'done'; rt.actualEnd[id] = nowMin(); }
+    else if (act === 'skip') { rt.status[id] = 'skipped'; delete rt.actualEnd[id]; }
+    else { delete rt.status[id]; delete rt.actualEnd[id]; }
+    saveRt(); renderSchedule();
+  });
+  $('ioFilter').addEventListener('click', (e) => { const b = e.target.closest('[data-io]'); if (!b) return; pocketIo = b.dataset.io; renderPocket(); });
+  $('areaFilter').addEventListener('click', (e) => { const b = e.target.closest('[data-area]'); if (!b) return; pocketArea = b.dataset.area; renderPocket(); });
+  $('todoList').addEventListener('change', (e) => { const c = e.target.closest('[data-meta]'); if (!c) return; rt.todo[c.dataset.meta] = c.checked; saveRt(); renderMeta(); });
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-copy]'); if (b) copy(decodeURIComponent(b.dataset.copy), b.dataset.label || '內容'); });
+  $('motionBtn').addEventListener('click', () => { motion = motion === 'system' ? 'reduce' : motion === 'reduce' ? 'normal' : 'system'; store.set(K.pref, { motion }); applyMotion(); });
+  $('resetStateBtn').addEventListener('click', () => { rt.status = {}; rt.actualEnd = {}; saveRt(); renderSchedule(); toast('已清除完成／跳過狀態'); });
+  $('resetAllBtn').addEventListener('click', () => { if (confirm('確定重設為範例資料並清除所有本機狀態？')) { store.del(K.bundle); store.del(K.state); location.reload(); } });
+
+  applyMotion(); renderCountdown(); renderDates(); renderSchedule(); renderPocket(); renderMeta();
+})();
+</script>
+</body>
+</html>
