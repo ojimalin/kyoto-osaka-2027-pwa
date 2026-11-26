@@ -178,3 +178,4 @@ const TripSyncService = (() => {
     mergeActivityWithOverride
   };
 })();
+if (typeof TripSyncService !== 'undefined') window.TripSyncService = TripSyncService;
