@@ -581,24 +581,18 @@
           <div id="mascotStage" class="mascot-stage" title="點我換台詞並跳到下一站">
             <div class="mascot-bird-wrap">
               <svg id="birdSvg" class="mascot-bird" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
-                <!-- 蓬鬆長尾 -->
                 <path d="M32 29 L43 22 L41 28 L33 32 Z" fill="#4a372c" />
                 <path d="M33 30 L43 25 L42 28 L34 32 Z" fill="#ffffff" />
-                <!-- 圓身體 -->
                 <ellipse cx="22" cy="27" rx="12.5" ry="11.5" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-                <!-- 翅膀 -->
                 <path d="M25 25 Q32.5 26 30.5 32.5 Q25 32.5 24 28 Z" fill="#8b6f5e" />
-                <!-- 眼睛與橘嘴 -->
                 <circle cx="16.8" cy="24" r="1.9" fill="#2b1e16" />
                 <circle cx="16.1" cy="23.2" r="0.65" fill="#ffffff" />
                 <circle cx="24.2" cy="24" r="1.9" fill="#2b1e16" />
                 <circle cx="23.5" cy="23.2" r="0.65" fill="#ffffff" />
                 <polygon points="20.5,25.2 18.8,27.8 22.2,27.8" fill="#e67e3c" />
-                <!-- 粉紅腮紅 -->
                 <ellipse cx="14.2" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
                 <ellipse cx="26.8" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
 
-                <!-- 三個獨立圖層：角色造型 / 季節裝飾 / 雨天配件 -->
                 <g id="birdRoleBadge"></g>
                 <g id="birdSeasonBadge"></g>
                 <g id="birdWeatherBadge"></g>
@@ -699,11 +693,10 @@
         'cafe', 'shop', 'onsen', 'hotel'
       ];
 
-      // 1. 季節判斷：當日日期優先，出發日期為備援（純函數，不修改資料）
       function detectSeasonLeaf(dateStr, fallbackStart) {
         const target = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr))
           ? dateStr
-          : ((fallbackStart && /^\d{4}-\d{2}-\d{2}$/.test(fallbackStart)) ? fallbackStart : getLocalTodayIso());
+          : ((fallbackStart && /^\d{4}-\d{2}-\d{2}$/.test(fallbackStart)) ? fallbackStart : '2027-11-25');
         const month = Number(target.split('-')[1]) || 11;
         if (month >= 3 && month <= 5) return 'spring';
         if (month >= 6 && month <= 8) return 'summer';
@@ -711,7 +704,6 @@
         return 'winter';
       }
 
-      // 2. 活動分類：有效 #標籤 優先 -> 既有 icon/category 其次 -> 完整詞組關鍵字 -> default（不含 transport_mode）
       function classifyActivityType(item) {
         if (!item || typeof item !== 'object') return 'default';
 
@@ -747,7 +739,6 @@
         return 'default';
       }
 
-      // 雨天戶外曝雨判斷：只在 rain 且明確戶外景點時為 'outdoor'，其餘一律 'sheltered'（不看 transport_mode）
       function detectRainExposure(item, type, weatherMode) {
         if (weatherMode !== 'rain' || !item) return 'sheltered';
         if (type === 'nature') return 'outdoor';
@@ -778,7 +769,6 @@
         rain_outdoor: '<path d="M31 11 Q36.5 5.5 42 11 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.2" /><line x1="36.5" y1="11" x2="36.5" y2="15" stroke="#7c5318" stroke-width="1.4" />'
       };
 
-      // 3. 組合卡片圖示（純函數，不寫入資料）
       function renderSpotChibi(item, season) {
         const type = classifyActivityType(item);
         const SVG_MAP = {
@@ -814,22 +804,6 @@
       let lastMascotContextKey = '';
       let quoteIndex = 0;
 
-      function getLocalTodayIso() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      }
-
-      function pickDefaultDate(dates) {
-        if (!Array.isArray(dates) || dates.length === 0) return '';
-        const today = getLocalTodayIso();
-        if (dates.indexOf(today) !== -1) return today;
-        if (today < dates[0]) return dates[0];
-        return dates[dates.length - 1];
-      }
-
       function showBanner(type, text) {
         const el = document.getElementById('globalBanner');
         el.className = 'banner show ' + (type || 'info');
@@ -863,7 +837,6 @@
         });
       }
 
-      // 4. 三軸智慧判斷（純前端畫面狀態更新，不修改任何資料或進度）
       function syncMascotWithSchedule(sched, cycleQuote) {
         const bubbleEl = document.getElementById('mascotBubble');
         const roleEl = document.getElementById('birdRoleBadge');
@@ -902,7 +875,6 @@
         let rainExposure = 'sheltered';
         let lines = ['啾！點我跳到下一站～'];
 
-        // 1. stopped
         if (sched.isStopped) {
           stateBucket = 'stopped';
           activeType = 'none';
@@ -910,27 +882,21 @@
           roleEl.innerHTML = ROLE_BADGE_SVG.sleep;
           weatherEl.innerHTML = '';
           lines = ['啾～今天辛苦了，好好休息💤'];
-        }
-        // 2. all_done（嚴格全部完成）
-        else if (total > 0 && done === total) {
+        } else if (total > 0 && done === total) {
           stateBucket = 'all_done';
           activeType = 'none';
           rainExposure = 'sheltered';
           roleEl.innerHTML = '';
           weatherEl.innerHTML = '';
           lines = ['本日全制霸！去慶祝吧🎉'];
-        }
-        // 3. no_pending（排除 total === 0）
-        else if (total > 0 && pending === 0 && done < total) {
+        } else if (total > 0 && pending === 0 && done < total) {
           stateBucket = 'no_pending';
           activeType = 'none';
           rainExposure = 'sheltered';
           roleEl.innerHTML = '';
           weatherEl.innerHTML = '';
           lines = ['今日行程告一段落囉～'];
-        }
-        // 4. late（前三種狀態皆不成立時才進入）
-        else if (lateCount > 0) {
+        } else if (lateCount > 0) {
           stateBucket = 'late';
           activeType = 'none';
           rainExposure = 'sheltered';
@@ -939,9 +905,7 @@
           lines = weatherMode === 'rain'
             ? ['雨天節奏較緊，留意時間與路滑喔']
             : ['啾！這站時間較緊，留意節奏'];
-        }
-        // 5. active（依下一個待辦活動類型與晴雨判斷）
-        else {
+        } else {
           stateBucket = 'active';
           activeType = nextType;
           rainExposure = detectRainExposure(nextPending, nextType, weatherMode);
@@ -1087,9 +1051,9 @@
 
         const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
         if (!currentDate) {
-          currentDate = pickDefaultDate(dates);
+          currentDate = dates[0] || '';
         } else if (dates.length > 0 && dates.indexOf(currentDate) === -1) {
-          currentDate = pickDefaultDate(dates);
+          currentDate = dates[0];
         }
 
         dateSel.innerHTML = dates.length > 0
