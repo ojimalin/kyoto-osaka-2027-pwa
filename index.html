@@ -3,414 +3,543 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#1e3a5f" />
+  <meta name="theme-color" content="#b84a27" />
   <title>家庭旅遊離線電子手帳</title>
   <link rel="manifest" href="./manifest.json" />
   <style>
     :root {
-      --bg: #f4f6f9;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --primary: #1e3a5f;
-      --primary-weak: #e8eef5;
-      --ok: #15803d;
-      --ok-bg: #dcfce7;
-      --warn: #b45309;
-      --warn-bg: #fef3c7;
-      --danger: #b91c1c;
-      --danger-bg: #fee2e2;
-      --border: #e5e7eb;
-      --radius: 12px;
+      --bg-paper: #fbf5ea;
+      --bg-card: #fffdf9;
+      --bg-soft: #f7ebd9;
+      --ink-main: #3e2f26;
+      --ink-muted: #7c685a;
+      --maple-deep: #b84a27;
+      --maple-warm: #d96b34;
+      --milk-tea: #f2e2ca;
+      --line-dash: #dec5a4;
+      --border-soft: #e6d2b5;
+      --stamp-red: #c8372d;
+      --ok-bg: #e7f4ea;
+      --ok-text: #246b3c;
+      --warn-bg: #fdeaea;
+      --warn-text: #b3261e;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       padding: 0 0 84px 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.45;
+      background: var(--bg-paper);
+      color: var(--ink-main);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
     }
 
-    header.topbar {
+    /* 頂部標題列 */
+    .app-header {
+      background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
+      color: #fffaf2;
+      padding: 14px 16px 12px;
+      border-bottom: 2px dashed rgba(255, 250, 242, 0.45);
       position: sticky;
       top: 0;
       z-index: 20;
-      background: var(--primary);
-      color: #fff;
-      padding: 12px 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    .topbar-row {
+    .header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .topbar-title {
-      font-size: 17px;
-      font-weight: 700;
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .app-title {
       margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
     }
 
-    .badge-net {
-      font-size: 12px;
-      padding: 3px 8px;
+    .mascot-btn {
+      background: #fffaf2;
+      border: 2px solid #f5d6b3;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
+      padding: 2px 10px 2px 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(62, 47, 38, 0.18);
+      transition: transform 0.16s ease;
+    }
+
+    .mascot-btn:active {
+      transform: scale(0.92) rotate(-4deg);
+    }
+
+    .mascot-quote {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--maple-deep);
       white-space: nowrap;
     }
 
-    .sub-info {
+    .net-badge {
+      padding: 4px 12px;
+      border-radius: 999px;
       font-size: 12px;
-      opacity: 0.9;
-      margin-top: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      font-weight: 700;
+      background: #2f7d4a;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
     }
 
-    main {
-      max-width: 780px;
+    .net-badge.offline {
+      background: #6f5d52;
+    }
+
+    .header-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(255, 250, 242, 0.92);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* 主容器 */
+    .container {
+      max-width: 860px;
       margin: 0 auto;
-      padding: 12px;
+      padding: 14px 14px 24px;
     }
 
     .banner {
-      padding: 10px 12px;
-      border-radius: var(--radius);
+      padding: 10px 14px;
+      border-radius: 14px;
       margin-bottom: 12px;
       font-size: 13px;
+      font-weight: 600;
+      border: 1.5px dashed var(--line-dash);
       display: none;
     }
-    .banner.show { display: block; }
-    .banner.info { background: var(--primary-weak); color: var(--primary); border: 1px solid #bfd2e8; }
-    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #86efac; }
-    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
-    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1px solid #fca5a5; }
 
-    .controls-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .banner.show {
+      display: block;
     }
 
-    .controls-line {
+    .banner.ok {
+      background: var(--ok-bg);
+      color: var(--ok-text);
+      border-color: #95c9a4;
+    }
+
+    .banner.err {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border-color: #e39a95;
+    }
+
+    .banner.info {
+      background: var(--milk-tea);
+      color: var(--ink-main);
+    }
+
+    /* 控制面板 */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(122, 74, 42, 0.05);
+    }
+
+    .controls-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 8px;
+      margin-bottom: 10px;
     }
 
     select, input[type="text"], input[type="number"], textarea {
       font-family: inherit;
       font-size: 14px;
+      color: var(--ink-main);
+      background: #fffaf2;
+      border: 1.5px solid var(--line-dash);
+      border-radius: 12px;
       padding: 7px 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      background: #fff;
-      color: var(--text);
     }
 
     button {
       font-family: inherit;
       font-size: 13px;
-      font-weight: 600;
-      padding: 7px 12px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      color: var(--text);
+      font-weight: 700;
       cursor: pointer;
+      border-radius: 999px;
+      border: 1.5px solid var(--line-dash);
+      background: var(--milk-tea);
+      color: var(--ink-main);
+      padding: 7px 14px;
+      transition: transform 0.12s ease, background 0.15s ease;
     }
-    button:active { transform: scale(0.99); }
-    button.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-    button.btn-warn { background: var(--warn); color: #fff; border-color: var(--warn); }
-    button.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-    button.btn-sm { padding: 5px 9px; font-size: 12px; }
 
-    .stats-bar {
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button.primary {
+      background: var(--maple-deep);
+      color: #fffaf2;
+      border-color: var(--maple-deep);
+    }
+
+    button.warm {
+      background: var(--maple-warm);
+      color: #fffaf2;
+      border-color: var(--maple-warm);
+    }
+
+    button.danger {
+      background: #fff3f2;
+      color: var(--stamp-red);
+      border-color: #e2a49f;
+    }
+
+    button.active-pill {
+      background: #2f7d4a;
+      color: #ffffff;
+      border-color: #2f7d4a;
+    }
+
+    .stats-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      border-top: 1.5px dashed var(--line-dash);
+      padding-top: 10px;
+    }
+
+    .stat-chip {
       font-size: 12px;
-      color: var(--muted);
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px dashed var(--line-dash);
+      color: var(--ink-main);
     }
-    .pill {
-      background: #f1f5f9;
-      padding: 3px 8px;
-      border-radius: 6px;
-      color: var(--text);
-    }
-    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
-    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; }
 
-    .timeline-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-left: 5px solid var(--primary);
-      border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 10px;
+    .stat-chip.warn {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border-color: #e39a95;
     }
-    .timeline-item.status-done { border-left-color: var(--ok); opacity: 0.85; }
-    .timeline-item.status-skipped { border-left-color: #9ca3af; opacity: 0.72; }
-    .timeline-item.is-late { border-left-color: var(--danger); }
 
-    .item-top {
+    .stat-chip.note {
+      background: #fff3dc;
+      color: #8a4b08;
+      border-color: #ecc788;
+    }
+
+    /* 行程卡片 */
+    .itinerary-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(122, 74, 42, 0.06);
+    }
+
+    .itinerary-card.is-done::after {
+      content: "済";
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 2.5px solid rgba(200, 55, 45, 0.75);
+      color: rgba(200, 55, 45, 0.82);
+      font-weight: 900;
+      font-size: 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-14deg);
+      background: rgba(200, 55, 45, 0.06);
+      pointer-events: none;
     }
-    .item-time {
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-right: 52px;
       font-size: 13px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--maple-deep);
     }
-    .item-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 3px 0 2px 0;
-    }
-    .item-sub {
+
+    .status-badge {
+      padding: 2px 10px;
+      border-radius: 999px;
       font-size: 12px;
-      color: var(--muted);
+      background: var(--bg-soft);
+      color: var(--ink-muted);
+      border: 1px solid var(--line-dash);
     }
-    .tag {
+
+    .status-badge.done {
+      background: var(--ok-bg);
+      color: var(--ok-text);
+      border-color: #95c9a4;
+    }
+
+    .status-badge.skipped {
+      background: #f2ece6;
+      color: #7c685a;
+    }
+
+    .card-title {
+      margin: 6px 0 4px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--ink-main);
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+
+    .card-divider {
+      border: none;
+      border-top: 1.5px dashed var(--line-dash);
+      margin: 10px 0;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .override-tag {
       display: inline-block;
+      margin-top: 6px;
       font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 5px;
-      margin-right: 4px;
-      margin-top: 4px;
-      background: #f1f5f9;
-      color: #334155;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #e8f1fc;
+      color: #1d4ed8;
     }
-    .tag.override { background: #dbeafe; color: #1d4ed8; }
-    .tag.inserted { background: #ede9fe; color: #6d28d9; }
-    .tag.late { background: var(--danger-bg); color: var(--danger); }
 
     .alert-box {
       margin-top: 8px;
-      padding: 7px 10px;
-      border-radius: 8px;
+      padding: 7px 11px;
+      border-radius: 12px;
       font-size: 12px;
-      background: var(--danger-bg);
-      color: var(--danger);
-    }
-    .warn-box {
-      margin-top: 8px;
-      padding: 7px 10px;
-      border-radius: 8px;
-      font-size: 12px;
+      font-weight: 700;
       background: var(--warn-bg);
-      color: var(--warn);
+      color: var(--warn-text);
     }
 
-    .item-actions {
+    /* 微調面板 */
+    .editor-box {
       margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--border);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--bg-soft);
+      border: 1.5px dashed var(--line-dash);
     }
 
-    .edit-panel {
-      margin-top: 10px;
-      padding: 10px;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      display: none;
-    }
-    .edit-panel.open { display: block; }
-    .edit-grid {
+    .editor-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 8px;
       margin-bottom: 8px;
     }
-    .field-box label {
+
+    .editor-field label {
       display: block;
-      font-size: 11px;
-      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
       margin-bottom: 3px;
+      color: var(--ink-muted);
     }
-    .field-row-inline {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-    .field-row-inline input, .field-row-inline select {
+
+    .editor-field input {
       width: 100%;
     }
 
-    .section-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .section-card h3 {
-      margin: 0 0 8px 0;
-      font-size: 15px;
-    }
-    .muted-note {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 4px 0 10px 0;
+    /* 分頁區塊與底部導覽 */
+    .tab-pane {
+      display: none;
     }
 
-    .tab-page { display: none; }
-    .tab-page.active { display: block; }
+    .tab-pane.active {
+      display: block;
+    }
 
-    nav.bottom-nav {
+    .bottom-nav {
       position: fixed;
-      bottom: 0;
       left: 0;
       right: 0;
-      z-index: 30;
-      background: #fff;
-      border-top: 1px solid var(--border);
+      bottom: 0;
+      background: #fffdf9;
+      border-top: 1.5px solid var(--border-soft);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
+      z-index: 30;
+      box-shadow: 0 -4px 14px rgba(62, 47, 38, 0.08);
     }
-    nav.bottom-nav button {
+
+    .nav-btn {
       border: none;
       border-radius: 0;
+      background: transparent;
+      color: var(--ink-muted);
       padding: 10px 4px;
       font-size: 12px;
-      background: transparent;
-      color: var(--muted);
-    }
-    nav.bottom-nav button.active {
-      color: var(--primary);
-      background: var(--primary-weak);
       font-weight: 700;
     }
 
-    .empty-state {
+    .nav-btn.active {
+      color: var(--maple-deep);
+      background: var(--milk-tea);
+    }
+
+    .footer-note {
       text-align: center;
-      padding: 32px 16px;
-      background: var(--card);
-      border: 1px dashed #cbd5e1;
-      border-radius: var(--radius);
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-top: 18px;
+      padding: 10px;
+      border-top: 1.5px dashed var(--line-dash);
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-row">
-      <h1 class="topbar-title">家庭旅遊離線電子手帳</h1>
-      <span id="netBadge" class="badge-net">檢查中</span>
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-group">
+        <h1 class="app-title">家庭旅遊離線電子手帳</h1>
+        <button type="button" id="mascotBtn" class="mascot-btn" title="點我聽雪之妖精說悄悄話">
+          <svg width="26" height="26" viewBox="0 0 36 36" aria-hidden="true">
+            <ellipse cx="18" cy="20" rx="11" ry="10" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
+            <path d="M9 17 Q18 11 27 17 L25 20 Q18 16 11 20 Z" fill="#5a4336" />
+            <circle cx="14.5" cy="18.5" r="1.7" fill="#2b1e16" />
+            <circle cx="21.5" cy="18.5" r="1.7" fill="#2b1e16" />
+            <polygon points="18,19.5 16.5,22 19.5,22" fill="#e07a3f" />
+            <path d="M16 7 L18 10.5 L20 7 L18 8.8 Z" fill="#c8372d" />
+          </svg>
+          <span id="mascotQuote" class="mascot-quote">啾！今天也要開心賞楓～</span>
+        </button>
+      </div>
+      <span id="netBadge" class="net-badge">線上</span>
     </div>
-    <div id="syncMetaBar" class="sub-info">
-      <span>尚未同步雲端底稿</span>
+    <div class="header-meta">
+      <span id="metaVersion">底稿版本：尚未同步</span>
+      <span id="metaSyncedAt">最後同步：--</span>
+      <span id="metaRange">行程：--</span>
     </div>
   </header>
 
-  <main>
-    <div id="globalBanner" class="banner"></div>
+  <main class="container">
+    <div id="statusBanner" class="banner"></div>
 
     <!-- 分頁 1：每日行程 -->
-    <section id="tab-schedule" class="tab-page active">
-      <div class="controls-card">
-        <div class="controls-line">
-          <label for="dateSelect"><strong>日期：</strong></label>
+    <section id="tab-itinerary" class="tab-pane active">
+      <div class="panel-card">
+        <div class="controls-row">
+          <label for="dateSelect" style="font-weight:700;">日期：</label>
           <select id="dateSelect"></select>
-
-          <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
-          <button id="btnToggleStop" class="btn-sm btn-warn">今天就到這裡</button>
+          <button type="button" id="weatherBtn">晴雨：☀️ 晴天</button>
+          <button type="button" id="stopDayBtn" class="warm">今天就到這裡</button>
         </div>
-        <div id="dayStats" class="stats-bar"></div>
+        <div id="statsRow" class="stats-row"></div>
       </div>
-
       <div id="scheduleList"></div>
     </section>
 
     <!-- 分頁 2：備選口袋 -->
-    <section id="tab-pocket" class="tab-page">
-      <div class="section-card">
-        <h3>插入備選景點至當日行程</h3>
-        <p class="muted-note">插入後將保存完整景點快照、停留／交通設定與錨點位置；若錨點活動日後被雲端刪除，將自動改接至當日末端且不刪除。</p>
-        <div class="controls-line">
-          <label for="insertAnchorSelect"><strong>插入位置：</strong></label>
-          <select id="insertAnchorSelect"></select>
-        </div>
+    <section id="tab-pocket" class="tab-pane">
+      <div class="panel-card">
+        <h3 style="margin:0 0 8px;">備選口袋景點</h3>
+        <div id="pocketList"></div>
       </div>
-      <div id="pocketList"></div>
     </section>
 
-    <!-- 分頁 3：住宿與航班 -->
-    <section id="tab-meta" class="tab-page">
-      <div id="metaList"></div>
+    <!-- 分頁 3：住宿航班 -->
+    <section id="tab-meta" class="tab-pane">
+      <div class="panel-card">
+        <h3 style="margin:0 0 8px;">住宿與航班資訊</h3>
+        <div id="metaList"></div>
+      </div>
     </section>
 
-    <!-- 分頁 4：設定、資料管理與備份 -->
-    <section id="tab-settings" class="tab-page">
-      <div class="section-card">
-        <h3>雲端同步設定（單向：雲端 → 手機）</h3>
-        <p class="muted-note">輸入 GAS Web App <code>/exec</code> 網址與 <code>API_TOKEN</code> 後，可手動同步最新底稿；離線或同步失敗時保留既有本機底稿不動。</p>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
-          <input id="apiUrlInput" type="text" placeholder="GAS Web App 網址（https://script.google.com/macros/s/.../exec）" />
-          <input id="apiTokenInput" type="text" placeholder="API_TOKEN" />
+    <!-- 分頁 4：設定備份 -->
+    <section id="tab-settings" class="tab-pane">
+      <div class="panel-card">
+        <h3 style="margin:0 0 10px;">雲端同步連線設定</h3>
+        <div class="editor-field" style="margin-bottom:8px;">
+          <label for="gasUrlInput">GAS Web App 網址（/exec）</label>
+          <input id="gasUrlInput" type="text" placeholder="https://script.google.com/macros/s/.../exec" />
         </div>
-        <div class="controls-line">
-          <button id="btnSaveConfig" class="btn-primary">儲存連線設定</button>
-          <button id="btnSyncNow" class="btn-ok">立即同步雲端底稿</button>
+        <div class="editor-field" style="margin-bottom:10px;">
+          <label for="apiTokenInput">API_TOKEN</label>
+          <input id="apiTokenInput" type="text" placeholder="貼上 setupApiToken() 產出的 Token" />
         </div>
-      </div>
-
-      <div class="section-card">
-        <h3>行程資料管理</h3>
-        <p class="muted-note">
-          • <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
-          • 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
-        </p>
-        <button id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
-      </div>
-
-      <div class="section-card">
-        <h3>備份匯出／匯入</h3>
-        <p class="muted-note">匯出或還原完整四個資料區（<code>baseline</code>、<code>local_overrides</code>、<code>runtime_state</code>、<code>removed_history</code>）。匯入時會驗證版本與結構，並依備份完整覆蓋本機狀態。</p>
-        <div class="controls-line">
-          <button id="btnExportBackup">匯出備份 JSON</button>
-          <button id="btnTriggerImport">匯入備份 JSON</button>
-          <input id="importFileInput" type="file" accept="application/json,.json" style="display:none;" />
+        <div class="controls-row">
+          <button type="button" id="saveConnBtn">儲存連線設定</button>
+          <button type="button" id="syncNowBtn" class="primary">立即同步雲端底稿</button>
         </div>
       </div>
 
-      <div class="section-card">
-        <h3>已移除項目歷史紀錄（removed_history）</h3>
-        <p class="muted-note">雲端底稿移除但本機曾有欄位修改的活動會保留在此，供查閱或一鍵清空。</p>
-        <div style="margin-bottom:8px;">
-          <button id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
+      <div class="panel-card">
+        <h3 style="margin:0 0 10px;">還原與備份管理</h3>
+        <div class="controls-row">
+          <button type="button" id="restoreAllBtn" class="danger">全部還原雲端底稿</button>
+          <button type="button" id="exportBackupBtn">匯出備份 JSON</button>
+          <button type="button" id="importBackupBtn">匯入備份 JSON</button>
+          <input id="importFileInput" type="file" accept="application/json" style="display:none;" />
         </div>
+      </div>
+
+      <div class="panel-card">
+        <h3 style="margin:0 0 8px;">已移除項目歷史紀錄（removed_history）</h3>
         <div id="removedHistoryList"></div>
       </div>
     </section>
+
+    <div class="footer-note">🍁 京都大阪秋楓手帳 · 離線優先運作中</div>
   </main>
 
-  <nav class="bottom-nav">
-    <button class="active" data-tab="tab-schedule">每日行程</button>
-    <button data-tab="tab-pocket">備選口袋</button>
-    <button data-tab="tab-meta">住宿航班</button>
-    <button data-tab="tab-settings">設定備份</button>
+  <nav class="bottom-nav" aria-label="主導覽">
+    <button type="button" class="nav-btn active" data-tab="itinerary">每日行程</button>
+    <button type="button" class="nav-btn" data-tab="pocket">備選口袋</button>
+    <button type="button" class="nav-btn" data-tab="meta">住宿航班</button>
+    <button type="button" class="nav-btn" data-tab="settings">設定備份</button>
   </nav>
 
   <script src="./idbStore.js"></script>
@@ -418,514 +547,393 @@
   <script src="./scheduleEngine.js"></script>
   <script>
     (() => {
-      const PREF_KEYS = {
-        API_URL: 'trip_pwa_api_url',
-        API_TOKEN: 'trip_pwa_api_token',
-        SELECTED_DATE: 'trip_pwa_selected_date'
-      };
+      // 1. 雪之妖精小語互動
+      const quotes = [
+        '啾！今天也要開心賞楓～',
+        '帶好相機跟保暖外套了嗎？',
+        '走累了就慢慢散步，不趕路！',
+        '離線也能看行程，安心出發！',
+        '下午來杯熱茶或點心吧～'
+      ];
+      let quoteIdx = 0;
+      const mascotBtn = document.getElementById('mascotBtn');
+      const mascotQuote = document.getElementById('mascotQuote');
+      if (mascotBtn && mascotQuote) {
+        mascotBtn.addEventListener('click', () => {
+          quoteIdx = (quoteIdx + 1) % quotes.length;
+          mascotQuote.textContent = quotes[quoteIdx];
+        });
+      }
+
+      // 2. Service Worker 註冊
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+
+      // 3. 網路狀態徽章
+      const netBadge = document.getElementById('netBadge');
+      function updateNetBadge() {
+        const online = navigator.onLine;
+        netBadge.textContent = online ? '線上' : '離線';
+        netBadge.classList.toggle('offline', !online);
+      }
+      window.addEventListener('online', updateNetBadge);
+      window.addEventListener('offline', updateNetBadge);
+      updateNetBadge();
+
+      // 4. 分頁切換
+      const navBtns = document.querySelectorAll('.nav-btn');
+      const panes = document.querySelectorAll('.tab-pane');
+      navBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-tab');
+          navBtns.forEach((b) => b.classList.toggle('active', b === btn));
+          panes.forEach((p) => p.classList.toggle('active', p.id === 'tab-' + target));
+        });
+      });
+
+      const bannerEl = document.getElementById('statusBanner');
+      function showBanner(type, msg) {
+        bannerEl.className = 'banner show ' + type;
+        bannerEl.textContent = msg;
+      }
+
+      const dateSelect = document.getElementById('dateSelect');
+      const weatherBtn = document.getElementById('weatherBtn');
+      const stopDayBtn = document.getElementById('stopDayBtn');
+      const statsRow = document.getElementById('statsRow');
+      const scheduleList = document.getElementById('scheduleList');
+      const pocketList = document.getElementById('pocketList');
+      const metaList = document.getElementById('metaList');
+      const removedHistoryList = document.getElementById('removedHistoryList');
 
       let currentDate = '';
-      let currentSchedule = null;
+      let editingActivityId = null;
 
-      function showBanner(type, text) {
-        const el = document.getElementById('globalBanner');
-        el.className = 'banner show ' + (type || 'info');
-        el.textContent = text;
-      }
-
-      function hideBanner() {
-        const el = document.getElementById('globalBanner');
-        el.className = 'banner';
-        el.textContent = '';
-      }
-
-      function escapeHtml(str) {
-        return String(str === null || str === undefined ? '' : str)
+      function escapeHtml(s) {
+        return String(s || '')
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;');
       }
 
-      function updateNetworkBadge() {
-        const badge = document.getElementById('netBadge');
-        const online = navigator.onLine;
-        badge.textContent = online ? '線上' : '離線模式';
-        badge.style.background = online ? 'rgba(21, 128, 61, 0.35)' : 'rgba(180, 83, 9, 0.5)';
-      }
-
-      function loadPrefsToInputs() {
-        document.getElementById('apiUrlInput').value = localStorage.getItem(PREF_KEYS.API_URL) || '';
-        document.getElementById('apiTokenInput').value = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
-      }
-
-      function savePrefsFromInputs() {
-        const url = document.getElementById('apiUrlInput').value.trim();
-        const token = document.getElementById('apiTokenInput').value.trim();
-        localStorage.setItem(PREF_KEYS.API_URL, url);
-        localStorage.setItem(PREF_KEYS.API_TOKEN, token);
-        showBanner('ok', '已儲存 GAS 網址與 API_TOKEN 至本機');
-      }
-
-      function enumerateDates(startIso, endIso, itinerary) {
-        const set = new Set();
-        if (startIso && endIso && /^\d{4}-\d{2}-\d{2}$/.test(startIso) && /^\d{4}-\d{2}-\d{2}$/.test(endIso)) {
-          const [sy, sm, sd] = startIso.split('-').map(Number);
-          const [ey, em, ed] = endIso.split('-').map(Number);
-          let cur = Date.UTC(sy, sm - 1, sd);
-          const end = Date.UTC(ey, em - 1, ed);
-          let guard = 0;
-          while (cur <= end && guard < 120) {
-            const d = new Date(cur);
-            const y = d.getUTCFullYear();
-            const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(d.getUTCDate()).padStart(2, '0');
-            set.add(`${y}-${m}-${day}`);
-            cur += 86400000;
-            guard++;
-          }
-        }
-        (itinerary || []).forEach((it) => {
-          if (it.trip_date) set.add(String(it.trip_date).trim());
-        });
-        return Array.from(set).sort();
-      }
-
-      async function renderHeaderAndDates() {
+      async function refreshAll(preferredDate) {
         const baseline = await TripIdbStore.getBaseline();
-        const metaBar = document.getElementById('syncMetaBar');
-        const dateSel = document.getElementById('dateSelect');
+        const metaVerEl = document.getElementById('metaVersion');
+        const metaSyncEl = document.getElementById('metaSyncedAt');
+        const metaRangeEl = document.getElementById('metaRange');
 
-        if (!baseline) {
-          metaBar.innerHTML = '<span>尚未同步雲端底稿（請至「設定備份」同步）</span>';
-          dateSel.innerHTML = '<option value="">無可用日期</option>';
-          currentDate = '';
-          return null;
+        if (!baseline || !baseline.data) {
+          metaVerEl.textContent = '底稿版本：尚未同步';
+          metaSyncEl.textContent = '最後同步：--';
+          metaRangeEl.textContent = '行程：--';
+          dateSelect.innerHTML = '';
+          statsRow.innerHTML = '';
+          scheduleList.innerHTML = '<div class="panel-card">尚未同步雲端底稿，請先至「設定備份」輸入網址與 Token 並同步。</div>';
+          pocketList.innerHTML = '';
+          metaList.innerHTML = '';
+          await renderRemovedHistory();
+          return;
         }
 
-        const m = baseline.meta || {};
-        const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
-        metaBar.innerHTML =
-          `<span>底稿版本：${escapeHtml(m.dataVersion || '-')}</span>` +
-          `<span>最後同步：${escapeHtml(syncedStr)}</span>` +
-          `<span>行程：${escapeHtml(m.tripStartDate || '')} ~ ${escapeHtml(m.tripEndDate || '')}</span>`;
+        const m = baseline.data.meta || {};
+        metaVerEl.textContent = '底稿版本：' + (m.dataVersion || '--');
+        metaSyncEl.textContent = '最後同步：' + (baseline.syncedAt || m.exportedAt || '--');
+        metaRangeEl.textContent = '行程：' + (m.tripStartDate || '--') + ' ~ ' + (m.tripEndDate || '--');
 
-        const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
-        const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
-        if (!currentDate) {
-          currentDate = (savedDate && dates.indexOf(savedDate) !== -1) ? savedDate : (dates[0] || '');
-        } else if (dates.length > 0 && dates.indexOf(currentDate) === -1) {
-          currentDate = dates[0];
+        const dates = Array.from(new Set((baseline.data.itinerary || []).map((r) => r.trip_date).filter(Boolean))).sort();
+        if (preferredDate && dates.includes(preferredDate)) {
+          currentDate = preferredDate;
+        } else if (!currentDate || !dates.includes(currentDate)) {
+          currentDate = dates[0] || '';
         }
 
-        dateSel.innerHTML = dates.length > 0
-          ? dates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('')
-          : '<option value="">無日期資料</option>';
+        dateSelect.innerHTML = dates.map((d, i) =>
+          `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)} ( Day ${i + 1} )</option>`
+        ).join('');
 
-        return baseline;
+        await renderDay(currentDate);
+        renderPocket(baseline.data.pocket_spots || []);
+        renderTripMeta(baseline.data.trip_meta || []);
+        await renderRemovedHistory();
       }
 
-      async function renderScheduleTab() {
-        const listEl = document.getElementById('scheduleList');
-        const statsEl = document.getElementById('dayStats');
-        const btnW = document.getElementById('btnToggleWeather');
-        const btnS = document.getElementById('btnToggleStop');
-
-        if (!currentDate) {
-          statsEl.innerHTML = '';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，請先切換至下方「設定備份」輸入網址與 Token 並執行同步。</div>';
+      async function renderDay(dateStr) {
+        if (!dateStr) {
+          scheduleList.innerHTML = '';
+          statsRow.innerHTML = '';
           return;
         }
 
-        const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
-        currentSchedule = sched;
+        const sched = await TripScheduleEngine.buildDaySchedule(dateStr);
+        const weather = await TripIdbStore.getDayWeather(dateStr);
+        const stopped = await TripIdbStore.getDayStopped(dateStr);
 
-        if (!sched.hasBaseline) {
-          statsEl.innerHTML = '';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿。</div>';
+        weatherBtn.textContent = weather === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
+        stopDayBtn.textContent = stopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
+        stopDayBtn.classList.toggle('active-pill', Boolean(stopped));
+
+        const items = sched.items || [];
+        const total = items.length;
+        const doneCount = items.filter((x) => x.status === 'done').length;
+        const skippedCount = items.filter((x) => x.status === 'skipped').length;
+        const pendingCount = items.filter((x) => x.status === 'pending').length;
+        const overdueCount = items.filter((x) => x.isOverdue).length;
+
+        let chipsHtml = `
+          <span class="stat-chip">總站數：${total}</span>
+          <span class="stat-chip">已完成：${doneCount}</span>
+          <span class="stat-chip">已跳過：${skippedCount}</span>
+          <span class="stat-chip">待執行：${pendingCount}</span>
+        `;
+        if (overdueCount > 0) {
+          chipsHtml += `<span class="stat-chip warn">逾時警示：${overdueCount}</span>`;
+        }
+        if (stopped) {
+          chipsHtml += `<span class="stat-chip note">已啟用「今天就到這裡」（未執行維持 pending）</span>`;
+        }
+        statsRow.innerHTML = chipsHtml;
+
+        if (!items.length) {
+          scheduleList.innerHTML = '<div class="panel-card">當日尚無符合條件的行程。</div>';
           return;
         }
 
-        btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
-        btnS.textContent = sched.isStopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
-        btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
+        scheduleList.innerHTML = items.map((item) => {
+          const isDone = item.status === 'done';
+          const statusText = isDone ? '已完成' : (item.status === 'skipped' ? '已跳過' : '待執行');
+          const statusCls = isDone ? 'done' : (item.status === 'skipped' ? 'skipped' : '');
+          const nextTimeStr = item.nextDepartureTime ? ` → 下一站 ${escapeHtml(item.nextDepartureTime)}` : '';
+          const travelInfo = (item.travel_min || item.buffer_min)
+            ? `（${escapeHtml(item.transport_mode || '移動')} ${item.travel_min || 0}m + 緩衝 ${item.buffer_min || 0}m）`
+            : '';
 
-        const st = sched.stats;
-        statsEl.innerHTML =
-          `<span class="pill">總站數：${st.total}</span>` +
-          `<span class="pill">已完成：${st.done}</span>` +
-          `<span class="pill">已跳過：${st.skipped}</span>` +
-          `<span class="pill">待執行：${st.pending}</span>` +
-          (st.lateCount > 0 ? `<span class="pill late">逾時警示：${st.lateCount}</span>` : '') +
-          (sched.isStopped ? `<span class="pill stop">已啟用「今天就到這裡」（未執行維持 pending）</span>` : '');
+          const ovKeys = Object.keys(item.overrideFields || {});
+          const ovBadge = ovKeys.length
+            ? `<div class="override-tag">已微調：${escapeHtml(ovKeys.join(', '))}</div>`
+            : '';
 
-        if (!sched.visibleItems || sched.visibleItems.length === 0) {
-          listEl.innerHTML = sched.isStopped
-            ? '<div class="empty-state">今日已標記「今天就到這裡」，剩餘待執行行程已停止顯示（狀態仍維持 pending）。</div>'
-            : '<div class="empty-state">本日尚無排定行程。</div>';
-          return;
-        }
+          const anchorAlert = item.anchorMissing
+            ? `<div class="alert-box">⚠️ 原插入錨點已不存在，已改接於當日末端</div>`
+            : '';
 
-        listEl.innerHTML = sched.visibleItems.map((it) => {
-          const statusClass = 'status-' + (it.status || 'pending');
-          const lateClass = it.isLate ? ' is-late' : '';
-          const timeRange = it.isLastOfDay
-            ? `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，當日最後一站）`
-            : `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`;
+          const overdueAlert = item.isOverdue
+            ? `<div class="alert-box">⏰ 推算時間已超過固定截止時間（${escapeHtml(item.deadline_time)}）</div>`
+            : '';
 
-          const statusBadge = it.status === 'done'
-            ? '<span class="tag" style="background:#dcfce7;color:#15803d;">已完成</span>'
-            : (it.status === 'skipped'
-              ? '<span class="tag" style="background:#e5e7eb;color:#374151;">已跳過</span>'
-              : '<span class="tag">待執行</span>');
-
-          const isBaseline = it._sourceType === 'baseline';
-          const actKey = encodeURIComponent(it.activity_id);
+          const editorHtml = editingActivityId === item.activity_id ? `
+            <div class="editor-box">
+              <div class="editor-grid">
+                <div class="editor-field">
+                  <label>停留分鐘 (dwell_min)</label>
+                  <input type="number" id="ed_dwell_${escapeHtml(item.activity_id)}" value="${escapeHtml(item.dwell_min)}" min="0" />
+                </div>
+                <div class="editor-field">
+                  <label>交通分鐘 (travel_min)</label>
+                  <input type="number" id="ed_travel_${escapeHtml(item.activity_id)}" value="${escapeHtml(item.travel_min)}" min="0" />
+                </div>
+                <div class="editor-field">
+                  <label>隨手備註 (note)</label>
+                  <input type="text" id="ed_note_${escapeHtml(item.activity_id)}" value="${escapeHtml(item.note || '')}" />
+                </div>
+              </div>
+              <div class="card-actions">
+                <button type="button" class="primary" onclick="window.__saveOverride('${escapeHtml(item.activity_id)}', '${escapeHtml(dateStr)}')">儲存本機微調</button>
+                <button type="button" onclick="window.__clearOverride('${escapeHtml(item.activity_id)}', '${escapeHtml(dateStr)}')">還原此站微調</button>
+                <button type="button" onclick="window.__closeEditor()">取消</button>
+              </div>
+            </div>
+          ` : '';
 
           return `
-            <article class="timeline-item ${statusClass}${lateClass}" data-act-id="${escapeHtml(it.activity_id)}">
-              <div class="item-top">
-                <div class="item-time">${escapeHtml(timeRange)}</div>
-                <div>${statusBadge}</div>
+            <article class="itinerary-card${isDone ? ' is-done' : ''}">
+              <div class="card-top">
+                <span>${escapeHtml(item.start_time || '')} ~ ${escapeHtml(item.end_time || '')}（停留 ${escapeHtml(item.dwell_min)} 分）${nextTimeStr} ${travelInfo}</span>
+                <span class="status-badge ${statusCls}">${statusText}</span>
               </div>
-              <div class="item-title">${escapeHtml(it.title_zh)}</div>
-              <div class="item-sub">
-                ${it.title_jp ? escapeHtml(it.title_jp) + '｜' : ''}${escapeHtml(it.area || '')}
-                ${it.address_jp ? '<br>地址：' + escapeHtml(it.address_jp) : ''}
-                ${it.note ? '<br>備註：' + escapeHtml(it.note) : ''}
+              <h3 class="card-title">${escapeHtml(item.title_zh || '')}</h3>
+              <div class="card-sub">${escapeHtml(item.title_jp || '')}${item.area ? ' | ' + escapeHtml(item.area) : ''}</div>
+              ${item.address_jp ? `<div class="card-sub">地址：${escapeHtml(item.address_jp)}</div>` : ''}
+              ${item.note ? `<hr class="card-divider" /><div class="card-sub">備註：${escapeHtml(item.note)}</div>` : ''}
+              ${ovBadge}
+              ${anchorAlert}
+              ${overdueAlert}
+              <div class="card-actions">
+                <button type="button" class="${isDone ? 'active-pill' : ''}" onclick="window.__setStatus('${escapeHtml(item.activity_id)}', 'done', '${escapeHtml(dateStr)}')">完成</button>
+                <button type="button" onclick="window.__setStatus('${escapeHtml(item.activity_id)}', 'skipped', '${escapeHtml(dateStr)}')">跳過</button>
+                <button type="button" onclick="window.__setStatus('${escapeHtml(item.activity_id)}', 'pending', '${escapeHtml(dateStr)}')">改待執行</button>
+                <button type="button" onclick="window.__toggleEditor('${escapeHtml(item.activity_id)}')">微調／單欄還原</button>
               </div>
-              <div>
-                ${it._sourceType === 'inserted' ? '<span class="tag inserted">本機插入備選</span>' : ''}
-                ${it._hasOverrides ? '<span class="tag override">已微調：' + escapeHtml((it._overriddenFields || []).join(', ')) + '</span>' : ''}
-                ${it.isLate ? '<span class="tag late">逾時</span>' : ''}
-              </div>
-              ${it.isLate ? `<div class="alert-box">${escapeHtml(it.lateReason)}</div>` : ''}
-              ${it._anchorMissing ? `<div class="warn-box">原插入錨點（${escapeHtml(it._afterActivityId)}）已不存在，已自動接在當日行程末端。</div>` : ''}
-
-              <div class="item-actions">
-                <button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">完成</button>
-                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">跳過</button>
-                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'pending')">改待執行</button>
-                ${isBaseline ? `<button class="btn-sm" onclick="window.__app.onToggleEdit('${actKey}')">微調／單欄還原</button>` : ''}
-                ${it._sourceType === 'inserted' ? `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>` : ''}
-              </div>
-
-              ${isBaseline ? `
-                <div id="edit-${escapeHtml(it.activity_id)}" class="edit-panel">
-                  <div class="edit-grid">
-                    <div class="field-box">
-                      <label>停留分鐘 (dwell_min)</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-dwell-${escapeHtml(it.activity_id)}" value="${it.dwell_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'dwell_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通分鐘 (travel_min)</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-travel-${escapeHtml(it.activity_id)}" value="${it.travel_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'travel_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通緩衝 (buffer_min)</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-buffer-${escapeHtml(it.activity_id)}" value="${it.buffer_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'buffer_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通方式 (transport_mode)</label>
-                      <div class="field-row-inline">
-                        <input type="text" id="f-trans-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.transport_mode || '')}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'transport_mode')">還原</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="field-box" style="margin-bottom:8px;">
-                    <label>隨手備註 (note)</label>
-                    <div class="field-row-inline">
-                      <input type="text" id="f-note-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.note || '')}" />
-                      <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'note')">還原</button>
-                    </div>
-                  </div>
-                  <button class="btn-sm btn-primary" onclick="window.__app.onSaveOverride('${actKey}')">儲存本機微調</button>
-                </div>
-              ` : ''}
+              ${editorHtml}
             </article>
           `;
         }).join('');
       }
 
-      async function renderPocketTab() {
-        const anchorSel = document.getElementById('insertAnchorSelect');
-        const listEl = document.getElementById('pocketList');
-        const baseline = await TripIdbStore.getBaseline();
-
-        if (!currentDate) {
-          anchorSel.innerHTML = '<option value="TOP">當日最前面</option>';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，無備選口袋資料。</div>';
+      function renderPocket(spots) {
+        if (!spots.length) {
+          pocketList.innerHTML = '<div class="card-sub">目前無備選口袋景點。</div>';
           return;
         }
-
-        const sched = currentSchedule || await TripScheduleEngine.buildDaySchedule(currentDate);
-        const anchorOptions = ['<option value="TOP">當日最前面</option>'];
-        (sched.items || []).forEach((it) => {
-          if (it._sourceType === 'baseline') {
-            anchorOptions.push(`<option value="${escapeHtml(it.activity_id)}">「${escapeHtml(it.title_zh)}」之後</option>`);
-          }
-        });
-        anchorSel.innerHTML = anchorOptions.join('');
-
-        const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
-        if (spots.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">底稿中尚無備選口袋景點。</div>';
-          return;
-        }
-
-        listEl.innerHTML = spots.map((sp, idx) => `
-          <div class="section-card">
-            <div class="item-top">
-              <div>
-                <strong>${escapeHtml(sp.title_zh)}</strong>
-                <div class="item-sub">
-                  ${sp.title_jp ? escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
-                  <br>預設停留 ${sp.default_dwell_min} 分｜建議交通 ${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
-                  ${sp.address_jp ? '<br>地址：' + escapeHtml(sp.address_jp) : ''}
-                  ${sp.note ? '<br>備註：' + escapeHtml(sp.note) : ''}
-                </div>
-              </div>
-              <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">插入本日</button>
+        pocketList.innerHTML = spots.map((s) => `
+          <div class="itinerary-card">
+            <div class="card-top">
+              <span>${escapeHtml(s.area || '')} · ${escapeHtml(s.indoor_outdoor || '')}</span>
+              <span>預設停留 ${escapeHtml(s.default_dwell_min)} 分</span>
+            </div>
+            <h4 class="card-title">${escapeHtml(s.title_zh || '')}</h4>
+            ${s.note ? `<div class="card-sub">備註：${escapeHtml(s.note)}</div>` : ''}
+            <div class="card-actions">
+              <button type="button" class="primary" onclick="window.__insertPocket('${escapeHtml(s.pocket_id)}')">插入本日行程</button>
             </div>
           </div>
         `).join('');
       }
 
-      async function renderMetaTab() {
-        const listEl = document.getElementById('metaList');
-        const baseline = await TripIdbStore.getBaseline();
-        const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
-
-        if (metas.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">尚無住宿與航班資料。</div>';
+      function renderTripMeta(rows) {
+        if (!rows.length) {
+          metaList.innerHTML = '<div class="card-sub">尚無住宿或航班紀錄。</div>';
           return;
         }
-
-        listEl.innerHTML = metas.map((m) => `
-          <div class="section-card">
-            <div class="item-time">${escapeHtml(m.trip_date || '通用')} ・ ${escapeHtml(m.category || '')}</div>
-            <div class="item-title">${escapeHtml(m.title_zh)}</div>
-            <div class="item-sub">
-              ${m.title_jp ? escapeHtml(m.title_jp) + '<br>' : ''}
-              ${m.address_jp ? '地址：' + escapeHtml(m.address_jp) + '<br>' : ''}
-              ${m.info_text ? escapeHtml(m.info_text) : ''}
+        metaList.innerHTML = rows.map((m) => `
+          <div class="itinerary-card">
+            <div class="card-top">
+              <span>${escapeHtml(m.category || '')} ${m.trip_date ? '· ' + escapeHtml(m.trip_date) : ''}</span>
+              <span>${escapeHtml(m.status || '')}</span>
             </div>
+            <h4 class="card-title">${escapeHtml(m.title_zh || '')}</h4>
+            ${m.detail ? `<div class="card-sub">${escapeHtml(m.detail)}</div>` : ''}
           </div>
         `).join('');
       }
 
       async function renderRemovedHistory() {
-        const el = document.getElementById('removedHistoryList');
         const list = await TripIdbStore.getRemovedHistory();
-        if (!list || list.length === 0) {
-          el.innerHTML = '<div class="muted-note">目前沒有已移除項目歷史紀錄。</div>';
+        if (!list || !list.length) {
+          removedHistoryList.innerHTML = '<div class="card-sub">目前無已移除且曾微調的歷史紀錄。</div>';
           return;
         }
-        el.innerHTML = list.map((r) => `
-          <div style="padding:8px; border:1px solid var(--border); border-radius:8px; margin-bottom:6px; font-size:12px;">
-            <strong>${escapeHtml(r.title_zh || r.activity_id)}</strong>（${escapeHtml(r.activity_id)}｜${escapeHtml(r.trip_date || '')}）
-            <div>移除時間：${escapeHtml(r.removedAt || '')}</div>
-            <div>本機曾修改欄位：<code>${escapeHtml(JSON.stringify(r.overrideFields || {}))}</code></div>
+        removedHistoryList.innerHTML = list.map((r) => `
+          <div class="itinerary-card">
+            <div class="card-top">
+              <span>${escapeHtml(r.trip_date || '')} · ${escapeHtml(r.activity_id || '')}</span>
+              <span>${escapeHtml(r.removedAt || '')}</span>
+            </div>
+            <div class="card-title">${escapeHtml(r.title_zh || '(未命名活動)')}</div>
+            <div class="card-sub">本機微調紀錄：${escapeHtml(JSON.stringify(r.overrideFields || {}))}</div>
           </div>
         `).join('');
       }
 
-      async function refreshAll() {
-        updateNetworkBadge();
-        await renderHeaderAndDates();
-        await renderScheduleTab();
-        await renderPocketTab();
-        await renderMetaTab();
-        await renderRemovedHistory();
-      }
-
-      window.__app = {
-        async onSetStatus(encodedId, status) {
-          const actId = decodeURIComponent(encodedId);
-          await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
-          await renderScheduleTab();
-        },
-        onToggleEdit(encodedId) {
-          const actId = decodeURIComponent(encodedId);
-          const panel = document.getElementById('edit-' + actId);
-          if (panel) panel.classList.toggle('open');
-        },
-        async onSaveOverride(encodedId) {
-          const actId = decodeURIComponent(encodedId);
-          const dwellVal = Number(document.getElementById('f-dwell-' + actId).value);
-          const travelVal = Number(document.getElementById('f-travel-' + actId).value);
-          const bufferVal = Number(document.getElementById('f-buffer-' + actId).value);
-          const transVal = document.getElementById('f-trans-' + actId).value.trim();
-          const noteVal = document.getElementById('f-note-' + actId).value;
-
-          if (!Number.isInteger(dwellVal) || dwellVal < 0 ||
-              !Number.isInteger(travelVal) || travelVal < 0 ||
-              !Number.isInteger(bufferVal) || bufferVal < 0) {
-            showBanner('err', '停留、交通與緩衝分鐘必須為 0 以上的整數');
-            return;
-          }
-
-          await TripScheduleEngine.updateActivityOverride(actId, currentDate, {
-            dwell_min: dwellVal,
-            travel_min: travelVal,
-            buffer_min: bufferVal,
-            transport_mode: transVal,
-            note: noteVal
-          });
-          showBanner('ok', '已儲存本機欄位微調');
-          await renderScheduleTab();
-        },
-        async onResetField(encodedId, fieldName) {
-          const actId = decodeURIComponent(encodedId);
-          await TripScheduleEngine.resetActivityField(actId, fieldName, currentDate);
-          showBanner('info', `已還原欄位 ${fieldName} 為雲端底稿值`);
-          await renderScheduleTab();
-        },
-        async onInsertSpot(spotIdx) {
-          if (!currentDate) return;
-          const baseline = await TripIdbStore.getBaseline();
-          const spots = (baseline && baseline.pocket_spots) || [];
-          const spot = spots[spotIdx];
-          if (!spot) return;
-          const anchor = document.getElementById('insertAnchorSelect').value || 'TOP';
-          await TripScheduleEngine.insertPocketSpot(currentDate, spot, anchor);
-          showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate} 行程`);
-          switchTab('tab-schedule');
-          await renderScheduleTab();
-        },
-        async onRemoveInserted(insertId) {
-          if (!currentDate) return;
-          await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
-          showBanner('info', '已移除本機插入站點');
-          await renderScheduleTab();
-        }
+      // 暴露給按鈕的事件處理
+      window.__setStatus = async (activityId, status, dateStr) => {
+        await TripIdbStore.setActivityStatus(activityId, status, { trip_date: dateStr });
+        await renderDay(dateStr);
       };
 
-      function switchTab(tabId) {
-        document.querySelectorAll('.tab-page').forEach((p) => p.classList.remove('active'));
-        document.querySelectorAll('nav.bottom-nav button').forEach((b) => {
-          b.classList.toggle('active', b.dataset.tab === tabId);
-        });
-        const target = document.getElementById(tabId);
-        if (target) target.classList.add('active');
+      window.__toggleEditor = async (activityId) => {
+        editingActivityId = editingActivityId === activityId ? null : activityId;
+        await renderDay(currentDate);
+      };
+
+      window.__closeEditor = async () => {
+        editingActivityId = null;
+        await renderDay(currentDate);
+      };
+
+      window.__saveOverride = async (activityId, dateStr) => {
+        const dwellVal = Number(document.getElementById('ed_dwell_' + activityId).value);
+        const travelVal = Number(document.getElementById('ed_travel_' + activityId).value);
+        const noteVal = document.getElementById('ed_note_' + activityId).value;
+        const patch = { note: noteVal };
+        if (Number.isFinite(dwellVal) && dwellVal >= 0) patch.dwell_min = Math.floor(dwellVal);
+        if (Number.isFinite(travelVal) && travelVal >= 0) patch.travel_min = Math.floor(travelVal);
+        await TripIdbStore.setFieldOverrides(activityId, dateStr, patch);
+        editingActivityId = null;
+        await renderDay(dateStr);
+        showBanner('ok', '已儲存本機微調');
+      };
+
+      window.__clearOverride = async (activityId, dateStr) => {
+        await TripIdbStore.clearFieldOverrides(activityId);
+        editingActivityId = null;
+        await renderDay(dateStr);
+        showBanner('info', '已還原此站本機微調');
+      };
+
+      window.__insertPocket = async (pocketId) => {
+        if (!currentDate) return;
+        const baseline = await TripIdbStore.getBaseline();
+        const spot = (baseline && baseline.data && baseline.data.pocket_spots || []).find((x) => x.pocket_id === pocketId);
+        if (!spot) return;
+        await TripScheduleEngine.insertPocketSpot(currentDate, spot, 'END');
+        navBtns[0].click();
+        await renderDay(currentDate);
+        showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate}`);
+      };
+
+      dateSelect.addEventListener('change', async () => {
+        currentDate = dateSelect.value;
+        editingActivityId = null;
+        await renderDay(currentDate);
+      });
+
+      weatherBtn.addEventListener('click', async () => {
+        if (!currentDate) return;
+        const cur = await TripIdbStore.getDayWeather(currentDate);
+        await TripIdbStore.setDayWeather(currentDate, cur === 'rain' ? 'sun' : 'rain');
+        await renderDay(currentDate);
+      });
+
+      stopDayBtn.addEventListener('click', async () => {
+        if (!currentDate) return;
+        const cur = await TripIdbStore.getDayStopped(currentDate);
+        await TripIdbStore.setDayStopped(currentDate, !cur);
+        await renderDay(currentDate);
+      });
+
+      // 設定備份事件
+      const gasUrlInput = document.getElementById('gasUrlInput');
+      const apiTokenInput = document.getElementById('apiTokenInput');
+
+      async function loadConnSettings() {
+        const cfg = await TripIdbStore.getSyncConfig();
+        if (cfg) {
+          gasUrlInput.value = cfg.url || '';
+          apiTokenInput.value = cfg.token || '';
+        }
       }
 
-      document.querySelectorAll('nav.bottom-nav button').forEach((btn) => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      document.getElementById('saveConnBtn').addEventListener('click', async () => {
+        await TripIdbStore.setSyncConfig({
+          url: gasUrlInput.value.trim(),
+          token: apiTokenInput.value.trim()
+        });
+        showBanner('ok', '已儲存連線設定');
       });
 
-      document.getElementById('dateSelect').addEventListener('change', async (e) => {
-        currentDate = e.target.value;
-        localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate);
-        await renderScheduleTab();
-        await renderPocketTab();
-      });
-
-      document.getElementById('btnToggleWeather').addEventListener('click', async () => {
-        if (!currentDate) return;
-        await TripScheduleEngine.toggleWeather(currentDate);
-        await renderScheduleTab();
-      });
-
-      document.getElementById('btnToggleStop').addEventListener('click', async () => {
-        if (!currentDate) return;
-        await TripScheduleEngine.toggleDayStop(currentDate);
-        await renderScheduleTab();
-      });
-
-      document.getElementById('btnSaveConfig').addEventListener('click', savePrefsFromInputs);
-
-      document.getElementById('btnSyncNow').addEventListener('click', async () => {
-        savePrefsFromInputs();
-        const url = localStorage.getItem(PREF_KEYS.API_URL) || '';
-        const token = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
-        showBanner('info', '正在從雲端同步底稿...');
-        const res = await TripSyncService.syncFromCloud({ endpointUrl: url, token: token });
-        if (res.ok) {
-          showBanner('ok', res.message);
-          await refreshAll();
+      document.getElementById('syncNowBtn').addEventListener('click', async () => {
+        await TripIdbStore.setSyncConfig({
+          url: gasUrlInput.value.trim(),
+          token: apiTokenInput.value.trim()
+        });
+        showBanner('info', '正在同步雲端底稿...');
+        const res = await TripSyncService.syncNow();
+        if (res && res.ok) {
+          await refreshAll(currentDate);
+          showBanner('ok', '已同步最新雲端底稿');
         } else {
-          showBanner('warn', res.message);
+          showBanner('err', '同步失敗：' + (res && res.message ? res.message : '未知錯誤'));
         }
       });
 
-      document.getElementById('btnRestoreAll').addEventListener('click', async () => {
-        const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
-        if (!ok) return;
+      document.getElementById('restoreAllBtn').addEventListener('click', async () => {
+        if (!confirm('確定要全部還原雲端底稿嗎？本機微調、狀態、晴雨與插入景點將清除，底稿與移除歷史會保留。')) return;
         await TripScheduleEngine.restoreAllToBaseline();
-        showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
-        await refreshAll();
+        editingActivityId = null;
+        await refreshAll(currentDate);
+        showBanner('ok', '已全部還原至雲端底稿');
       });
 
-      document.getElementById('btnExportBackup').addEventListener('click', async () => {
-        try {
-          const backupObj = await TripIdbStore.exportAllBackup();
-          const jsonStr = JSON.stringify(backupObj, null, 2);
-          const blob = new Blob([jsonStr], { type: 'application/json' });
-          const a = document.createElement('a');
-          const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-          a.href = URL.createObjectURL(blob);
-          a.download = `trip-pwa-backup-${stamp}.json`;
-          a.click();
-          URL.revokeObjectURL(a.href);
-          showBanner('ok', '已匯出完整備份 JSON');
-        } catch (err) {
-          showBanner('err', '匯出備份失敗：' + (err && err.message ? err.message : String(err)));
-        }
-      });
-
-      document.getElementById('btnTriggerImport').addEventListener('click', () => {
-        document.getElementById('importFileInput').click();
-      });
-
-      document.getElementById('importFileInput').addEventListener('change', async (e) => {
-        const file = e.target.files && e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-
-        try {
-          const text = await file.text();
-          const parsed = JSON.parse(text);
-          const res = await TripIdbStore.importAllBackup(parsed);
-          if (res.ok) {
-            showBanner('ok', res.message);
-            await refreshAll();
-          } else {
-            showBanner('err', '匯入已拒絕（未覆蓋原有資料）：' + res.message);
-          }
-        } catch (err) {
-          showBanner('err', '備份檔案解析或匯入失敗（未覆蓋原有資料）：' + (err && err.message ? err.message : String(err)));
-        }
-      });
-
-      document.getElementById('btnClearHistory').addEventListener('click', async () => {
-        await TripIdbStore.clearRemovedHistory();
-        showBanner('info', '已清空已移除項目歷史紀錄');
-        await renderRemovedHistory();
-      });
-
-      window.addEventListener('online', updateNetworkBadge);
-      window.addEventListener('offline', updateNetworkBadge);
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(() => {});
-        });
-      }
-
-      loadPrefsToInputs();
-      refreshAll();
-    })();
-  </script>
-</body>
-</html>
+      document.getElementById
