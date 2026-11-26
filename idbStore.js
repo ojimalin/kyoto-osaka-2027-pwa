@@ -4,13 +4,15 @@
  * 四個 Object Store：
  *   1. baseline        : { key: 'current', meta, syncedAt, itinerary, pocket_spots, trip_meta }
  *   2. local_overrides : { activity_id, trip_date, fields: {...}, updatedAt }
- *   3. runtime_state   : { key, ... }（支援活動狀態、每日晴雨、當日停止旗標、當日插入備選景點）
+ *   3. runtime_state   : { key, ... }（活動狀態、每日晴雨、當日停止旗標、當日插入備選景點）
  *   4. removed_history : { id, activity_id, trip_date, title_zh, removedAt, overrideFields, lastBaselineItem }
  */
 
 const TripIdbStore = (() => {
   const DB_NAME = 'TripPwaDB';
   const DB_VERSION = 1;
+  const BACKUP_VERSION = 1;
+  const SUPPORTED_SCHEMA_VERSIONS = ['V1.2', 1, '1'];
 
   const STORES = {
     BASELINE: 'baseline',
@@ -18,6 +20,13 @@ const TripIdbStore = (() => {
     RUNTIME_STATE: 'runtime_state',
     REMOVED_HISTORY: 'removed_history'
   };
+
+  const ALL_STORE_LIST = [
+    STORES.BASELINE,
+    STORES.LOCAL_OVERRIDES,
+    STORES.RUNTIME_STATE,
+    STORES.REMOVED_HISTORY
+  ];
 
   let dbPromise = null;
 
@@ -212,7 +221,6 @@ const TripIdbStore = (() => {
     return await reqToPromise(tx.objectStore(STORES.RUNTIME_STATE).getAll());
   }
 
-  // 活動執行狀態（'pending' | 'done' | 'skipped'），依 activity_id 獨立保存
   async function getActivityStatus(activityId) {
     const rec = await getRuntimeItem('act:' + String(activityId));
     return rec && rec.status ? rec.status : 'pending';
@@ -231,7 +239,6 @@ const TripIdbStore = (() => {
     }, extraMeta || {}));
   }
 
-  // 每日晴雨模式（'sun' | 'rain'）
   async function getDayWeather(tripDate, fallbackMode) {
     const rec = await getRuntimeItem('weather:' + String(tripDate));
     if (rec && (rec.weather_mode === 'sun' || rec.weather_mode === 'rain')) {
@@ -252,7 +259,6 @@ const TripIdbStore = (() => {
     });
   }
 
-  // 當日「今天就到這裡」旗標（只停止顯示當日剩餘待執行行程，未執行維持 pending、不改 skipped、不影響隔日）
   async function getDayStopped(tripDate) {
     const rec = await getRuntimeItem('stop:' + String(tripDate));
     return !!(rec && rec.stopped === true);
@@ -269,7 +275,6 @@ const TripIdbStore = (() => {
     });
   }
 
-  // 當日插入之備選站點清單（保存完整快照、錨點 after_activity_id、停留與交通）
   async function getInsertedSpots(tripDate) {
     const rec = await getRuntimeItem('extra:' + String(tripDate));
     return rec && Array.isArray(rec.items) ? rec.items : [];
@@ -313,9 +318,130 @@ const TripIdbStore = (() => {
     await txDone(tx);
   }
 
+  // --- 全部還原雲端底稿（保留 baseline 與 removed_history，清除 local_overrides 與 runtime_state） ---
+
+  async function restoreAllToBaseline() {
+    const db = await openDb();
+    const tx = db.transaction([STORES.LOCAL_OVERRIDES, STORES.RUNTIME_STATE], 'readwrite');
+    tx.objectStore(STORES.LOCAL_OVERRIDES).clear();
+    tx.objectStore(STORES.RUNTIME_STATE).clear();
+    await txDone(tx);
+  }
+
+  // --- 完整備份匯出／匯入（四個 Store 依備份覆蓋，版本/結構不符直接拒絕，不猜測轉換） ---
+
+  async function exportAllBackup() {
+    const db = await openDb();
+    const tx = db.transaction(ALL_STORE_LIST, 'readonly');
+    const [baselineRec, overrides, runtimeItems, removedHistory] = await Promise.all([
+      reqToPromise(tx.objectStore(STORES.BASELINE).get('current')),
+      reqToPromise(tx.objectStore(STORES.LOCAL_OVERRIDES).getAll()),
+      reqToPromise(tx.objectStore(STORES.RUNTIME_STATE).getAll()),
+      reqToPromise(tx.objectStore(STORES.REMOVED_HISTORY).getAll())
+    ]);
+    await txDone(tx);
+
+    const schemaVer = (baselineRec && baselineRec.meta && baselineRec.meta.schemaVersion)
+      ? baselineRec.meta.schemaVersion
+      : 'V1.2';
+
+    return {
+      backupVersion: BACKUP_VERSION,
+      schemaVersion: schemaVer,
+      exportedAt: new Date().toISOString(),
+      data: {
+        baseline: baselineRec || null,
+        local_overrides: Array.isArray(overrides) ? overrides : [],
+        runtime_state: Array.isArray(runtimeItems) ? runtimeItems : [],
+        removed_history: Array.isArray(removedHistory) ? removedHistory : []
+      }
+    };
+  }
+
+  function validateBackupPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return '備份檔案不是合法物件';
+    }
+    if (payload.backupVersion !== BACKUP_VERSION) {
+      return '不支援的備份版本（backupVersion=' + String(payload.backupVersion) + '，僅支援 ' + BACKUP_VERSION + '）';
+    }
+    if (payload.schemaVersion === undefined || SUPPORTED_SCHEMA_VERSIONS.indexOf(payload.schemaVersion) === -1) {
+      return '不支援的資料結構版本（schemaVersion=' + String(payload.schemaVersion) + '）';
+    }
+    const d = payload.data;
+    if (!d || typeof d !== 'object') {
+      return '備份檔案缺少 data 區塊';
+    }
+    if (d.baseline !== null && d.baseline !== undefined && typeof d.baseline !== 'object') {
+      return 'data.baseline 格式無效';
+    }
+    if (!Array.isArray(d.local_overrides)) {
+      return 'data.local_overrides 必須為陣列';
+    }
+    if (!Array.isArray(d.runtime_state)) {
+      return 'data.runtime_state 必須為陣列';
+    }
+    if (!Array.isArray(d.removed_history)) {
+      return 'data.removed_history 必須為陣列';
+    }
+    return null;
+  }
+
+  async function importAllBackup(payload) {
+    const errMsg = validateBackupPayload(payload);
+    if (errMsg) {
+      return { ok: false, error: 'INVALID_BACKUP', message: errMsg };
+    }
+
+    const d = payload.data;
+    const db = await openDb();
+    const tx = db.transaction(ALL_STORE_LIST, 'readwrite');
+
+    try {
+      const baseStore = tx.objectStore(STORES.BASELINE);
+      const ovStore = tx.objectStore(STORES.LOCAL_OVERRIDES);
+      const rtStore = tx.objectStore(STORES.RUNTIME_STATE);
+      const remStore = tx.objectStore(STORES.REMOVED_HISTORY);
+
+      baseStore.clear();
+      ovStore.clear();
+      rtStore.clear();
+      remStore.clear();
+
+      if (d.baseline && typeof d.baseline === 'object') {
+        baseStore.put(Object.assign({}, d.baseline, { key: 'current' }));
+      }
+      d.local_overrides.forEach((item) => {
+        if (item && item.activity_id) {
+          ovStore.put(item);
+        }
+      });
+      d.runtime_state.forEach((item) => {
+        if (item && item.key) {
+          rtStore.put(item);
+        }
+      });
+      d.removed_history.forEach((item) => {
+        if (item && item.id) {
+          remStore.put(item);
+        }
+      });
+
+      await txDone(tx);
+      return { ok: true, message: '已完整匯入備份並覆蓋本機四個資料區' };
+    } catch (e) {
+      return {
+        ok: false,
+        error: 'IMPORT_FAILED',
+        message: '備份匯入失敗，已中止寫入（' + (e && e.message ? e.message : String(e)) + '）'
+      };
+    }
+  }
+
   return {
     DB_NAME,
     DB_VERSION,
+    BACKUP_VERSION,
     STORES,
     openDb,
     getBaseline,
@@ -338,6 +464,10 @@ const TripIdbStore = (() => {
     saveInsertedSpots,
     getRemovedHistory,
     addRemovedHistoryItem,
-    clearRemovedHistory
+    clearRemovedHistory,
+    restoreAllToBaseline,
+    exportAllBackup,
+    validateBackupPayload,
+    importAllBackup
   };
 })();
