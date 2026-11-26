@@ -1,21 +1,69 @@
-/* sw.js — 離線快取。每次修改任何靜態檔案，請把 VERSION 往上遞增，手機才會更新。 */
-const VERSION = 'v2';
-const CACHE = 'ko2027-shell-' + VERSION;
-const SHELL = [
+/**
+ * sw.js
+ * Service Worker：快取 PWA 靜態外殼，確保離線時可正常開啟並讀取 IndexedDB；
+ * 絕不快取帶有 ?token= 的 GAS API 同步請求。
+ */
+
+const CACHE_VERSION = 'trip-pwa-shell-v1.0.0';
+const STATIC_ASSETS = [
   './',
   './index.html',
-  './tripEngine.js',
-  './manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png'
+  './manifest.json',
+  './idbStore.js',
+  './syncService.js',
+  './scheduleEngine.js'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys
+          .filter((key) => key !== CACHE_VERSION)
+          .map((key) => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const urlStr = req.url || '';
+  // GAS Web App 同步端點一律走網路，不寫入靜態 Cache
+  if (urlStr.indexOf('script.google.com') !== -1 || urlStr.indexOf('token=') !== -1) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(req, { ignoreSearch: true }).then((cached) => {
+      if (cached) {
+        return cached;
+      }
+      return fetch(req).then((networkResp) => {
+        if (networkResp && networkResp.status === 200 && req.url.startsWith(self.location.origin)) {
+          const clone = networkResp.clone();
+          caches.open(CACHE_VERSION).then((cache) => cache.put(req, clone));
+        }
+        return networkResp;
+      }).catch(() => {
+        if (req.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+        return new Response('離線且尚無快取資源', { status: 503, statusText: 'Service Unavailable' });
+      });
+    })
+  );
+});
 });
 
 self.addEventListener('activate', (e) => {
