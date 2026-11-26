@@ -1,372 +1,931 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#FFFCF6" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="京阪2027" />
-<title>2027 京阪秋楓旅遊手帳</title>
-<link rel="manifest" href="./manifest.webmanifest" />
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
-<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet" />
-<style>
-:root{--paper:#FFFCF6;--ink:#3E3A39;--coral:#F2A497;--yellow:#F6D27A;--sky:#A8D3E6;--bamboo:#B9DAA5;--card:#FFFDF9;--soft:#F5EFE4}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;padding:0 0 calc(40px + env(safe-area-inset-bottom,0px));background:var(--paper);color:var(--ink);font:16px/1.55 'Huninn',-apple-system,'Noto Sans TC',sans-serif;overflow-x:hidden}
-.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:3px solid var(--ink);padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.brand{font-weight:700;white-space:nowrap}
-.nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.tab{background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:8px 12px;min-height:44px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
-.tab.active{background:var(--yellow)}
-.wrap{max-width:680px;margin:0 auto;padding:14px}
-.card{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px;margin-bottom:12px}
-.hero{display:grid;grid-template-columns:1fr 84px;gap:10px;align-items:center}
-.hero h1{margin:6px 0;font-size:20px}
-.badge{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;background:var(--yellow)}
-.badge.coral{background:var(--coral)}.badge.sky{background:var(--sky)}.badge.bamboo{background:var(--bamboo)}.badge.soft{background:var(--soft)}
-.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
-.strip::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:8px 12px;min-height:44px;font:inherit;color:var(--ink);text-align:center;cursor:pointer}
-.chip.active{background:var(--coral)}
-.chip b{display:block;font-size:14px}.chip small{font-size:12px}
-.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
-.seg{display:inline-flex;border:2.5px solid var(--ink);border-radius:16px;overflow:hidden}
-.seg button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:700;padding:10px 14px;min-height:44px;cursor:pointer}
-.seg .on-sun{background:var(--yellow)}.seg .on-rain{background:var(--sky)}
-.item{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px;margin-bottom:12px}
-.item.done{opacity:.6}.item.skipped{opacity:.45;border-style:dashed}
-.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:6px}
-.time{font-weight:700;background:var(--soft);border:2px solid var(--ink);border-radius:12px;padding:2px 9px}
-.title{margin:4px 0 2px;font-size:18px}
-.jp{font-size:15px;margin-bottom:2px}.addr{font-size:13px;color:#5a5452;margin-bottom:8px}
-.note{background:var(--paper);border:2px dashed var(--ink);border-radius:14px;padding:8px 10px;font-size:14px;margin-bottom:10px}
-.alert{background:var(--coral);border:2.5px solid var(--ink);border-radius:14px;padding:8px 10px;font-size:14px;font-weight:700;margin-bottom:10px}
-.move{background:var(--bamboo);border:2.5px solid var(--ink);border-radius:16px;padding:8px 12px;margin:-4px 0 12px 14px;font-size:14px;font-weight:700}
-.acts{display:flex;flex-wrap:wrap;gap:8px}
-.btn{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:8px 12px;min-height:44px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
-.btn:active{background:var(--yellow)}
-.todo{display:flex;gap:10px;padding:10px;border:2.5px solid var(--ink);border-radius:16px;background:var(--paper);margin-bottom:8px;cursor:pointer}
-.todo input{width:22px;height:22px;accent-color:var(--ink);flex:0 0 auto}
-.struck{text-decoration:line-through;opacity:.65}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:14px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
-.toast.show{opacity:1}
-.hidden{display:none!important}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.bob{animation:bob 3.6s ease-in-out infinite}
-@keyframes pop{from{transform:scale(.97);opacity:.6}to{transform:scale(1);opacity:1}}
-.pop{animation:pop .25s ease-out}
-@media (prefers-reduced-motion:reduce){body:not(.motion-normal) .bob,body:not(.motion-normal) .pop{animation:none!important}}
-body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e3a5f" />
+  <title>家庭旅遊離線電子手帳</title>
+  <link rel="manifest" href="./manifest.json" />
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #1e3a5f;
+      --primary-weak: #e8eef5;
+      --ok: #15803d;
+      --ok-bg: #dcfce7;
+      --warn: #b45309;
+      --warn-bg: #fef3c7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+      --border: #e5e7eb;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0 0 84px 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    header.topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .topbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .badge-net {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      white-space: nowrap;
+    }
+
+    .sub-info {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .banner {
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      font-size: 13px;
+      display: none;
+    }
+    .banner.show { display: block; }
+    .banner.info { background: var(--primary-weak); color: var(--primary); border: 1px solid #bfd2e8; }
+    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #86efac; }
+    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
+    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1px solid #fca5a5; }
+
+    .controls-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .controls-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    select, input[type="text"], input[type="number"], textarea {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+    }
+    button:active { transform: scale(0.99); }
+    button.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+    button.btn-warn { background: var(--warn); color: #fff; border-color: var(--warn); }
+    button.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+    button.btn-sm { padding: 5px 9px; font-size: 12px; }
+
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill {
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: var(--text);
+    }
+    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
+    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; }
+
+    .timeline-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .timeline-item.status-done { border-left-color: var(--ok); opacity: 0.85; }
+    .timeline-item.status-skipped { border-left-color: #9ca3af; opacity: 0.72; }
+    .timeline-item.is-late { border-left-color: var(--danger); }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .item-time {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .item-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 3px 0 2px 0;
+    }
+    .item-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 5px;
+      margin-right: 4px;
+      margin-top: 4px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .tag.override { background: #dbeafe; color: #1d4ed8; }
+    .tag.inserted { background: #ede9fe; color: #6d28d9; }
+    .tag.late { background: var(--danger-bg); color: var(--danger); }
+
+    .alert-box {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+    .warn-box {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .item-actions {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .edit-panel {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: none;
+    }
+    .edit-panel.open { display: block; }
+    .edit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .field-box label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .field-row-inline {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .field-row-inline input, .field-row-inline select {
+      width: 100%;
+    }
+
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .section-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+    }
+    .muted-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0 10px 0;
+    }
+
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+    nav.bottom-nav button {
+      border: none;
+      border-radius: 0;
+      padding: 10px 4px;
+      font-size: 12px;
+      background: transparent;
+      color: var(--muted);
+    }
+    nav.bottom-nav button.active {
+      color: var(--primary);
+      background: var(--primary-weak);
+      font-weight: 700;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      background: var(--card);
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">🍁 京阪 2027</div>
-  <nav class="nav">
-    <button class="tab active" data-view="schedule">每日行程</button>
-    <button class="tab" data-view="pocket">備選口袋</button>
-    <button class="tab" data-view="meta">航班住宿待辦</button>
-    <button class="tab" data-view="settings">設定</button>
-  </nav>
-</header>
-<main class="wrap">
-  <section class="card hero">
-    <div>
-      <span class="badge bamboo" id="countdown"></span>
-      <h1>2027 京阪秋楓手帳</h1>
-      <span class="badge soft" id="syncInfo"></span>
+  <header class="topbar">
+    <div class="topbar-row">
+      <h1 class="topbar-title">家庭旅遊離線電子手帳</h1>
+      <span id="netBadge" class="badge-net">檢查中</span>
     </div>
-    <svg class="bob" viewBox="0 0 96 96" width="84" height="84" fill="none" aria-hidden="true">
-      <circle cx="48" cy="48" r="40" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
-      <path d="M22 36H74M26 45H70M35 36V74M61 36V74" stroke="#3E3A39" stroke-width="3.5" stroke-linecap="round"/>
-      <path d="M72 22C78 24 80 30 74 34 72 29 70 25 72 22Z" fill="#F2A497" stroke="#3E3A39" stroke-width="2.5"/>
-    </svg>
-  </section>
-
-  <section id="view-schedule" class="pop">
-    <div class="strip" id="dateStrip"></div>
-    <div class="row">
-      <div class="seg"><button id="btnSun">☀️ 晴天路線</button><button id="btnRain">🌧️ 雨天路線</button></div>
-      <span class="badge sky" id="daySummary"></span>
+    <div id="syncMetaBar" class="sub-info">
+      <span>尚未同步雲端底稿</span>
     </div>
-    <div id="timeline"></div>
-  </section>
+  </header>
 
-  <section id="view-pocket" class="hidden pop">
-    <div class="card">
-      <h2 style="margin:0 0 8px;font-size:18px">🎒 備選口袋景點</h2>
-      <div class="acts" id="ioFilter" style="margin-bottom:10px"></div>
-      <div class="acts" id="areaFilter" style="margin-bottom:12px"></div>
-      <div id="pocketList"></div>
-    </div>
-  </section>
+  <main>
+    <div id="globalBanner" class="banner"></div>
 
-  <section id="view-meta" class="hidden pop">
-    <div class="card"><h2 style="margin:0 0 8px;font-size:18px">✈️ 航班與住宿</h2><div id="travelInfo"></div></div>
-    <div class="card"><h2 style="margin:0 0 8px;font-size:18px">✅ 待辦清單</h2><div id="todoList"></div></div>
-  </section>
+    <!-- 分頁 1：每日行程 -->
+    <section id="tab-schedule" class="tab-page active">
+      <div class="controls-card">
+        <div class="controls-line">
+          <label for="dateSelect"><strong>日期：</strong></label>
+          <select id="dateSelect"></select>
 
-  <section id="view-settings" class="hidden pop">
-    <div class="card">
-      <h2 style="margin:0 0 8px;font-size:18px">⚙️ 設定</h2>
-      <div class="acts">
-        <button class="btn" id="motionBtn"></button>
-        <button class="btn" id="resetStateBtn">清除完成／跳過狀態</button>
-        <button class="btn" id="resetAllBtn">重設為完整 9 天資料</button>
+          <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
+          <button id="btnToggleStop" class="btn-sm btn-warn">今天就到這裡</button>
+        </div>
+        <div id="dayStats" class="stats-bar"></div>
       </div>
-      <p class="note" style="margin-top:12px" id="swStatus">離線快取狀態檢查中…</p>
-    </div>
-  </section>
-</main>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="./tripEngine.js"></script>
-<script>
-(function () {
-  'use strict';
-  const K = { bundle: 'KO2027_BUNDLE_V3', state: 'KO2027_STATE_V3', pref: 'KO2027_PREF_V3' };
-  const E = window.TripEngine;
+      <div id="scheduleList"></div>
+    </section>
 
-  const SAMPLE = {
-    itinerary: [
-      { slot_id: 'SLOT-0003', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0004', title_zh: '關西機場入境與搭乘HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '星宇航空抵達后領行李與兌換車票' },
-      { slot_id: 'SLOT-0004', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', deadline_time: '', deadline_type: '', dwell_min: 45, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '京都車站', sort_order: 20, activity_id: 'ACT-0005', title_zh: '京都車站飯店寄放行李', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '先寄放行李再輕裝出門' },
-      { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0006', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', coords: '', note: '楓葉季夜楓名所' },
-      { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 5, buffer_min: 5, transport_mode: '步行', area: '京都車站', sort_order: 30, activity_id: 'ACT-0007', title_zh: '京都車站大階梯光影與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', coords: '', note: '雨天室內備案，晚餐吃豚骨/雞白湯拉麵' },
-      { slot_id: 'SLOT-0006', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0008', title_zh: '先斗町京都豚骨與炸豬排晚餐', title_jp: '先斗町', address_jp: '京都市中京区先斗町通', coords: '', note: '避開牛肉、牛油與肥腸' },
+    <!-- 分頁 2：備選口袋 -->
+    <section id="tab-pocket" class="tab-page">
+      <div class="section-card">
+        <h3>插入備選景點至當日行程</h3>
+        <p class="muted-note">插入後將保存完整景點快照、停留／交通設定與錨點位置；若錨點活動日後被雲端刪除，將自動改接至當日末端且不刪除。</p>
+        <div class="controls-line">
+          <label for="insertAnchorSelect"><strong>插入位置：</strong></label>
+          <select id="insertAnchorSelect"></select>
+        </div>
+      </div>
+      <div id="pocketList"></div>
+    </section>
 
-      { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'flexible', start_time: '08:30', deadline_time: '', deadline_type: '', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0009', title_zh: '渡月橋與桂川河畔晨間散步', title_jp: '渡月橋', address_jp: '京都市右京区嵯峨中ノ島町', coords: '', note: '避開人潮拍攝晨景' },
-      { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'rain', time_type: 'flexible', start_time: '08:30', deadline_time: '', deadline_type: '', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0010', title_zh: '天龍寺大方丈室內迴廊賞楓', title_jp: '天龍寺', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町68', coords: '', note: '雨天可於室內迴廊坐賞曹源池庭園' },
-      { slot_id: 'SLOT-0008', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 20, activity_id: 'ACT-0011', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', coords: '', note: '需事先官網預約，水鏡倒影紅葉' },
-      { slot_id: 'SLOT-0009', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '11:45', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 30, activity_id: 'ACT-0012', title_zh: '嵐山鯛魚茶泡飯與天婦羅午餐', title_jp: '嵐山', address_jp: '京都市右京区嵯峨天龍寺造路町', coords: '', note: '海鮮與野菜天婦羅為主' },
-      { slot_id: 'SLOT-0010', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '13:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: 'JR', area: '嵐山', sort_order: 40, activity_id: 'ACT-0013', title_zh: '常寂光寺與竹林小徑', title_jp: '常寂光寺', address_jp: '京都市右京区嵯峨小倉山小倉町3', coords: '', note: '楓紅隧道步道' },
-      { slot_id: 'SLOT-0011', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '17:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 50, activity_id: 'ACT-0014', title_zh: '京都車站地下街採買與海鮮丼晚餐', title_jp: '京都ポルタ', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町902', coords: '', note: '不吃活魷魚刺身與牛肉' },
+    <!-- 分頁 3：住宿與航班 -->
+    <section id="tab-meta" class="tab-page">
+      <div id="metaList"></div>
+    </section>
 
-      { slot_id: 'SLOT-0012', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'fixed', start_time: '08:45', deadline_time: '09:00', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0015', title_zh: '八瀬瑠璃光院預約賞楓', title_jp: '瑠璃光院', address_jp: '京都市左京区上高野東山55', coords: '', note: '秋季特別拜觀需提前預約' },
-      { slot_id: 'SLOT-0013', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'sun', time_type: 'flexible', start_time: '10:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 20, activity_id: 'ACT-0016', title_zh: '大原三千院聚碧園與往生極樂院', title_jp: '三千院', address_jp: '京都市左京区大原来迎院町540', coords: '', note: '苔庭紅葉與地藏石像' },
-      { slot_id: 'SLOT-0013', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'rain', time_type: 'flexible', start_time: '10:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 20, activity_id: 'ACT-0017', title_zh: '實相院床紅葉室內賞景', title_jp: '実相院', address_jp: '京都市左京区岩倉上蔵町121', coords: '', note: '室內木地板倒映紅葉，雨天亦佳' },
-      { slot_id: 'SLOT-0014', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'flexible', start_time: '13:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 35, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 30, activity_id: 'ACT-0018', title_zh: '北山通手作漢堡排（純豬肉）與洋食午餐', title_jp: '北山通', address_jp: '京都市左京区下鴨前萩町', coords: '', note: '確認使用100%純豬肉排' },
-      { slot_id: 'SLOT-0015', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0019', title_zh: '河原町商店街散步與京風雞肉水炊鍋晚餐', title_jp: '河原町通', address_jp: '京都市中京区河原町通四条上ル', coords: '', note: '博多/京風雞白湯水炊鍋' },
+    <!-- 分頁 4：設定、資料管理與備份 -->
+    <section id="tab-settings" class="tab-page">
+      <div class="section-card">
+        <h3>雲端同步設定（單向：雲端 → 手機）</h3>
+        <p class="muted-note">輸入 GAS Web App <code>/exec</code> 網址與 <code>API_TOKEN</code> 後，可手動同步最新底稿；離線或同步失敗時保留既有本機底稿不動。</p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
+          <input id="apiUrlInput" type="text" placeholder="GAS Web App 網址（https://script.google.com/macros/s/.../exec）" />
+          <input id="apiTokenInput" type="text" placeholder="API_TOKEN" />
+        </div>
+        <div class="controls-line">
+          <button id="btnSaveConfig" class="btn-primary">儲存連線設定</button>
+          <button id="btnSyncNow" class="btn-ok">立即同步雲端底稿</button>
+        </div>
+      </div>
 
-      { slot_id: 'SLOT-0016', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'fixed', start_time: '08:23', deadline_time: '08:38', deadline_type: 'depart_by', dwell_min: 15, travel_min: 125, buffer_min: 10, transport_mode: '特急/新幹線', area: '京都車站', sort_order: 10, activity_id: 'ACT-0020', title_zh: '搭乘JR特急橋立號前往天橋立', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '劃位指定席前往丹後地區' },
-      { slot_id: 'SLOT-0017', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'sun', time_type: 'flexible', start_time: '11:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 20, activity_id: 'ACT-0021', title_zh: '天橋立View Land飛龍觀展望台', title_jp: '天橋立ビューランド', address_jp: '京都府宮津市文珠437', coords: '', note: '搭乘單人吊椅或單軌車上山' },
-      { slot_id: 'SLOT-0017', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'rain', time_type: 'flexible', start_time: '11:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '天橋立', sort_order: 20, activity_id: 'ACT-0022', title_zh: '智恩寺與迴旋橋周邊慢遊', title_jp: '智恩寺', address_jp: '京都府宮津市文珠466', coords: '', note: '扇子籤與文殊堂參拜' },
-      { slot_id: 'SLOT-0018', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'flexible', start_time: '13:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 30, activity_id: 'ACT-0023', title_zh: '天橋立海鮮丼與丹後鯖魚壽司午餐', title_jp: '天橋立駅周辺', address_jp: '京都府宮津市字文珠', coords: '', note: '現流鮮魚定食' },
-      { slot_id: 'SLOT-0019', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '天橋立', sort_order: 40, activity_id: 'ACT-0024', title_zh: '天橋立溫泉旅館入住與懷石晚餐', title_jp: '天橋立温泉', address_jp: '京都府宮津市文珠', coords: '', note: '備註不吃牛肉與牛油' },
+      <div class="section-card">
+        <h3>行程資料管理</h3>
+        <p class="muted-note">
+          • <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
+          • 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
+        </p>
+        <button id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
+      </div>
 
-      { slot_id: 'SLOT-0020', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'sun', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 20, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 10, activity_id: 'ACT-0025', title_zh: '傘松公園昇龍觀與成相寺遠眺', title_jp: '傘松公園', address_jp: '京都府宮津市大垣75', coords: '', note: '搭乘觀光船橫渡阿蘇海再轉纜車' },
-      { slot_id: 'SLOT-0020', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'rain', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 30, buffer_min: 5, transport_mode: '巴士', area: '天橋立', sort_order: 10, activity_id: 'ACT-0026', title_zh: '丹後ちりめん歷史館織布體驗', title_jp: '丹後ちりめん歴史館', address_jp: '京都府与謝郡与謝野町加悦1085', coords: '', note: '雨天室內工藝參觀' },
-      { slot_id: 'SLOT-0021', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'all', time_type: 'flexible', start_time: '12:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 130, buffer_min: 15, transport_mode: '特急/新幹線', area: '天橋立', sort_order: 20, activity_id: 'ACT-0027', title_zh: '天橋立午餐後搭特急返回京都市區', title_jp: '天橋立駅', address_jp: '京都府宮津市文珠314-2', coords: '', note: '指定席返回京都車站' },
-      { slot_id: 'SLOT-0022', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'all', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 30, activity_id: 'ACT-0028', title_zh: '京都車站伊勢丹百貨與炸豬排晚餐', title_jp: 'ジェイアール京都伊勢丹', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町', coords: '', note: '名代豬排或和幸豬排' },
+      <div class="section-card">
+        <h3>備份匯出／匯入</h3>
+        <p class="muted-note">匯出或還原完整四個資料區（<code>baseline</code>、<code>local_overrides</code>、<code>runtime_state</code>、<code>removed_history</code>）。匯入時會驗證版本與結構，並依備份完整覆蓋本機狀態。</p>
+        <div class="controls-line">
+          <button id="btnExportBackup">匯出備份 JSON</button>
+          <button id="btnTriggerImport">匯入備份 JSON</button>
+          <input id="importFileInput" type="file" accept="application/json,.json" style="display:none;" />
+        </div>
+      </div>
 
-      { slot_id: 'SLOT-0023', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'sun', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0029', title_zh: '金閣寺鏡湖池晨間參拜', title_jp: '鹿苑寺 金閣寺', address_jp: '京都市北区金閣寺町1', coords: '', note: '順光拍攝金色舍利殿倒影' },
-      { slot_id: 'SLOT-0023', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'rain', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0030', title_zh: '京都府立陶板名畫之庭與北山室內散步', title_jp: '京都府立陶板名画の庭', address_jp: '京都市左京区下鴨半木町', coords: '', note: '安藤忠雄建築與周邊咖啡廳' },
-      { slot_id: 'SLOT-0024', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '12:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 20, activity_id: 'ACT-0031', title_zh: '南禪寺天授庵與水路閣賞楓', title_jp: '南禅寺 天授庵', address_jp: '京都市左京区南禅寺福地町', coords: '', note: '枯山水庭園紅葉' },
-      { slot_id: 'SLOT-0025', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0032', title_zh: '花見小路與白川南通散策', title_jp: '花見小路通', address_jp: '京都市東山区祇園町南側', coords: '', note: '傍晚點燈氛圍' },
-      { slot_id: 'SLOT-0026', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '18:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0033', title_zh: '祇園烤雞串與京野菜居酒屋晚餐', title_jp: '祇園四条', address_jp: '京都市東山区四条通大和大路西入', coords: '', note: '點選雞肉串燒、烤魚與釜飯' },
+      <div class="section-card">
+        <h3>已移除項目歷史紀錄（removed_history）</h3>
+        <p class="muted-note">雲端底稿移除但本機曾有欄位修改的活動會保留在此，供查閱或一鍵清空。</p>
+        <div style="margin-bottom:8px;">
+          <button id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
+        </div>
+        <div id="removedHistoryList"></div>
+      </div>
+    </section>
+  </main>
 
-      { slot_id: 'SLOT-0027', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'fixed', start_time: '09:30', deadline_time: '10:00', deadline_type: 'depart_by', dwell_min: 30, travel_min: 30, buffer_min: 10, transport_mode: 'JR', area: '京都車站', sort_order: 10, activity_id: 'ACT-0034', title_zh: '京都飯店退房並搭JR新快速移動至大阪梅田', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '直達大阪站後前往梅田飯店寄放行李' },
-      { slot_id: 'SLOT-0028', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'sun', time_type: 'flexible', start_time: '11:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 15, buffer_min: 5, transport_mode: '地鐵', area: '大阪梅田', sort_order: 20, activity_id: 'ACT-0035', title_zh: '大阪城公園天守閣與銀杏大道', title_jp: '大阪城公園', address_jp: '大阪市中央区大阪城1-1', coords: '', note: '12月初金黃銀杏葉正美' },
-      { slot_id: 'SLOT-0028', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'rain', time_type: 'flexible', start_time: '11:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪梅田', sort_order: 20, activity_id: 'ACT-0036', title_zh: 'Grand Front Osaka與Lucua百貨逛街', title_jp: 'グランフロント大阪', address_jp: '大阪市北区大深町4-20', coords: '', note: '全室內連通商場不怕雨' },
-      { slot_id: 'SLOT-0029', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪梅田', sort_order: 30, activity_id: 'ACT-0037', title_zh: '梅田藍天大廈空中庭園展望台', title_jp: '梅田スカイビル', address_jp: '大阪市北区大淀中1-1-88', coords: '', note: '欣賞大阪夕陽與夜景' },
-      { slot_id: 'SLOT-0030', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'flexible', start_time: '18:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '大阪梅田', sort_order: 40, activity_id: 'ACT-0038', title_zh: '梅田大阪燒與章魚燒鐵板料理晚餐', title_jp: '梅田', address_jp: '大阪市北区梅田', coords: '', note: '點豬肉海鮮綜合大阪燒（不加牛筋）' },
+  <nav class="bottom-nav">
+    <button class="active" data-tab="tab-schedule">每日行程</button>
+    <button data-tab="tab-pocket">備選口袋</button>
+    <button data-tab="tab-meta">住宿航班</button>
+    <button data-tab="tab-settings">設定備份</button>
+  </nav>
 
-      { slot_id: 'SLOT-0031', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'sun', time_type: 'flexible', start_time: '09:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 15, buffer_min: 5, transport_mode: '地鐵', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0039', title_zh: '海遊館與天保山港灣區', title_jp: '海遊館', address_jp: '大阪市港区海岸通1-1-10', coords: '', note: '親子必訪世界級水族館' },
-      { slot_id: 'SLOT-0031', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'rain', time_type: 'flexible', start_time: '09:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0040', title_zh: '難波Parks與高島屋親子購物', title_jp: 'なんばパークス', address_jp: '大阪市浪速区難波中2-10-70', coords: '', note: '雨天室內購物動線順暢' },
-      { slot_id: 'SLOT-0032', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '12:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 20, activity_id: 'ACT-0041', title_zh: '黑門市場與千日前道具屋筋午餐', title_jp: '黒門市場', address_jp: '大阪市中央区日本橋2-4-1', coords: '', note: '現烤扇貝、鮪魚壽司與章魚燒' },
-      { slot_id: 'SLOT-0033', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 150, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 30, activity_id: 'ACT-0042', title_zh: '心齋橋筋商店街與道頓堀藥妝伴手禮採買', title_jp: '心斎橋筋商店街', address_jp: '大阪市中央区心斎橋筋', coords: '', note: '集中採買藥妝與零食伴手禮' },
-      { slot_id: 'SLOT-0034', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '大阪難波', sort_order: 40, activity_id: 'ACT-0043', title_zh: '道頓堀迴轉壽司與串炸晚餐', title_jp: '道頓堀', address_jp: '大阪市中央区道頓堀', coords: '', note: '海鮮與豬肉蔬菜串炸（不點牛肉串）' },
+  <script src="./idbStore.js"></script>
+  <script src="./syncService.js"></script>
+  <script src="./scheduleEngine.js"></script>
+  <script>
+    (() => {
+      const PREF_KEYS = {
+        API_URL: 'trip_pwa_api_url',
+        API_TOKEN: 'trip_pwa_api_token',
+        SELECTED_DATE: 'trip_pwa_selected_date'
+      };
 
-      { slot_id: 'SLOT-0035', trip_date: '2027-12-03', day_label: 'Day 9', weather_mode: 'all', time_type: 'fixed', start_time: '09:00', deadline_time: '09:30', deadline_type: 'depart_by', dwell_min: 30, travel_min: 40, buffer_min: 15, transport_mode: '特急/新幹線', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0044', title_zh: '難波飯店退房搭乘南海電鐵Rapi:t前往關西機場', title_jp: '南海なんば駅', address_jp: '大阪市中央区難波5-1-60', coords: '', note: '全車指定席直達關西機場第一航廈' },
-      { slot_id: 'SLOT-0036', trip_date: '2027-12-03', day_label: 'Day 9', weather_mode: 'all', time_type: 'fixed', start_time: '10:30', deadline_time: '11:00', deadline_type: 'arrive_by', dwell_min: 150, travel_min: 0, buffer_min: 0, transport_mode: '', area: '關西機場', sort_order: 20, activity_id: 'ACT-0045', title_zh: '關西機場報到退稅與搭乘星宇航空返台', title_jp: '関西国際空港 第1ターミナル', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '免稅店最後採買並搭機返回桃園機場' }
-    ],
-    pocket_spots: [
-      { pocket_id: 'PK-0002', area: '嵐山', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '步行', title_zh: '寶嚴院獅子吼庭園', title_jp: '宝厳院', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町36', coords: '', note: '紅葉迴遊式庭園，可彈性安插於嵐山行程' },
-      { pocket_id: 'PK-0003', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '巴士', title_zh: '詩仙堂丈山寺', title_jp: '詩仙堂', address_jp: '京都市左京区一乗寺門口町27', coords: '', note: '一乘寺區域靜謐賞楓庭園' },
-      { pocket_id: 'PK-0004', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 20, transport_mode: '巴士', title_zh: '圓光寺十牛之庭', title_jp: '圓光寺', address_jp: '京都市左京区一乗寺小谷町13', coords: '', note: '需留意楓葉季是否採事前預約制' },
-      { pocket_id: 'PK-0005', area: '祇園河原町', indoor_outdoor: 'mixed', default_dwell_min: 60, default_travel_min: 10, transport_mode: '步行', title_zh: '建仁寺風神雷神圖與潮音庭', title_jp: '建仁寺', address_jp: '京都市東山区大和大路通四条下ル小松町', coords: '', note: '室內走廊與庭園兼具，雨天亦可參觀' },
-      { pocket_id: 'PK-0006', area: '京都車站', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 5, transport_mode: '步行', title_zh: '京都塔展望室與大浴場', title_jp: '京都タワー', address_jp: '京都市下京区烏丸通七条下ル東塩小路町721-1', coords: '', note: '夜間雨天備案，適合晚間放鬆' },
-      { pocket_id: 'PK-0007', area: '大阪梅田', indoor_outdoor: 'indoor', default_dwell_min: 120, default_travel_min: 10, transport_mode: '步行', title_zh: '阪神百貨梅田本店美食街', title_jp: '阪神梅田本店', address_jp: '大阪市北区梅田1-13-13', coords: '', note: '甜點伴手禮與熟食名店集中' },
-      { pocket_id: 'PK-0008', area: '大阪難波', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 10, transport_mode: '步行', title_zh: '難波八阪神社與周邊商店街', title_jp: '難波八阪神社', address_jp: '大阪市浪速区元町2-9-19', coords: '', note: '巨大獅子殿拍照打卡點' },
-      { pocket_id: 'PK-0009', area: '其他', indoor_outdoor: 'indoor', default_dwell_min: 120, default_travel_min: 20, transport_mode: 'JR', title_zh: '京都鐵道博物館', title_jp: '京都鉄道博物館', address_jp: '京都市下京区観喜寺町', coords: '', note: '親子雨天最佳室內備案（JR梅小路京都西站）' }
-    ],
-    trip_meta: [
-      { meta_id: 'META-0002', trip_date: '2027-11-25', category: 'flight', title_zh: '星宇航空 JX820 桃園→關西', title_jp: 'スターラックス航空 JX820', address_jp: '関西国際空港 第1ターミナル', info_text: '預約狀態：待預約；07:40 桃園起飛 / 11:10 抵達關西（經濟艙直飛）' },
-      { meta_id: 'META-0003', trip_date: '2027-12-03', category: 'flight', title_zh: '星宇航空 JX821 關西→桃園', title_jp: 'スターラックス航空 JX821', address_jp: '関西国際空港 第1ターミナル', info_text: '預約狀態：待預約；12:20 關西起飛 / 14:35 抵達桃園（經濟艙直飛）' },
-      { meta_id: 'META-0004', trip_date: '2027-11-25', category: 'hotel', title_zh: '京都車站周邊飯店（連住3晚）', title_jp: '京都駅周辺ホテル', address_jp: '京都市下京区東塩小路町', info_text: '預約狀態：待預約；11/25～11/28 入住3晚，雙床或家庭房' },
-      { meta_id: 'META-0005', trip_date: '2027-11-28', category: 'hotel', title_zh: '天橋立溫泉旅館（1晚）', title_jp: '天橋立温泉 旅館', address_jp: '京都府宮津市文珠', info_text: '預約狀態：待預約；11/28～11/29 入住1晚，含早晚餐（備註不吃牛肉與牛油）' },
-      { meta_id: 'META-0006', trip_date: '2027-11-29', category: 'hotel', title_zh: '京都車站周邊飯店（連住2晚）', title_jp: '京都駅周辺ホテル', address_jp: '京都市下京区東塩小路町', info_text: '預約狀態：待預約；11/29～12/01 入住2晚，方便前往洛北與祇園' },
-      { meta_id: 'META-0007', trip_date: '2027-12-01', category: 'hotel', title_zh: '大阪難波／梅田飯店（連住2晚）', title_jp: '大阪難波・梅田ホテル', address_jp: '大阪市中央区難波', info_text: '預約狀態：待預約；12/01～12/03 入住2晚，近南海電鐵直達關西機場' },
-      { meta_id: 'META-0008', trip_date: '', category: 'todo', title_zh: '嵐山祐齋亭與八瀬瑠璃光院紅葉季線上預約', title_jp: '嵐山 祐斎亭・瑠璃光院 事前予約', address_jp: '', info_text: '預約狀態：待預約；開放預約當日準時搶票（預計10月下旬開放）' },
-      { meta_id: 'META-0009', trip_date: '', category: 'todo', title_zh: 'JR西日本關西廣域周遊券／特急指定席兌換', title_jp: 'JR-WEST RAIL PASS', address_jp: '京都駅 みどりの窓口', info_text: '預約狀態：免預約；兌換HARUKA與特急橋立號往返天橋立指定席' },
-      { meta_id: 'META-0010', trip_date: '', category: 'todo', title_zh: '日本入境 Visit Japan Web 與旅遊保險', title_jp: 'Visit Japan Web', address_jp: '', info_text: '預約狀態：免預約；出發前72小時完成海關與入境QR Code登錄' }
-    ]
-  };
+      let currentDate = '';
+      let currentSchedule = null;
 
-  const store = {
-    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (_) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
-    del(k) { try { localStorage.removeItem(k); } catch (_) {} }
-  };
-  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const $ = (id) => document.getElementById(id);
-
-  let bundle = E.normalizeBundle(store.get(K.bundle) || SAMPLE);
-  if (!bundle.itinerary.length) bundle = E.normalizeBundle(SAMPLE);
-  let rt = Object.assign({ status: {}, actualEnd: {}, weather: {}, todo: {} }, store.get(K.state) || {});
-  const dates = Array.from(new Set(bundle.itinerary.map((i) => i.tripDate).filter(Boolean))).sort();
-  let activeDate = dates[0] || '';
-  let pocketIo = 'all', pocketArea = 'ALL', motion = (store.get(K.pref) || {}).motion || 'system';
-  const saveRt = () => store.set(K.state, rt);
-
-  function toast(msg) {
-    const el = $('toast'); el.textContent = msg; el.classList.add('show');
-    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800);
-  }
-  async function copy(text, label) {
-    if (!text) return toast('沒有可複製的內容');
-    try { await navigator.clipboard.writeText(text); toast('已複製' + label); }
-    catch (_) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (__) {} t.remove(); toast('已複製' + label); }
-  }
-  const mapUrl = (a, b, c) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a || b || c || '');
-  const copyBtn = (text, label) => text ? '<button class="btn" data-copy="' + encodeURIComponent(text) + '" data-label="' + label + '">複製' + label + '</button>' : '';
-  const mapBtn = (jp, addr, zh) => '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + esc(mapUrl(addr, jp, zh)) + '">🗺️ 地圖</a>';
-  const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
-
-  function renderCountdown() {
-    const start = bundle.meta.tripStartDate || dates[0];
-    const el = $('countdown');
-    if (!start) { el.textContent = '尚無行程日期'; return; }
-    const diff = Math.ceil((new Date(start + 'T00:00:00+09:00').getTime() - Date.now()) / 86400000);
-    el.textContent = diff > 0 ? '距離出發還有 ' + diff + ' 天' : diff === 0 ? '今天出發！' : '旅程進行中／已結束';
-    $('syncInfo').textContent = '資料：' + (store.get(K.bundle) ? '本機快取（9 天完整版）' : '內建 9 天完整資料');
-  }
-
-  function renderDates() {
-    $('dateStrip').innerHTML = dates.map((d) => {
-      const s = bundle.itinerary.find((i) => i.tripDate === d);
-      return '<button class="chip ' + (d === activeDate ? 'active' : '') + '" data-date="' + esc(d) + '"><b>' + esc(s ? s.dayLabel : '') + '</b><small>' + esc(d.slice(5)) + '</small></button>';
-    }).join('');
-  }
-
-  function renderSchedule() {
-    const mode = rt.weather[activeDate] || 'sun';
-    $('btnSun').className = mode === 'sun' ? 'on-sun' : '';
-    $('btnRain').className = mode === 'rain' ? 'on-rain' : '';
-    const route = E.buildDayRoute(bundle.itinerary, activeDate, mode);
-    const tl = E.computeTimeline(route, { status: rt.status, actualEnd: rt.actualEnd });
-    $('daySummary').textContent = (mode === 'sun' ? '☀️ 晴天' : '🌧️ 雨天') + '・' + tl.length + ' 站';
-    if (!tl.length) { $('timeline').innerHTML = '<div class="card">這一天此天氣模式下尚無行程。</div>'; return; }
-
-    $('timeline').innerHTML = tl.map((r) => {
-      const st = r.status;
-      const timeStr = st === 'skipped' ? '已跳過' : (r.startFormatted.text || '未定時間') + (r.departFormatted.text ? ' → ' + r.departFormatted.text : '') + (r.departFormatted.isNextDay ? '（跨日）' : '');
-      const delay = r.delayMin > 0 && st !== 'skipped' ? '<span class="badge coral">較預定晚 ' + r.delayMin + ' 分</span>' : '';
-      const alt = r.isWeatherAlternative ? '<span class="badge ' + (r.weatherMode === 'rain' ? 'sky' : '') + '">' + (r.weatherMode === 'rain' ? '雨天替代' : '晴天替代') + '</span>' : '';
-      const fixed = r.timeType === 'fixed' ? '<span class="badge coral">固定時段</span>' : '';
-      let al = '';
-      if (r.deadlineAlert) {
-        const a = r.deadlineAlert;
-        al = a.isLate
-          ? '<div class="alert">⚠️ 預計 ' + esc(a.actualFormatted) + '，晚於截止 ' + esc(a.deadlineTime) + '（+' + a.diffMin + ' 分）</div>'
-          : '<div class="note">⏰ 截止 ' + esc(a.deadlineTime) + '，預計 ' + esc(a.actualFormatted) + '，時間充裕</div>';
+      function showBanner(type, text) {
+        const el = document.getElementById('globalBanner');
+        el.className = 'banner show ' + (type || 'info');
+        el.textContent = text;
       }
-      const next = r.nextArrivalFormatted.text ? '（預計 ' + r.nextArrivalFormatted.text + ' 抵達下一站）' : '';
-      const move = r.hasMoveToNext && st !== 'skipped'
-        ? '<div class="move">交通：' + esc(r.transportMode || '移動') + '（' + r.travelUsed + ' 分 + 緩衝 ' + r.bufferUsed + ' 分）' + next + '</div>' : '';
-      const ctl = st === 'pending'
-        ? '<button class="btn" data-act="done" data-id="' + esc(r.activityId) + '">✅ 完成</button><button class="btn" data-act="skip" data-id="' + esc(r.activityId) + '">⏭️ 跳過</button>'
-        : '<button class="btn" data-act="undo" data-id="' + esc(r.activityId) + '">↩️ 還原</button>';
-      return '<article class="item ' + (st !== 'pending' ? st : '') + '">' +
-        '<div class="head"><span class="time">🕒 ' + esc(timeStr) + '</span><span>' + '<span class="badge soft">' + esc(r.area || '未標示') + '</span> ' + fixed + ' ' + alt + ' ' + delay + '</span></div>' +
-        '<h3 class="title">' + r.stepIndex + '. ' + esc(r.titleZh || '未命名') + '</h3>' +
-        (r.titleJp ? '<div class="jp">🇯🇵 ' + esc(r.titleJp) + '</div>' : '') +
-        (r.addressJp ? '<div class="addr">📍 ' + esc(r.addressJp) + '</div>' : '') +
-        (r.note ? '<div class="note">📝 ' + esc(r.note) + '</div>' : '') + al +
-        '<div class="acts">' + ctl + copyBtn(r.titleJp, '日文') + copyBtn(r.addressJp, '地址') + mapBtn(r.titleJp, r.addressJp, r.titleZh) + '</div></article>' + move;
-    }).join('');
-  }
 
-  function renderPocket() {
-    const ioMap = { all: '全部', indoor: '🏠 室內', outdoor: '🍂 戶外', mixed: '🌤️ 混合' };
-    $('ioFilter').innerHTML = Object.keys(ioMap).map((k) => '<button class="tab ' + (pocketIo === k ? 'active' : '') + '" data-io="' + k + '">' + ioMap[k] + '</button>').join('');
-    const areas = ['ALL'].concat(Array.from(new Set(bundle.pocketSpots.map((x) => x.area).filter(Boolean))));
-    $('areaFilter').innerHTML = areas.map((a) => '<button class="tab ' + (pocketArea === a ? 'active' : '') + '" data-area="' + esc(a) + '">' + (a === 'ALL' ? '全部區域' : esc(a)) + '</button>').join('');
-    const list = E.filterPocket(bundle.pocketSpots, { area: pocketArea, indoorOutdoor: pocketIo });
-    $('pocketList').innerHTML = list.length ? list.map((x) =>
-      '<div class="item"><div class="head"><span class="badge soft">' + esc(x.area) + '</span><span class="badge sky">' + esc(ioMap[x.indoorOutdoor] || x.indoorOutdoor) + '</span><span class="badge bamboo">停留 ' + x.defaultDwellMin + ' 分・' + esc(x.transportMode || '移動') + ' ' + x.defaultTravelMin + ' 分</span></div>' +
-      '<h3 class="title">' + esc(x.titleZh) + '</h3>' +
-      (x.titleJp ? '<div class="jp">🇯🇵 ' + esc(x.titleJp) + '</div>' : '') +
-      (x.addressJp ? '<div class="addr">📍 ' + esc(x.addressJp) + '</div>' : '') +
-      (x.note ? '<div class="note">📝 ' + esc(x.note) + '</div>' : '') +
-      '<div class="acts">' + copyBtn(x.titleJp, '日文') + copyBtn(x.addressJp, '地址') + mapBtn(x.titleJp, x.addressJp, x.titleZh) + '</div></div>'
-    ).join('') : '<p>目前篩選條件下沒有口袋景點。</p>';
-  }
+      function hideBanner() {
+        const el = document.getElementById('globalBanner');
+        el.className = 'banner';
+        el.textContent = '';
+      }
 
-  function renderMeta() {
-    const trips = bundle.tripMeta.filter((m) => m.category !== 'todo').sort((a, b) => a.tripDate.localeCompare(b.tripDate));
-    $('travelInfo').innerHTML = trips.length ? trips.map((m) =>
-      '<div class="note" style="border-style:solid"><div class="head"><strong>' + esc(m.titleZh) + '</strong><span class="badge ' + (m.category === 'flight' ? 'sky' : '') + '">' + (m.category === 'flight' ? '航班' : '住宿') + '・' + esc(m.tripDate) + '</span></div>' +
-      (m.titleJp ? '<div class="jp">🇯🇵 ' + esc(m.titleJp) + '</div>' : '') +
-      (m.addressJp ? '<div class="addr">📍 ' + esc(m.addressJp) + '</div>' : '') +
-      (m.infoText ? '<div style="font-size:14px;margin-bottom:8px">' + esc(m.infoText) + '</div>' : '') +
-      '<div class="acts">' + copyBtn(m.titleJp, '日文') + copyBtn(m.addressJp, '地址') + (m.addressJp || m.titleJp ? mapBtn(m.titleJp, m.addressJp, m.titleZh) : '') + '</div></div>'
-    ).join('') : '<p>尚無航班或住宿資料。</p>';
-    const todos = bundle.tripMeta.filter((m) => m.category === 'todo');
-    $('todoList').innerHTML = todos.length ? todos.map((t) => {
-      const c = !!rt.todo[t.metaId];
-      return '<label class="todo"><input type="checkbox" data-meta="' + esc(t.metaId) + '" ' + (c ? 'checked' : '') + '><span class="' + (c ? 'struck' : '') + '"><strong>' + esc(t.titleZh) + '</strong>' + (t.infoText ? '<br><small>' + esc(t.infoText) + '</small>' : '') + '</span></label>';
-    }).join('') : '<p>沒有待辦事項。</p>';
-  }
+      function escapeHtml(str) {
+        return String(str === null || str === undefined ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
 
-  function applyMotion() {
-    document.body.classList.toggle('reduced-motion', motion === 'reduce');
-    document.body.classList.toggle('motion-normal', motion === 'normal');
-    $('motionBtn').textContent = '動畫：' + ({ system: '跟隨系統', reduce: '已減少', normal: '完整' }[motion]);
-  }
+      function updateNetworkBadge() {
+        const badge = document.getElementById('netBadge');
+        const online = navigator.onLine;
+        badge.textContent = online ? '線上' : '離線模式';
+        badge.style.background = online ? 'rgba(21, 128, 61, 0.35)' : 'rgba(180, 83, 9, 0.5)';
+      }
 
-  document.querySelectorAll('.tab[data-view]').forEach((b) => b.addEventListener('click', () => {
-    document.querySelectorAll('.tab[data-view]').forEach((x) => x.classList.toggle('active', x === b));
-    ['schedule', 'pocket', 'meta', 'settings'].forEach((v) => $('view-' + v).classList.toggle('hidden', v !== b.dataset.view));
-  }));
-  $('dateStrip').addEventListener('click', (e) => { const b = e.target.closest('[data-date]'); if (!b) return; activeDate = b.dataset.date; renderDates(); renderSchedule(); });
-  $('btnSun').addEventListener('click', () => { rt.weather[activeDate] = 'sun'; saveRt(); renderSchedule(); });
-  $('btnRain').addEventListener('click', () => { rt.weather[activeDate] = 'rain'; saveRt(); renderSchedule(); });
-  $('timeline').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-act]'); if (!b) return;
-    const id = b.dataset.id, act = b.dataset.act;
-    if (act === 'done') { rt.status[id] = 'done'; rt.actualEnd[id] = nowMin(); }
-    else if (act === 'skip') { rt.status[id] = 'skipped'; delete rt.actualEnd[id]; }
-    else { delete rt.status[id]; delete rt.actualEnd[id]; }
-    saveRt(); renderSchedule();
-  });
-  $('ioFilter').addEventListener('click', (e) => { const b = e.target.closest('[data-io]'); if (!b) return; pocketIo = b.dataset.io; renderPocket(); });
-  $('areaFilter').addEventListener('click', (e) => { const b = e.target.closest('[data-area]'); if (!b) return; pocketArea = b.dataset.area; renderPocket(); });
-  $('todoList').addEventListener('change', (e) => { const c = e.target.closest('[data-meta]'); if (!c) return; rt.todo[c.dataset.meta] = c.checked; saveRt(); renderMeta(); });
-  document.addEventListener('click', (e) => { const b = e.target.closest('[data-copy]'); if (b) copy(decodeURIComponent(b.dataset.copy), b.dataset.label || '內容'); });
-  $('motionBtn').addEventListener('click', () => { motion = motion === 'system' ? 'reduce' : motion === 'reduce' ? 'normal' : 'system'; store.set(K.pref, { motion }); applyMotion(); });
-  $('resetStateBtn').addEventListener('click', () => { rt.status = {}; rt.actualEnd = {}; saveRt(); renderSchedule(); toast('已清除完成／跳過狀態'); });
-  $('resetAllBtn').addEventListener('click', () => { if (confirm('確定重設為完整 9 天資料並清除所有本機狀態？')) { store.del(K.bundle); store.del(K.state); location.reload(); } });
+      function loadPrefsToInputs() {
+        document.getElementById('apiUrlInput').value = localStorage.getItem(PREF_KEYS.API_URL) || '';
+        document.getElementById('apiTokenInput').value = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
+      }
 
-  applyMotion(); renderCountdown(); renderDates(); renderSchedule(); renderPocket(); renderMeta();
+      function savePrefsFromInputs() {
+        const url = document.getElementById('apiUrlInput').value.trim();
+        const token = document.getElementById('apiTokenInput').value.trim();
+        localStorage.setItem(PREF_KEYS.API_URL, url);
+        localStorage.setItem(PREF_KEYS.API_TOKEN, token);
+        showBanner('ok', '已儲存 GAS 網址與 API_TOKEN 至本機');
+      }
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(() => {
-        const el = $('swStatus');
-        if (el) el.textContent = '離線快取已啟用（PWA 可加入主畫面離線使用）';
-      }).catch(() => {
-        const el = $('swStatus');
-        if (el) el.textContent = '離線快取未啟用（請確認透過 HTTPS 開啟）';
+      function enumerateDates(startIso, endIso, itinerary) {
+        const set = new Set();
+        if (startIso && endIso && /^\d{4}-\d{2}-\d{2}$/.test(startIso) && /^\d{4}-\d{2}-\d{2}$/.test(endIso)) {
+          const [sy, sm, sd] = startIso.split('-').map(Number);
+          const [ey, em, ed] = endIso.split('-').map(Number);
+          let cur = Date.UTC(sy, sm - 1, sd);
+          const end = Date.UTC(ey, em - 1, ed);
+          let guard = 0;
+          while (cur <= end && guard < 120) {
+            const d = new Date(cur);
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(d.getUTCDate()).padStart(2, '0');
+            set.add(`${y}-${m}-${day}`);
+            cur += 86400000;
+            guard++;
+          }
+        }
+        (itinerary || []).forEach((it) => {
+          if (it.trip_date) set.add(String(it.trip_date).trim());
+        });
+        return Array.from(set).sort();
+      }
+
+      async function renderHeaderAndDates() {
+        const baseline = await TripIdbStore.getBaseline();
+        const metaBar = document.getElementById('syncMetaBar');
+        const dateSel = document.getElementById('dateSelect');
+
+        if (!baseline) {
+          metaBar.innerHTML = '<span>尚未同步雲端底稿（請至「設定備份」同步）</span>';
+          dateSel.innerHTML = '<option value="">無可用日期</option>';
+          currentDate = '';
+          return null;
+        }
+
+        const m = baseline.meta || {};
+        const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
+        metaBar.innerHTML =
+          `<span>底稿版本：${escapeHtml(m.dataVersion || '-')}</span>` +
+          `<span>最後同步：${escapeHtml(syncedStr)}</span>` +
+          `<span>行程：${escapeHtml(m.tripStartDate || '')} ~ ${escapeHtml(m.tripEndDate || '')}</span>`;
+
+        const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
+        const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
+        if (!currentDate) {
+          currentDate = (savedDate && dates.indexOf(savedDate) !== -1) ? savedDate : (dates[0] || '');
+        } else if (dates.length > 0 && dates.indexOf(currentDate) === -1) {
+          currentDate = dates[0];
+        }
+
+        dateSel.innerHTML = dates.length > 0
+          ? dates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('')
+          : '<option value="">無日期資料</option>';
+
+        return baseline;
+      }
+
+      async function renderScheduleTab() {
+        const listEl = document.getElementById('scheduleList');
+        const statsEl = document.getElementById('dayStats');
+        const btnW = document.getElementById('btnToggleWeather');
+        const btnS = document.getElementById('btnToggleStop');
+
+        if (!currentDate) {
+          statsEl.innerHTML = '';
+          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，請先切換至下方「設定備份」輸入網址與 Token 並執行同步。</div>';
+          return;
+        }
+
+        const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
+        currentSchedule = sched;
+
+        if (!sched.hasBaseline) {
+          statsEl.innerHTML = '';
+          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿。</div>';
+          return;
+        }
+
+        btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
+        btnS.textContent = sched.isStopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
+        btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
+
+        const st = sched.stats;
+        statsEl.innerHTML =
+          `<span class="pill">總站數：${st.total}</span>` +
+          `<span class="pill">已完成：${st.done}</span>` +
+          `<span class="pill">已跳過：${st.skipped}</span>` +
+          `<span class="pill">待執行：${st.pending}</span>` +
+          (st.lateCount > 0 ? `<span class="pill late">逾時警示：${st.lateCount}</span>` : '') +
+          (sched.isStopped ? `<span class="pill stop">已啟用「今天就到這裡」（未執行維持 pending）</span>` : '');
+
+        if (!sched.visibleItems || sched.visibleItems.length === 0) {
+          listEl.innerHTML = sched.isStopped
+            ? '<div class="empty-state">今日已標記「今天就到這裡」，剩餘待執行行程已停止顯示（狀態仍維持 pending）。</div>'
+            : '<div class="empty-state">本日尚無排定行程。</div>';
+          return;
+        }
+
+        listEl.innerHTML = sched.visibleItems.map((it) => {
+          const statusClass = 'status-' + (it.status || 'pending');
+          const lateClass = it.isLate ? ' is-late' : '';
+          const timeRange = it.isLastOfDay
+            ? `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，當日最後一站）`
+            : `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`;
+
+          const statusBadge = it.status === 'done'
+            ? '<span class="tag" style="background:#dcfce7;color:#15803d;">已完成</span>'
+            : (it.status === 'skipped'
+              ? '<span class="tag" style="background:#e5e7eb;color:#374151;">已跳過</span>'
+              : '<span class="tag">待執行</span>');
+
+          const isBaseline = it._sourceType === 'baseline';
+          const actKey = encodeURIComponent(it.activity_id);
+
+          return `
+            <article class="timeline-item ${statusClass}${lateClass}" data-act-id="${escapeHtml(it.activity_id)}">
+              <div class="item-top">
+                <div class="item-time">${escapeHtml(timeRange)}</div>
+                <div>${statusBadge}</div>
+              </div>
+              <div class="item-title">${escapeHtml(it.title_zh)}</div>
+              <div class="item-sub">
+                ${it.title_jp ? escapeHtml(it.title_jp) + '｜' : ''}${escapeHtml(it.area || '')}
+                ${it.address_jp ? '<br>地址：' + escapeHtml(it.address_jp) : ''}
+                ${it.note ? '<br>備註：' + escapeHtml(it.note) : ''}
+              </div>
+              <div>
+                ${it._sourceType === 'inserted' ? '<span class="tag inserted">本機插入備選</span>' : ''}
+                ${it._hasOverrides ? '<span class="tag override">已微調：' + escapeHtml((it._overriddenFields || []).join(', ')) + '</span>' : ''}
+                ${it.isLate ? '<span class="tag late">逾時</span>' : ''}
+              </div>
+              ${it.isLate ? `<div class="alert-box">${escapeHtml(it.lateReason)}</div>` : ''}
+              ${it._anchorMissing ? `<div class="warn-box">原插入錨點（${escapeHtml(it._afterActivityId)}）已不存在，已自動接在當日行程末端。</div>` : ''}
+
+              <div class="item-actions">
+                <button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">完成</button>
+                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">跳過</button>
+                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'pending')">改待執行</button>
+                ${isBaseline ? `<button class="btn-sm" onclick="window.__app.onToggleEdit('${actKey}')">微調／單欄還原</button>` : ''}
+                ${it._sourceType === 'inserted' ? `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>` : ''}
+              </div>
+
+              ${isBaseline ? `
+                <div id="edit-${escapeHtml(it.activity_id)}" class="edit-panel">
+                  <div class="edit-grid">
+                    <div class="field-box">
+                      <label>停留分鐘 (dwell_min)</label>
+                      <div class="field-row-inline">
+                        <input type="number" min="0" id="f-dwell-${escapeHtml(it.activity_id)}" value="${it.dwell_min}" />
+                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'dwell_min')">還原</button>
+                      </div>
+                    </div>
+                    <div class="field-box">
+                      <label>交通分鐘 (travel_min)</label>
+                      <div class="field-row-inline">
+                        <input type="number" min="0" id="f-travel-${escapeHtml(it.activity_id)}" value="${it.travel_min}" />
+                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'travel_min')">還原</button>
+                      </div>
+                    </div>
+                    <div class="field-box">
+                      <label>交通緩衝 (buffer_min)</label>
+                      <div class="field-row-inline">
+                        <input type="number" min="0" id="f-buffer-${escapeHtml(it.activity_id)}" value="${it.buffer_min}" />
+                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'buffer_min')">還原</button>
+                      </div>
+                    </div>
+                    <div class="field-box">
+                      <label>交通方式 (transport_mode)</label>
+                      <div class="field-row-inline">
+                        <input type="text" id="f-trans-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.transport_mode || '')}" />
+                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'transport_mode')">還原</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field-box" style="margin-bottom:8px;">
+                    <label>隨手備註 (note)</label>
+                    <div class="field-row-inline">
+                      <input type="text" id="f-note-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.note || '')}" />
+                      <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'note')">還原</button>
+                    </div>
+                  </div>
+                  <button class="btn-sm btn-primary" onclick="window.__app.onSaveOverride('${actKey}')">儲存本機微調</button>
+                </div>
+              ` : ''}
+            </article>
+          `;
+        }).join('');
+      }
+
+      async function renderPocketTab() {
+        const anchorSel = document.getElementById('insertAnchorSelect');
+        const listEl = document.getElementById('pocketList');
+        const baseline = await TripIdbStore.getBaseline();
+
+        if (!currentDate) {
+          anchorSel.innerHTML = '<option value="TOP">當日最前面</option>';
+          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，無備選口袋資料。</div>';
+          return;
+        }
+
+        const sched = currentSchedule || await TripScheduleEngine.buildDaySchedule(currentDate);
+        const anchorOptions = ['<option value="TOP">當日最前面</option>'];
+        (sched.items || []).forEach((it) => {
+          if (it._sourceType === 'baseline') {
+            anchorOptions.push(`<option value="${escapeHtml(it.activity_id)}">「${escapeHtml(it.title_zh)}」之後</option>`);
+          }
+        });
+        anchorSel.innerHTML = anchorOptions.join('');
+
+        const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
+        if (spots.length === 0) {
+          listEl.innerHTML = '<div class="empty-state">底稿中尚無備選口袋景點。</div>';
+          return;
+        }
+
+        listEl.innerHTML = spots.map((sp, idx) => `
+          <div class="section-card">
+            <div class="item-top">
+              <div>
+                <strong>${escapeHtml(sp.title_zh)}</strong>
+                <div class="item-sub">
+                  ${sp.title_jp ? escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
+                  <br>預設停留 ${sp.default_dwell_min} 分｜建議交通 ${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
+                  ${sp.address_jp ? '<br>地址：' + escapeHtml(sp.address_jp) : ''}
+                  ${sp.note ? '<br>備註：' + escapeHtml(sp.note) : ''}
+                </div>
+              </div>
+              <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">插入本日</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      async function renderMetaTab() {
+        const listEl = document.getElementById('metaList');
+        const baseline = await TripIdbStore.getBaseline();
+        const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
+
+        if (metas.length === 0) {
+          listEl.innerHTML = '<div class="empty-state">尚無住宿與航班資料。</div>';
+          return;
+        }
+
+        listEl.innerHTML = metas.map((m) => `
+          <div class="section-card">
+            <div class="item-time">${escapeHtml(m.trip_date || '通用')} ・ ${escapeHtml(m.category || '')}</div>
+            <div class="item-title">${escapeHtml(m.title_zh)}</div>
+            <div class="item-sub">
+              ${m.title_jp ? escapeHtml(m.title_jp) + '<br>' : ''}
+              ${m.address_jp ? '地址：' + escapeHtml(m.address_jp) + '<br>' : ''}
+              ${m.info_text ? escapeHtml(m.info_text) : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      async function renderRemovedHistory() {
+        const el = document.getElementById('removedHistoryList');
+        const list = await TripIdbStore.getRemovedHistory();
+        if (!list || list.length === 0) {
+          el.innerHTML = '<div class="muted-note">目前沒有已移除項目歷史紀錄。</div>';
+          return;
+        }
+        el.innerHTML = list.map((r) => `
+          <div style="padding:8px; border:1px solid var(--border); border-radius:8px; margin-bottom:6px; font-size:12px;">
+            <strong>${escapeHtml(r.title_zh || r.activity_id)}</strong>（${escapeHtml(r.activity_id)}｜${escapeHtml(r.trip_date || '')}）
+            <div>移除時間：${escapeHtml(r.removedAt || '')}</div>
+            <div>本機曾修改欄位：<code>${escapeHtml(JSON.stringify(r.overrideFields || {}))}</code></div>
+          </div>
+        `).join('');
+      }
+
+      async function refreshAll() {
+        updateNetworkBadge();
+        await renderHeaderAndDates();
+        await renderScheduleTab();
+        await renderPocketTab();
+        await renderMetaTab();
+        await renderRemovedHistory();
+      }
+
+      window.__app = {
+        async onSetStatus(encodedId, status) {
+          const actId = decodeURIComponent(encodedId);
+          await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
+          await renderScheduleTab();
+        },
+        onToggleEdit(encodedId) {
+          const actId = decodeURIComponent(encodedId);
+          const panel = document.getElementById('edit-' + actId);
+          if (panel) panel.classList.toggle('open');
+        },
+        async onSaveOverride(encodedId) {
+          const actId = decodeURIComponent(encodedId);
+          const dwellVal = Number(document.getElementById('f-dwell-' + actId).value);
+          const travelVal = Number(document.getElementById('f-travel-' + actId).value);
+          const bufferVal = Number(document.getElementById('f-buffer-' + actId).value);
+          const transVal = document.getElementById('f-trans-' + actId).value.trim();
+          const noteVal = document.getElementById('f-note-' + actId).value;
+
+          if (!Number.isInteger(dwellVal) || dwellVal < 0 ||
+              !Number.isInteger(travelVal) || travelVal < 0 ||
+              !Number.isInteger(bufferVal) || bufferVal < 0) {
+            showBanner('err', '停留、交通與緩衝分鐘必須為 0 以上的整數');
+            return;
+          }
+
+          await TripScheduleEngine.updateActivityOverride(actId, currentDate, {
+            dwell_min: dwellVal,
+            travel_min: travelVal,
+            buffer_min: bufferVal,
+            transport_mode: transVal,
+            note: noteVal
+          });
+          showBanner('ok', '已儲存本機欄位微調');
+          await renderScheduleTab();
+        },
+        async onResetField(encodedId, fieldName) {
+          const actId = decodeURIComponent(encodedId);
+          await TripScheduleEngine.resetActivityField(actId, fieldName, currentDate);
+          showBanner('info', `已還原欄位 ${fieldName} 為雲端底稿值`);
+          await renderScheduleTab();
+        },
+        async onInsertSpot(spotIdx) {
+          if (!currentDate) return;
+          const baseline = await TripIdbStore.getBaseline();
+          const spots = (baseline && baseline.pocket_spots) || [];
+          const spot = spots[spotIdx];
+          if (!spot) return;
+          const anchor = document.getElementById('insertAnchorSelect').value || 'TOP';
+          await TripScheduleEngine.insertPocketSpot(currentDate, spot, anchor);
+          showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate} 行程`);
+          switchTab('tab-schedule');
+          await renderScheduleTab();
+        },
+        async onRemoveInserted(insertId) {
+          if (!currentDate) return;
+          await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
+          showBanner('info', '已移除本機插入站點');
+          await renderScheduleTab();
+        }
+      };
+
+      function switchTab(tabId) {
+        document.querySelectorAll('.tab-page').forEach((p) => p.classList.remove('active'));
+        document.querySelectorAll('nav.bottom-nav button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.tab === tabId);
+        });
+        const target = document.getElementById(tabId);
+        if (target) target.classList.add('active');
+      }
+
+      document.querySelectorAll('nav.bottom-nav button').forEach((btn) => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
       });
-    });
-  }
-})();
-</script>
+
+      document.getElementById('dateSelect').addEventListener('change', async (e) => {
+        currentDate = e.target.value;
+        localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate);
+        await renderScheduleTab();
+        await renderPocketTab();
+      });
+
+      document.getElementById('btnToggleWeather').addEventListener('click', async () => {
+        if (!currentDate) return;
+        await TripScheduleEngine.toggleWeather(currentDate);
+        await renderScheduleTab();
+      });
+
+      document.getElementById('btnToggleStop').addEventListener('click', async () => {
+        if (!currentDate) return;
+        await TripScheduleEngine.toggleDayStop(currentDate);
+        await renderScheduleTab();
+      });
+
+      document.getElementById('btnSaveConfig').addEventListener('click', savePrefsFromInputs);
+
+      document.getElementById('btnSyncNow').addEventListener('click', async () => {
+        savePrefsFromInputs();
+        const url = localStorage.getItem(PREF_KEYS.API_URL) || '';
+        const token = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
+        showBanner('info', '正在從雲端同步底稿...');
+        const res = await TripSyncService.syncFromCloud({ endpointUrl: url, token: token });
+        if (res.ok) {
+          showBanner('ok', res.message);
+          await refreshAll();
+        } else {
+          showBanner('warn', res.message);
+        }
+      });
+
+      document.getElementById('btnRestoreAll').addEventListener('click', async () => {
+        const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
+        if (!ok) return;
+        await TripScheduleEngine.restoreAllToBaseline();
+        showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
+        await refreshAll();
+      });
+
+      document.getElementById('btnExportBackup').addEventListener('click', async () => {
+        try {
+          const backupObj = await TripIdbStore.exportAllBackup();
+          const jsonStr = JSON.stringify(backupObj, null, 2);
+          const blob = new Blob([jsonStr], { type: 'application/json' });
+          const a = document.createElement('a');
+          const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+          a.href = URL.createObjectURL(blob);
+          a.download = `trip-pwa-backup-${stamp}.json`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          showBanner('ok', '已匯出完整備份 JSON');
+        } catch (err) {
+          showBanner('err', '匯出備份失敗：' + (err && err.message ? err.message : String(err)));
+        }
+      });
+
+      document.getElementById('btnTriggerImport').addEventListener('click', () => {
+        document.getElementById('importFileInput').click();
+      });
+
+      document.getElementById('importFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+          const res = await TripIdbStore.importAllBackup(parsed);
+          if (res.ok) {
+            showBanner('ok', res.message);
+            await refreshAll();
+          } else {
+            showBanner('err', '匯入已拒絕（未覆蓋原有資料）：' + res.message);
+          }
+        } catch (err) {
+          showBanner('err', '備份檔案解析或匯入失敗（未覆蓋原有資料）：' + (err && err.message ? err.message : String(err)));
+        }
+      });
+
+      document.getElementById('btnClearHistory').addEventListener('click', async () => {
+        await TripIdbStore.clearRemovedHistory();
+        showBanner('info', '已清空已移除項目歷史紀錄');
+        await renderRemovedHistory();
+      });
+
+      window.addEventListener('online', updateNetworkBadge);
+      window.addEventListener('offline', updateNetworkBadge);
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
+
+      loadPrefsToInputs();
+      refreshAll();
+    })();
+  </script>
 </body>
 </html>
