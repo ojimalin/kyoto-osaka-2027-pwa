@@ -1,0 +1,35 @@
+{
+  "id": "./",
+  "name": "2027 京阪秋楓旅遊手帳",
+  "short_name": "京阪2027",
+  "description": "2027 京都・天橋立・大阪 9 日秋楓家族自由行離線手帳（晴雨路線推算、時間軸、口袋備選與日文一鍵複製）",
+  "lang": "zh-Hant",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFCF6",
+  "theme_color": "#FFFCF6",
+  "categories": ["travel", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
