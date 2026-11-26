@@ -471,3 +471,4 @@ const TripIdbStore = (() => {
     importAllBackup
   };
 })();
+if (typeof TripIdbStore !== 'undefined') window.TripIdbStore = TripIdbStore;
