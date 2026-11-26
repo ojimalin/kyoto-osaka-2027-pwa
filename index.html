@@ -4,16 +4,24 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#FFFCF6" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="京阪2027" />
 <title>2027 京阪秋楓旅遊手帳</title>
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet" />
 <style>
 :root{--paper:#FFFCF6;--ink:#3E3A39;--coral:#F2A497;--yellow:#F6D27A;--sky:#A8D3E6;--bamboo:#B9DAA5;--card:#FFFDF9;--soft:#F5EFE4}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;padding:0 0 40px;background:var(--paper);color:var(--ink);font:16px/1.55 'Huninn',-apple-system,'Noto Sans TC',sans-serif;overflow-x:hidden}
+body{margin:0;padding:0 0 calc(40px + env(safe-area-inset-bottom,0px));background:var(--paper);color:var(--ink);font:16px/1.55 'Huninn',-apple-system,'Noto Sans TC',sans-serif;overflow-x:hidden}
 .topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:3px solid var(--ink);padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .brand{font-weight:700;white-space:nowrap}
 .nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.tab{background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:8px 12px;min-height:40px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.nav::-webkit-scrollbar{display:none}
+.tab{background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:8px 12px;min-height:44px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .tab.active{background:var(--yellow)}
 .wrap{max-width:680px;margin:0 auto;padding:14px}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px;margin-bottom:12px}
@@ -22,6 +30,7 @@ body{margin:0;padding:0 0 40px;background:var(--paper);color:var(--ink);font:16p
 .badge{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;background:var(--yellow)}
 .badge.coral{background:var(--coral)}.badge.sky{background:var(--sky)}.badge.bamboo{background:var(--bamboo)}.badge.soft{background:var(--soft)}
 .strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:8px 12px;min-height:44px;font:inherit;color:var(--ink);text-align:center;cursor:pointer}
 .chip.active{background:var(--coral)}
 .chip b{display:block;font-size:14px}.chip small{font-size:12px}
@@ -108,9 +117,9 @@ body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
       <div class="acts">
         <button class="btn" id="motionBtn"></button>
         <button class="btn" id="resetStateBtn">清除完成／跳過狀態</button>
-        <button class="btn" id="resetAllBtn">重設為範例資料</button>
+        <button class="btn" id="resetAllBtn">重設為完整 9 天資料</button>
       </div>
-      <p class="note" style="margin-top:12px">目前為原型：資料存於本機 localStorage，尚未連接試算表同步與離線快取。</p>
+      <p class="note" style="margin-top:12px" id="swStatus">離線快取狀態檢查中…</p>
     </div>
   </section>
 </main>
@@ -120,33 +129,85 @@ body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
 <script>
 (function () {
   'use strict';
-  const K = { bundle: 'KO2027_BUNDLE_V2', state: 'KO2027_STATE_V2', pref: 'KO2027_PREF_V2' };
+  const K = { bundle: 'KO2027_BUNDLE_V3', state: 'KO2027_STATE_V3', pref: 'KO2027_PREF_V3' };
   const E = window.TripEngine;
 
-  /* 範例資料：欄位與格式對齊轉檔輸出（ID 格式、交通枚舉、末站交通留空且為 0、通用日期為空字串） */
   const SAMPLE = {
     itinerary: [
-      { slot_id: 'SLOT-0001', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0001', title_zh: '關西機場入境與搭 HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '通關、領行李後搭 HARUKA 前往京都車站' },
-      { slot_id: 'SLOT-0002', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 20, activity_id: 'ACT-0002', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', coords: '', note: '夜楓名所' },
-      { slot_id: 'SLOT-0002', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 20, activity_id: 'ACT-0003', title_zh: '京都車站與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', coords: '', note: '雨天備案' },
-      { slot_id: 'SLOT-0003', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 75, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0004', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', coords: '', note: '需事先預約' },
-      { slot_id: 'SLOT-0003', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'rain', time_type: 'flexible', start_time: '10:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0005', title_zh: '天龍寺大方丈迴廊', title_jp: '天龍寺', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町68', coords: '', note: '雨天替代，室內迴廊賞庭' },
-      { slot_id: 'SLOT-0004', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '12:30', deadline_time: '', deadline_type: '', dwell_min: 45, travel_min: 0, buffer_min: 0, transport_mode: '', area: '嵐山', sort_order: 20, activity_id: 'ACT-0006', title_zh: '竹林小徑散步', title_jp: '竹林の小径', address_jp: '京都市右京区嵯峨小倉山田渕山町', coords: '', note: '' },
-      { slot_id: 'SLOT-0005', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'fixed', start_time: '08:45', deadline_time: '09:00', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 0, buffer_min: 0, transport_mode: '', area: '洛北', sort_order: 10, activity_id: 'ACT-0007', title_zh: '八瀬瑠璃光院預約賞楓', title_jp: '瑠璃光院', address_jp: '京都市左京区上高野東山55', coords: '', note: '秋季特別拜觀需預約' }
+      { slot_id: 'SLOT-0003', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0004', title_zh: '關西機場入境與搭乘HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '星宇航空抵達后領行李與兌換車票' },
+      { slot_id: 'SLOT-0004', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', deadline_time: '', deadline_type: '', dwell_min: 45, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '京都車站', sort_order: 20, activity_id: 'ACT-0005', title_zh: '京都車站飯店寄放行李', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '先寄放行李再輕裝出門' },
+      { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0006', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', coords: '', note: '楓葉季夜楓名所' },
+      { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 5, buffer_min: 5, transport_mode: '步行', area: '京都車站', sort_order: 30, activity_id: 'ACT-0007', title_zh: '京都車站大階梯光影與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', coords: '', note: '雨天室內備案，晚餐吃豚骨/雞白湯拉麵' },
+      { slot_id: 'SLOT-0006', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0008', title_zh: '先斗町京都豚骨與炸豬排晚餐', title_jp: '先斗町', address_jp: '京都市中京区先斗町通', coords: '', note: '避開牛肉、牛油與肥腸' },
+
+      { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'flexible', start_time: '08:30', deadline_time: '', deadline_type: '', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0009', title_zh: '渡月橋與桂川河畔晨間散步', title_jp: '渡月橋', address_jp: '京都市右京区嵯峨中ノ島町', coords: '', note: '避開人潮拍攝晨景' },
+      { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'rain', time_type: 'flexible', start_time: '08:30', deadline_time: '', deadline_type: '', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0010', title_zh: '天龍寺大方丈室內迴廊賞楓', title_jp: '天龍寺', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町68', coords: '', note: '雨天可於室內迴廊坐賞曹源池庭園' },
+      { slot_id: 'SLOT-0008', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 20, activity_id: 'ACT-0011', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', coords: '', note: '需事先官網預約，水鏡倒影紅葉' },
+      { slot_id: 'SLOT-0009', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '11:45', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 30, activity_id: 'ACT-0012', title_zh: '嵐山鯛魚茶泡飯與天婦羅午餐', title_jp: '嵐山', address_jp: '京都市右京区嵯峨天龍寺造路町', coords: '', note: '海鮮與野菜天婦羅為主' },
+      { slot_id: 'SLOT-0010', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '13:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: 'JR', area: '嵐山', sort_order: 40, activity_id: 'ACT-0013', title_zh: '常寂光寺與竹林小徑', title_jp: '常寂光寺', address_jp: '京都市右京区嵯峨小倉山小倉町3', coords: '', note: '楓紅隧道步道' },
+      { slot_id: 'SLOT-0011', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'flexible', start_time: '17:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 50, activity_id: 'ACT-0014', title_zh: '京都車站地下街採買與海鮮丼晚餐', title_jp: '京都ポルタ', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町902', coords: '', note: '不吃活魷魚刺身與牛肉' },
+
+      { slot_id: 'SLOT-0012', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'fixed', start_time: '08:45', deadline_time: '09:00', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0015', title_zh: '八瀬瑠璃光院預約賞楓', title_jp: '瑠璃光院', address_jp: '京都市左京区上高野東山55', coords: '', note: '秋季特別拜觀需提前預約' },
+      { slot_id: 'SLOT-0013', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'sun', time_type: 'flexible', start_time: '10:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 20, activity_id: 'ACT-0016', title_zh: '大原三千院聚碧園與往生極樂院', title_jp: '三千院', address_jp: '京都市左京区大原来迎院町540', coords: '', note: '苔庭紅葉與地藏石像' },
+      { slot_id: 'SLOT-0013', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'rain', time_type: 'flexible', start_time: '10:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 25, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 20, activity_id: 'ACT-0017', title_zh: '實相院床紅葉室內賞景', title_jp: '実相院', address_jp: '京都市左京区岩倉上蔵町121', coords: '', note: '室內木地板倒映紅葉，雨天亦佳' },
+      { slot_id: 'SLOT-0014', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'flexible', start_time: '13:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 35, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 30, activity_id: 'ACT-0018', title_zh: '北山通手作漢堡排（純豬肉）與洋食午餐', title_jp: '北山通', address_jp: '京都市左京区下鴨前萩町', coords: '', note: '確認使用100%純豬肉排' },
+      { slot_id: 'SLOT-0015', trip_date: '2027-11-27', day_label: 'Day 3', weather_mode: 'all', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0019', title_zh: '河原町商店街散步與京風雞肉水炊鍋晚餐', title_jp: '河原町通', address_jp: '京都市中京区河原町通四条上ル', coords: '', note: '博多/京風雞白湯水炊鍋' },
+
+      { slot_id: 'SLOT-0016', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'fixed', start_time: '08:23', deadline_time: '08:38', deadline_type: 'depart_by', dwell_min: 15, travel_min: 125, buffer_min: 10, transport_mode: '特急/新幹線', area: '京都車站', sort_order: 10, activity_id: 'ACT-0020', title_zh: '搭乘JR特急橋立號前往天橋立', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '劃位指定席前往丹後地區' },
+      { slot_id: 'SLOT-0017', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'sun', time_type: 'flexible', start_time: '11:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 20, activity_id: 'ACT-0021', title_zh: '天橋立View Land飛龍觀展望台', title_jp: '天橋立ビューランド', address_jp: '京都府宮津市文珠437', coords: '', note: '搭乘單人吊椅或單軌車上山' },
+      { slot_id: 'SLOT-0017', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'rain', time_type: 'flexible', start_time: '11:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '天橋立', sort_order: 20, activity_id: 'ACT-0022', title_zh: '智恩寺與迴旋橋周邊慢遊', title_jp: '智恩寺', address_jp: '京都府宮津市文珠466', coords: '', note: '扇子籤與文殊堂參拜' },
+      { slot_id: 'SLOT-0018', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'flexible', start_time: '13:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 30, activity_id: 'ACT-0023', title_zh: '天橋立海鮮丼與丹後鯖魚壽司午餐', title_jp: '天橋立駅周辺', address_jp: '京都府宮津市字文珠', coords: '', note: '現流鮮魚定食' },
+      { slot_id: 'SLOT-0019', trip_date: '2027-11-28', day_label: 'Day 4', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '天橋立', sort_order: 40, activity_id: 'ACT-0024', title_zh: '天橋立溫泉旅館入住與懷石晚餐', title_jp: '天橋立温泉', address_jp: '京都府宮津市文珠', coords: '', note: '備註不吃牛肉與牛油' },
+
+      { slot_id: 'SLOT-0020', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'sun', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 20, buffer_min: 5, transport_mode: '纜車/船', area: '天橋立', sort_order: 10, activity_id: 'ACT-0025', title_zh: '傘松公園昇龍觀與成相寺遠眺', title_jp: '傘松公園', address_jp: '京都府宮津市大垣75', coords: '', note: '搭乘觀光船橫渡阿蘇海再轉纜車' },
+      { slot_id: 'SLOT-0020', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'rain', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 30, buffer_min: 5, transport_mode: '巴士', area: '天橋立', sort_order: 10, activity_id: 'ACT-0026', title_zh: '丹後ちりめん歷史館織布體驗', title_jp: '丹後ちりめん歴史館', address_jp: '京都府与謝郡与謝野町加悦1085', coords: '', note: '雨天室內工藝參觀' },
+      { slot_id: 'SLOT-0021', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'all', time_type: 'flexible', start_time: '12:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 130, buffer_min: 15, transport_mode: '特急/新幹線', area: '天橋立', sort_order: 20, activity_id: 'ACT-0027', title_zh: '天橋立午餐後搭特急返回京都市區', title_jp: '天橋立駅', address_jp: '京都府宮津市文珠314-2', coords: '', note: '指定席返回京都車站' },
+      { slot_id: 'SLOT-0022', trip_date: '2027-11-29', day_label: 'Day 5', weather_mode: 'all', time_type: 'flexible', start_time: '16:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 0, buffer_min: 0, transport_mode: '', area: '京都車站', sort_order: 30, activity_id: 'ACT-0028', title_zh: '京都車站伊勢丹百貨與炸豬排晚餐', title_jp: 'ジェイアール京都伊勢丹', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町', coords: '', note: '名代豬排或和幸豬排' },
+
+      { slot_id: 'SLOT-0023', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'sun', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0029', title_zh: '金閣寺鏡湖池晨間參拜', title_jp: '鹿苑寺 金閣寺', address_jp: '京都市北区金閣寺町1', coords: '', note: '順光拍攝金色舍利殿倒影' },
+      { slot_id: 'SLOT-0023', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'rain', time_type: 'flexible', start_time: '09:00', deadline_time: '', deadline_type: '', dwell_min: 75, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '洛北', sort_order: 10, activity_id: 'ACT-0030', title_zh: '京都府立陶板名畫之庭與北山室內散步', title_jp: '京都府立陶板名画の庭', address_jp: '京都市左京区下鴨半木町', coords: '', note: '安藤忠雄建築與周邊咖啡廳' },
+      { slot_id: 'SLOT-0024', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '12:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 20, activity_id: 'ACT-0031', title_zh: '南禪寺天授庵與水路閣賞楓', title_jp: '南禅寺 天授庵', address_jp: '京都市左京区南禅寺福地町', coords: '', note: '枯山水庭園紅葉' },
+      { slot_id: 'SLOT-0025', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 15, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0032', title_zh: '花見小路與白川南通散策', title_jp: '花見小路通', address_jp: '京都市東山区祇園町南側', coords: '', note: '傍晚點燈氛圍' },
+      { slot_id: 'SLOT-0026', trip_date: '2027-11-30', day_label: 'Day 6', weather_mode: 'all', time_type: 'flexible', start_time: '18:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0033', title_zh: '祇園烤雞串與京野菜居酒屋晚餐', title_jp: '祇園四条', address_jp: '京都市東山区四条通大和大路西入', coords: '', note: '點選雞肉串燒、烤魚與釜飯' },
+
+      { slot_id: 'SLOT-0027', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'fixed', start_time: '09:30', deadline_time: '10:00', deadline_type: 'depart_by', dwell_min: 30, travel_min: 30, buffer_min: 10, transport_mode: 'JR', area: '京都車站', sort_order: 10, activity_id: 'ACT-0034', title_zh: '京都飯店退房並搭JR新快速移動至大阪梅田', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', coords: '', note: '直達大阪站後前往梅田飯店寄放行李' },
+      { slot_id: 'SLOT-0028', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'sun', time_type: 'flexible', start_time: '11:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 15, buffer_min: 5, transport_mode: '地鐵', area: '大阪梅田', sort_order: 20, activity_id: 'ACT-0035', title_zh: '大阪城公園天守閣與銀杏大道', title_jp: '大阪城公園', address_jp: '大阪市中央区大阪城1-1', coords: '', note: '12月初金黃銀杏葉正美' },
+      { slot_id: 'SLOT-0028', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'rain', time_type: 'flexible', start_time: '11:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪梅田', sort_order: 20, activity_id: 'ACT-0036', title_zh: 'Grand Front Osaka與Lucua百貨逛街', title_jp: 'グランフロント大阪', address_jp: '大阪市北区大深町4-20', coords: '', note: '全室內連通商場不怕雨' },
+      { slot_id: 'SLOT-0029', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪梅田', sort_order: 30, activity_id: 'ACT-0037', title_zh: '梅田藍天大廈空中庭園展望台', title_jp: '梅田スカイビル', address_jp: '大阪市北区大淀中1-1-88', coords: '', note: '欣賞大阪夕陽與夜景' },
+      { slot_id: 'SLOT-0030', trip_date: '2027-12-01', day_label: 'Day 7', weather_mode: 'all', time_type: 'flexible', start_time: '18:00', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '大阪梅田', sort_order: 40, activity_id: 'ACT-0038', title_zh: '梅田大阪燒與章魚燒鐵板料理晚餐', title_jp: '梅田', address_jp: '大阪市北区梅田', coords: '', note: '點豬肉海鮮綜合大阪燒（不加牛筋）' },
+
+      { slot_id: 'SLOT-0031', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'sun', time_type: 'flexible', start_time: '09:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 15, buffer_min: 5, transport_mode: '地鐵', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0039', title_zh: '海遊館與天保山港灣區', title_jp: '海遊館', address_jp: '大阪市港区海岸通1-1-10', coords: '', note: '親子必訪世界級水族館' },
+      { slot_id: 'SLOT-0031', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'rain', time_type: 'flexible', start_time: '09:30', deadline_time: '', deadline_type: '', dwell_min: 120, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0040', title_zh: '難波Parks與高島屋親子購物', title_jp: 'なんばパークス', address_jp: '大阪市浪速区難波中2-10-70', coords: '', note: '雨天室內購物動線順暢' },
+      { slot_id: 'SLOT-0032', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '12:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 20, activity_id: 'ACT-0041', title_zh: '黑門市場與千日前道具屋筋午餐', title_jp: '黒門市場', address_jp: '大阪市中央区日本橋2-4-1', coords: '', note: '現烤扇貝、鮪魚壽司與章魚燒' },
+      { slot_id: 'SLOT-0033', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '15:00', deadline_time: '', deadline_type: '', dwell_min: 150, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '大阪難波', sort_order: 30, activity_id: 'ACT-0042', title_zh: '心齋橋筋商店街與道頓堀藥妝伴手禮採買', title_jp: '心斎橋筋商店街', address_jp: '大阪市中央区心斎橋筋', coords: '', note: '集中採買藥妝與零食伴手禮' },
+      { slot_id: 'SLOT-0034', trip_date: '2027-12-02', day_label: 'Day 8', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', deadline_time: '', deadline_type: '', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '大阪難波', sort_order: 40, activity_id: 'ACT-0043', title_zh: '道頓堀迴轉壽司與串炸晚餐', title_jp: '道頓堀', address_jp: '大阪市中央区道頓堀', coords: '', note: '海鮮與豬肉蔬菜串炸（不點牛肉串）' },
+
+      { slot_id: 'SLOT-0035', trip_date: '2027-12-03', day_label: 'Day 9', weather_mode: 'all', time_type: 'fixed', start_time: '09:00', deadline_time: '09:30', deadline_type: 'depart_by', dwell_min: 30, travel_min: 40, buffer_min: 15, transport_mode: '特急/新幹線', area: '大阪難波', sort_order: 10, activity_id: 'ACT-0044', title_zh: '難波飯店退房搭乘南海電鐵Rapi:t前往關西機場', title_jp: '南海なんば駅', address_jp: '大阪市中央区難波5-1-60', coords: '', note: '全車指定席直達關西機場第一航廈' },
+      { slot_id: 'SLOT-0036', trip_date: '2027-12-03', day_label: 'Day 9', weather_mode: 'all', time_type: 'fixed', start_time: '10:30', deadline_time: '11:00', deadline_type: 'arrive_by', dwell_min: 150, travel_min: 0, buffer_min: 0, transport_mode: '', area: '關西機場', sort_order: 20, activity_id: 'ACT-0045', title_zh: '關西機場報到退稅與搭乘星宇航空返台', title_jp: '関西国際空港 第1ターミナル', address_jp: '大阪府泉佐野市泉州空港北1', coords: '', note: '免稅店最後採買並搭機返回桃園機場' }
     ],
     pocket_spots: [
-      { pocket_id: 'PK-0001', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 90, default_travel_min: 25, transport_mode: '巴士', title_zh: '大原三千院', title_jp: '三千院', address_jp: '京都市左京区大原来迎院町540', coords: '', note: '苔庭與秋楓' },
-      { pocket_id: 'PK-0002', area: '洛北', indoor_outdoor: 'indoor', default_dwell_min: 75, default_travel_min: 25, transport_mode: '巴士', title_zh: '實相院床紅葉', title_jp: '実相院', address_jp: '京都市左京区岩倉上蔵町121', coords: '', note: '地板倒映楓紅' },
-      { pocket_id: 'PK-0003', area: '大阪難波', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 10, transport_mode: '步行', title_zh: '難波 Parks', title_jp: 'なんばパークス', address_jp: '大阪市浪速区難波中2-10-70', coords: '', note: '雨天購物備案' }
+      { pocket_id: 'PK-0002', area: '嵐山', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '步行', title_zh: '寶嚴院獅子吼庭園', title_jp: '宝厳院', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町36', coords: '', note: '紅葉迴遊式庭園，可彈性安插於嵐山行程' },
+      { pocket_id: 'PK-0003', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '巴士', title_zh: '詩仙堂丈山寺', title_jp: '詩仙堂', address_jp: '京都市左京区一乗寺門口町27', coords: '', note: '一乘寺區域靜謐賞楓庭園' },
+      { pocket_id: 'PK-0004', area: '洛北', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 20, transport_mode: '巴士', title_zh: '圓光寺十牛之庭', title_jp: '圓光寺', address_jp: '京都市左京区一乗寺小谷町13', coords: '', note: '需留意楓葉季是否採事前預約制' },
+      { pocket_id: 'PK-0005', area: '祇園河原町', indoor_outdoor: 'mixed', default_dwell_min: 60, default_travel_min: 10, transport_mode: '步行', title_zh: '建仁寺風神雷神圖與潮音庭', title_jp: '建仁寺', address_jp: '京都市東山区大和大路通四条下ル小松町', coords: '', note: '室內走廊與庭園兼具，雨天亦可參觀' },
+      { pocket_id: 'PK-0006', area: '京都車站', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 5, transport_mode: '步行', title_zh: '京都塔展望室與大浴場', title_jp: '京都タワー', address_jp: '京都市下京区烏丸通七条下ル東塩小路町721-1', coords: '', note: '夜間雨天備案，適合晚間放鬆' },
+      { pocket_id: 'PK-0007', area: '大阪梅田', indoor_outdoor: 'indoor', default_dwell_min: 120, default_travel_min: 10, transport_mode: '步行', title_zh: '阪神百貨梅田本店美食街', title_jp: '阪神梅田本店', address_jp: '大阪市北区梅田1-13-13', coords: '', note: '甜點伴手禮與熟食名店集中' },
+      { pocket_id: 'PK-0008', area: '大阪難波', indoor_outdoor: 'indoor', default_dwell_min: 90, default_travel_min: 10, transport_mode: '步行', title_zh: '難波八阪神社與周邊商店街', title_jp: '難波八阪神社', address_jp: '大阪市浪速区元町2-9-19', coords: '', note: '巨大獅子殿拍照打卡點' },
+      { pocket_id: 'PK-0009', area: '其他', indoor_outdoor: 'indoor', default_dwell_min: 120, default_travel_min: 20, transport_mode: 'JR', title_zh: '京都鐵道博物館', title_jp: '京都鉄道博物館', address_jp: '京都市下京区観喜寺町', coords: '', note: '親子雨天最佳室內備案（JR梅小路京都西站）' }
     ],
     trip_meta: [
-      { meta_id: 'META-0001', trip_date: '2027-11-25', category: 'flight', title_zh: '去程 桃園 → 關西', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', info_text: '預約狀態：已訂；抵達後搭 HARUKA' },
-      { meta_id: 'META-0002', trip_date: '2027-11-28', category: 'hotel', title_zh: '天橋立溫泉旅館', title_jp: '天橋立温泉', address_jp: '京都府宮津市文珠', info_text: '預約狀態：已訂；飲食備註請提前告知' },
-      { meta_id: 'META-0003', trip_date: '', category: 'todo', title_zh: '預約祐齋亭與瑠璃光院', title_jp: '', address_jp: '', info_text: '依官方開放時間提前預約' }
+      { meta_id: 'META-0002', trip_date: '2027-11-25', category: 'flight', title_zh: '星宇航空 JX820 桃園→關西', title_jp: 'スターラックス航空 JX820', address_jp: '関西国際空港 第1ターミナル', info_text: '預約狀態：待預約；07:40 桃園起飛 / 11:10 抵達關西（經濟艙直飛）' },
+      { meta_id: 'META-0003', trip_date: '2027-12-03', category: 'flight', title_zh: '星宇航空 JX821 關西→桃園', title_jp: 'スターラックス航空 JX821', address_jp: '関西国際空港 第1ターミナル', info_text: '預約狀態：待預約；12:20 關西起飛 / 14:35 抵達桃園（經濟艙直飛）' },
+      { meta_id: 'META-0004', trip_date: '2027-11-25', category: 'hotel', title_zh: '京都車站周邊飯店（連住3晚）', title_jp: '京都駅周辺ホテル', address_jp: '京都市下京区東塩小路町', info_text: '預約狀態：待預約；11/25～11/28 入住3晚，雙床或家庭房' },
+      { meta_id: 'META-0005', trip_date: '2027-11-28', category: 'hotel', title_zh: '天橋立溫泉旅館（1晚）', title_jp: '天橋立温泉 旅館', address_jp: '京都府宮津市文珠', info_text: '預約狀態：待預約；11/28～11/29 入住1晚，含早晚餐（備註不吃牛肉與牛油）' },
+      { meta_id: 'META-0006', trip_date: '2027-11-29', category: 'hotel', title_zh: '京都車站周邊飯店（連住2晚）', title_jp: '京都駅周辺ホテル', address_jp: '京都市下京区東塩小路町', info_text: '預約狀態：待預約；11/29～12/01 入住2晚，方便前往洛北與祇園' },
+      { meta_id: 'META-0007', trip_date: '2027-12-01', category: 'hotel', title_zh: '大阪難波／梅田飯店（連住2晚）', title_jp: '大阪難波・梅田ホテル', address_jp: '大阪市中央区難波', info_text: '預約狀態：待預約；12/01～12/03 入住2晚，近南海電鐵直達關西機場' },
+      { meta_id: 'META-0008', trip_date: '', category: 'todo', title_zh: '嵐山祐齋亭與八瀬瑠璃光院紅葉季線上預約', title_jp: '嵐山 祐斎亭・瑠璃光院 事前予約', address_jp: '', info_text: '預約狀態：待預約；開放預約當日準時搶票（預計10月下旬開放）' },
+      { meta_id: 'META-0009', trip_date: '', category: 'todo', title_zh: 'JR西日本關西廣域周遊券／特急指定席兌換', title_jp: 'JR-WEST RAIL PASS', address_jp: '京都駅 みどりの窓口', info_text: '預約狀態：免預約；兌換HARUKA與特急橋立號往返天橋立指定席' },
+      { meta_id: 'META-0010', trip_date: '', category: 'todo', title_zh: '日本入境 Visit Japan Web 與旅遊保險', title_jp: 'Visit Japan Web', address_jp: '', info_text: '預約狀態：免預約；出發前72小時完成海關與入境QR Code登錄' }
     ]
   };
 
-  /* 安全的儲存存取 */
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (_) { return null; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
@@ -183,7 +244,7 @@ body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
     if (!start) { el.textContent = '尚無行程日期'; return; }
     const diff = Math.ceil((new Date(start + 'T00:00:00+09:00').getTime() - Date.now()) / 86400000);
     el.textContent = diff > 0 ? '距離出發還有 ' + diff + ' 天' : diff === 0 ? '今天出發！' : '旅程進行中／已結束';
-    $('syncInfo').textContent = '資料：' + (store.get(K.bundle) ? '本機快取' : '範例資料');
+    $('syncInfo').textContent = '資料：' + (store.get(K.bundle) ? '本機快取（9 天完整版）' : '內建 9 天完整資料');
   }
 
   function renderDates() {
@@ -269,7 +330,6 @@ body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
     $('motionBtn').textContent = '動畫：' + ({ system: '跟隨系統', reduce: '已減少', normal: '完整' }[motion]);
   }
 
-  /* 事件 */
   document.querySelectorAll('.tab[data-view]').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('.tab[data-view]').forEach((x) => x.classList.toggle('active', x === b));
     ['schedule', 'pocket', 'meta', 'settings'].forEach((v) => $('view-' + v).classList.toggle('hidden', v !== b.dataset.view));
@@ -291,9 +351,21 @@ body.reduced-motion .bob,body.reduced-motion .pop{animation:none!important}
   document.addEventListener('click', (e) => { const b = e.target.closest('[data-copy]'); if (b) copy(decodeURIComponent(b.dataset.copy), b.dataset.label || '內容'); });
   $('motionBtn').addEventListener('click', () => { motion = motion === 'system' ? 'reduce' : motion === 'reduce' ? 'normal' : 'system'; store.set(K.pref, { motion }); applyMotion(); });
   $('resetStateBtn').addEventListener('click', () => { rt.status = {}; rt.actualEnd = {}; saveRt(); renderSchedule(); toast('已清除完成／跳過狀態'); });
-  $('resetAllBtn').addEventListener('click', () => { if (confirm('確定重設為範例資料並清除所有本機狀態？')) { store.del(K.bundle); store.del(K.state); location.reload(); } });
+  $('resetAllBtn').addEventListener('click', () => { if (confirm('確定重設為完整 9 天資料並清除所有本機狀態？')) { store.del(K.bundle); store.del(K.state); location.reload(); } });
 
   applyMotion(); renderCountdown(); renderDates(); renderSchedule(); renderPocket(); renderMeta();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        const el = $('swStatus');
+        if (el) el.textContent = '離線快取已啟用（PWA 可加入主畫面離線使用）';
+      }).catch(() => {
+        const el = $('swStatus');
+        if (el) el.textContent = '離線快取未啟用（請確認透過 HTTPS 開啟）';
+      });
+    });
+  }
 })();
 </script>
 </body>
