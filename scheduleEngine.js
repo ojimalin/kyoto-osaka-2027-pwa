@@ -350,3 +350,4 @@ const TripScheduleEngine = (() => {
     restoreAllToBaseline
   };
 })();
+if (typeof TripScheduleEngine !== 'undefined') window.TripScheduleEngine = TripScheduleEngine;
