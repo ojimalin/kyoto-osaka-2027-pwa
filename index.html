@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#b84a27" />
-  <title>家庭旅遊離線電子手帳</title>
+  <title>2027 京阪秋楓旅遊手帳</title>
   <link rel="manifest" href="./manifest.json" />
   <style>
     :root {
@@ -16,6 +16,9 @@
       --primary: #b84a27;
       --primary-weak: #f7ebd9;
       --warm: #d96b34;
+      --yellow: #f6d27a;
+      --sky: #a8d3e6;
+      --bamboo: #b9daa5;
       --ok: #246b3c;
       --ok-bg: #e7f4ea;
       --warn: #9a4a12;
@@ -83,6 +86,8 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(62, 47, 38, 0.16);
+      transition: transform 0.14s ease;
     }
 
     .mascot-pill:active {
@@ -212,8 +217,8 @@
       width: 40px;
       height: 40px;
       border-radius: 999px;
-      border: 2px solid rgba(200, 55, 45, 0.75);
-      color: rgba(200, 55, 45, 0.85);
+      border: 2px solid rgba(200, 55, 45, 0.78);
+      color: rgba(200, 55, 45, 0.88);
       font-weight: 800;
       font-size: 18px;
       display: flex;
@@ -453,8 +458,8 @@
       <div class="section-card">
         <h3>行程資料管理</h3>
         <p class="muted-note">
-- <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
-- 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
+          - <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
+          - 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
         </p>
         <button id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
       </div>
@@ -490,12 +495,33 @@
   <script src="./idbStore.js"></script>
   <script src="./syncService.js"></script>
   <script src="./scheduleEngine.js"></script>
+  <script src="./tripEngine.js"></script>
   <script>
     (() => {
       const PREF_KEYS = {
         API_URL: 'trip_pwa_api_url',
         API_TOKEN: 'trip_pwa_api_token',
-        SELECTED_DATE: 'trip_pwa_selected_date'
+        SELECTED_DATE: 'trip_pwa_selected_date',
+        FALLBACK_STATE: 'trip_pwa_fallback_state'
+      };
+
+      const FALLBACK_SAMPLE = {
+        meta: { dataVersion: 'SAMPLE-9D', tripStartDate: '2027-11-25', tripEndDate: '2027-12-03' },
+        itinerary: [
+          { slot_id: 'SLOT-0003', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0004', title_zh: '關西機場入境與搭乘HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', note: '星宇航空抵達後領行李與兌換車票' },
+          { slot_id: 'SLOT-0004', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', dwell_min: 45, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '京都車站', sort_order: 20, activity_id: 'ACT-0005', title_zh: '京都車站飯店寄放行李', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', note: '先寄放行李再輕裝出門' },
+          { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0006', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', note: '楓葉季夜楓名所' },
+          { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', dwell_min: 90, travel_min: 5, buffer_min: 5, transport_mode: '步行', area: '京都車站', sort_order: 30, activity_id: 'ACT-0007', title_zh: '京都車站大階梯光影與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', note: '雨天室內備案' },
+          { slot_id: 'SLOT-0006', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0008', title_zh: '先斗町京都豚骨與炸豬排晚餐', title_jp: '先斗町', address_jp: '京都市中京区先斗町通', note: '避開牛肉、牛油與肥腸' },
+          { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'flexible', start_time: '08:30', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0009', title_zh: '渡月橋與桂川河畔晨間散步', title_jp: '渡月橋', address_jp: '京都市右京区嵯峨中ノ島町', note: '避開人潮拍攝晨景' },
+          { slot_id: 'SLOT-0008', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 20, activity_id: 'ACT-0011', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', note: '需事先官網預約' }
+        ],
+        pocket_spots: [
+          { pocket_id: 'PK-0002', area: '嵐山', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '步行', title_zh: '寶嚴院獅子吼庭園', title_jp: '宝厳院', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町36', note: '紅葉迴遊式庭園' }
+        ],
+        trip_meta: [
+          { meta_id: 'META-0002', trip_date: '2027-11-25', category: 'flight', title_zh: '星宇航空 JX820 桃園→關西', title_jp: 'スターラックス航空 JX820', address_jp: '関西国際空港 第1ターミナル', info_text: '07:40 桃園起飛 / 11:10 抵達關西' }
+        ]
       };
 
       const mascotQuotes = ['啾！賞楓出發～', '今天也要慢慢逛！', '帶好保暖外套了嗎？', '離線也能看行程唷～'];
@@ -511,17 +537,22 @@
 
       let currentDate = '';
       let currentSchedule = null;
+      let hasIdbBaseline = false;
+      let fallbackRt = (() => {
+        try {
+          return Object.assign({ status: {}, weather: {} }, JSON.parse(localStorage.getItem(PREF_KEYS.FALLBACK_STATE) || '{}'));
+        } catch (_) {
+          return { status: {}, weather: {} };
+        }
+      })();
+      const saveFallbackRt = () => {
+        try { localStorage.setItem(PREF_KEYS.FALLBACK_STATE, JSON.stringify(fallbackRt)); } catch (_) {}
+      };
 
       function showBanner(type, text) {
         const el = document.getElementById('globalBanner');
         el.className = 'banner show ' + (type || 'info');
         el.textContent = text;
-      }
-
-      function hideBanner() {
-        const el = document.getElementById('globalBanner');
-        el.className = 'banner';
-        el.textContent = '';
       }
 
       function escapeHtml(str) {
@@ -536,7 +567,7 @@
         const badge = document.getElementById('netBadge');
         const online = navigator.onLine;
         badge.textContent = online ? '線上' : '離線模式';
-        badge.style.background = online ? 'rgba(21, 128, 61, 0.45)' : 'rgba(120, 90, 60, 0.65)';
+        badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.7)';
       }
 
       function loadPrefsToInputs() {
@@ -576,18 +607,73 @@
         return Array.from(set).sort();
       }
 
+      function buildFallbackDay(dateStr) {
+        const mode = fallbackRt.weather[dateStr] || 'sun';
+        if (typeof TripEngine !== 'undefined' && TripEngine && typeof TripEngine.buildDayRoute === 'function') {
+          const route = TripEngine.buildDayRoute(FALLBACK_SAMPLE.itinerary, dateStr, mode);
+          const tl = TripEngine.computeTimeline(route, { status: fallbackRt.status });
+          return {
+            hasBaseline: false,
+            isFallback: true,
+            tripDate: dateStr,
+            weatherMode: mode,
+            isStopped: false,
+            items: [],
+            visibleItems: tl.map((r) => ({
+              activity_id: r.activityId,
+              title_zh: r.titleZh,
+              title_jp: r.titleJp,
+              address_jp: r.addressJp,
+              area: r.area,
+              note: r.note,
+              status: r.status,
+              _sourceType: 'baseline',
+              _hasOverrides: false,
+              _overriddenFields: [],
+              estArrive: r.startFormatted.text,
+              estArriveNextDay: r.startFormatted.isNextDay,
+              estDepart: r.departFormatted.text,
+              estDepartNextDay: r.departFormatted.isNextDay,
+              nextArrive: r.nextArrivalFormatted.text,
+              nextArriveNextDay: r.nextArrivalFormatted.isNextDay,
+              transport_mode: r.transportMode,
+              dwell_min: r.dwellMin,
+              effectiveTravelMin: r.travelUsed,
+              effectiveBufferMin: r.bufferUsed,
+              isLastOfDay: r.isLastStop,
+              isLate: Boolean(r.deadlineAlert && r.deadlineAlert.isLate),
+              lateReason: (r.deadlineAlert && r.deadlineAlert.isLate)
+                ? `預計 ${r.deadlineAlert.actualFormatted} 晚於截止 ${r.deadlineAlert.deadlineTime}（+${r.deadlineAlert.diffMin} 分）`
+                : ''
+            })),
+            stats: {
+              total: tl.length,
+              done: tl.filter((x) => x.status === 'done').length,
+              skipped: tl.filter((x) => x.status === 'skipped').length,
+              pending: tl.filter((x) => x.status === 'pending').length,
+              lateCount: tl.filter((x) => x.deadlineAlert && x.deadlineAlert.isLate).length
+            }
+          };
+        }
+        return { hasBaseline: false, isFallback: true, tripDate: dateStr, weatherMode: mode, isStopped: false, items: [], visibleItems: [], stats: { total: 0, done: 0, skipped: 0, pending: 0, lateCount: 0 } };
+      }
+
       async function renderHeaderAndDates() {
         const baseline = await TripIdbStore.getBaseline();
         const metaBar = document.getElementById('syncMetaBar');
         const dateSel = document.getElementById('dateSelect');
 
         if (!baseline) {
-          metaBar.innerHTML = '<span>尚未同步雲端底稿（請至「設定備份」同步）</span>';
-          dateSel.innerHTML = '<option value="">無可用日期</option>';
-          currentDate = '';
+          hasIdbBaseline = false;
+          metaBar.innerHTML = '<span>尚未同步雲端底稿（目前顯示內建範例，請至「設定備份」同步）</span>';
+          const fDates = enumerateDates(FALLBACK_SAMPLE.meta.tripStartDate, FALLBACK_SAMPLE.meta.tripEndDate, FALLBACK_SAMPLE.itinerary);
+          const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
+          currentDate = (savedDate && fDates.indexOf(savedDate) !== -1) ? savedDate : (fDates[0] || '');
+          dateSel.innerHTML = fDates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('');
           return null;
         }
 
+        hasIdbBaseline = true;
         const m = baseline.meta || {};
         const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
         metaBar.innerHTML =
@@ -622,18 +708,15 @@
           return;
         }
 
-        const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
+        const sched = hasIdbBaseline
+          ? await TripScheduleEngine.buildDaySchedule(currentDate)
+          : buildFallbackDay(currentDate);
         currentSchedule = sched;
-
-        if (!sched.hasBaseline) {
-          statsEl.innerHTML = '';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿。</div>';
-          return;
-        }
 
         btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
         btnS.textContent = sched.isStopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
         btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
+        btnS.style.display = hasIdbBaseline ? '' : 'none';
 
         const st = sched.stats;
         statsEl.innerHTML =
@@ -664,7 +747,7 @@
               ? '<span class="tag" style="background:#e5e7eb;color:#374151;border-color:transparent;">已跳過</span>'
               : '<span class="tag">待執行</span>');
 
-          const isBaseline = it._sourceType === 'baseline';
+          const isBaseline = hasIdbBaseline && it._sourceType === 'baseline';
           const actKey = encodeURIComponent(it.activity_id);
 
           return `
@@ -746,14 +829,17 @@
         const anchorSel = document.getElementById('insertAnchorSelect');
         const listEl = document.getElementById('pocketList');
         const baseline = await TripIdbStore.getBaseline();
+        const spots = (baseline && Array.isArray(baseline.pocket_spots))
+          ? baseline.pocket_spots
+          : FALLBACK_SAMPLE.pocket_spots;
 
         if (!currentDate) {
           anchorSel.innerHTML = '<option value="TOP">當日最前面</option>';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，無備選口袋資料。</div>';
+          listEl.innerHTML = '<div class="empty-state">無備選口袋資料。</div>';
           return;
         }
 
-        const sched = currentSchedule || await TripScheduleEngine.buildDaySchedule(currentDate);
+        const sched = currentSchedule || (hasIdbBaseline ? await TripScheduleEngine.buildDaySchedule(currentDate) : buildFallbackDay(currentDate));
         const anchorOptions = ['<option value="TOP">當日最前面</option>'];
         (sched.items || []).forEach((it) => {
           if (it._sourceType === 'baseline') {
@@ -762,9 +848,8 @@
         });
         anchorSel.innerHTML = anchorOptions.join('');
 
-        const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
         if (spots.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">底稿中尚無備選口袋景點。</div>';
+          listEl.innerHTML = '<div class="empty-state">尚無備選口袋景點。</div>';
           return;
         }
 
@@ -780,7 +865,7 @@
                   ${sp.note ? '<br>備註：' + escapeHtml(sp.note) : ''}
                 </div>
               </div>
-              <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">插入本日</button>
+              ${hasIdbBaseline ? `<button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">插入本日</button>` : ''}
             </div>
           </div>
         `).join('');
@@ -789,7 +874,9 @@
       async function renderMetaTab() {
         const listEl = document.getElementById('metaList');
         const baseline = await TripIdbStore.getBaseline();
-        const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
+        const metas = (baseline && Array.isArray(baseline.trip_meta))
+          ? baseline.trip_meta
+          : FALLBACK_SAMPLE.trip_meta;
 
         if (metas.length === 0) {
           listEl.innerHTML = '<div class="empty-state">尚無住宿與航班資料。</div>';
@@ -837,7 +924,12 @@
       window.__app = {
         async onSetStatus(encodedId, status) {
           const actId = decodeURIComponent(encodedId);
-          await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
+          if (hasIdbBaseline) {
+            await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
+          } else {
+            fallbackRt.status[actId] = status;
+            saveFallbackRt();
+          }
           await renderScheduleTab();
         },
         onToggleEdit(encodedId) {
@@ -877,7 +969,7 @@
           await renderScheduleTab();
         },
         async onInsertSpot(spotIdx) {
-          if (!currentDate) return;
+          if (!currentDate || !hasIdbBaseline) return;
           const baseline = await TripIdbStore.getBaseline();
           const spots = (baseline && baseline.pocket_spots) || [];
           const spot = spots[spotIdx];
@@ -889,7 +981,7 @@
           await renderScheduleTab();
         },
         async onRemoveInserted(insertId) {
-          if (!currentDate) return;
+          if (!currentDate || !hasIdbBaseline) return;
           await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
           showBanner('info', '已移除本機插入站點');
           await renderScheduleTab();
@@ -918,12 +1010,17 @@
 
       document.getElementById('btnToggleWeather').addEventListener('click', async () => {
         if (!currentDate) return;
-        await TripScheduleEngine.toggleWeather(currentDate);
+        if (hasIdbBaseline) {
+          await TripScheduleEngine.toggleWeather(currentDate);
+        } else {
+          fallbackRt.weather[currentDate] = (fallbackRt.weather[currentDate] === 'rain') ? 'sun' : 'rain';
+          saveFallbackRt();
+        }
         await renderScheduleTab();
       });
 
       document.getElementById('btnToggleStop').addEventListener('click', async () => {
-        if (!currentDate) return;
+        if (!currentDate || !hasIdbBaseline) return;
         await TripScheduleEngine.toggleDayStop(currentDate);
         await renderScheduleTab();
       });
@@ -948,6 +1045,8 @@
         const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
         if (!ok) return;
         await TripScheduleEngine.restoreAllToBaseline();
+        fallbackRt = { status: {}, weather: {} };
+        saveFallbackRt();
         showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
         await refreshAll();
       });
