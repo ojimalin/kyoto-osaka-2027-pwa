@@ -684,7 +684,9 @@
     (() => {
       const PREF_KEYS = {
         API_URL: 'trip_pwa_api_url',
-        API_TOKEN: 'trip_pwa_api_token'
+        API_TOKEN: 'trip_pwa_api_token',
+        ACTIVE_TAB: 'trip_pwa_active_tab',
+        SELECTED_DATE: 'trip_pwa_selected_date'
       };
 
       const VALID_TYPES = [
@@ -1050,8 +1052,9 @@
           `<div>同步：${escapeHtml(syncedStr)}</div>`;
 
         const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
+        const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
         if (!currentDate) {
-          currentDate = dates[0] || '';
+          currentDate = (savedDate && dates.indexOf(savedDate) !== -1) ? savedDate : (dates[0] || '');
         } else if (dates.length > 0 && dates.indexOf(currentDate) === -1) {
           currentDate = dates[0];
         }
@@ -1374,21 +1377,27 @@
         }
       };
 
-      function switchTab(tabId) {
+      function switchTab(tabId, persist = true) {
+        const validTabs = ['tab-schedule', 'tab-pocket', 'tab-meta', 'tab-settings'];
+        const targetId = validTabs.indexOf(tabId) !== -1 ? tabId : 'tab-schedule';
         document.querySelectorAll('.tab-page').forEach((p) => p.classList.remove('active'));
         document.querySelectorAll('nav.bottom-nav button').forEach((b) => {
-          b.classList.toggle('active', b.dataset.tab === tabId);
+          b.classList.toggle('active', b.dataset.tab === targetId);
         });
-        const target = document.getElementById(tabId);
+        const target = document.getElementById(targetId);
         if (target) target.classList.add('active');
+        if (persist) {
+          localStorage.setItem(PREF_KEYS.ACTIVE_TAB, targetId);
+        }
       }
 
       document.querySelectorAll('nav.bottom-nav button').forEach((btn) => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab, true));
       });
 
       document.getElementById('dateSelect').addEventListener('change', async (e) => {
         currentDate = e.target.value;
+        localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate);
         await renderScheduleTab();
         await renderPocketTab();
       });
@@ -1486,6 +1495,7 @@
       }
 
       loadPrefsToInputs();
+      switchTab(localStorage.getItem(PREF_KEYS.ACTIVE_TAB) || 'tab-schedule', false);
       refreshAll();
     })();
   </script>
