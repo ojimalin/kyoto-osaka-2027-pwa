@@ -163,14 +163,14 @@
       flex-direction: column;
       align-items: center;
       flex-shrink: 0;
-      width: 122px;
+      width: 126px;
       cursor: pointer;
       user-select: none;
     }
 
     .mascot-bird-wrap {
-      width: 58px;
-      height: 58px;
+      width: 60px;
+      height: 60px;
       border-radius: 18px;
       background: linear-gradient(180deg, #fff9ee 0%, #f7ebd7 100%);
       border: 1.5px solid var(--border);
@@ -580,19 +580,28 @@
 
           <div id="mascotStage" class="mascot-stage" title="點我換台詞並跳到下一站">
             <div class="mascot-bird-wrap">
-              <svg id="birdSvg" class="mascot-bird" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
-                <path d="M31 27 L41 20 L39 26 L32 30 Z" fill="#4a372c" />
-                <path d="M32 28 L41 23 L40 26 L33 30 Z" fill="#ffffff" />
-                <ellipse cx="21" cy="25" rx="13" ry="12" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-                <path d="M24 23 Q32 24 30 31 Q24 31 23 26 Z" fill="#8b6f5e" />
-                <circle cx="15.5" cy="22" r="2" fill="#2b1e16" />
-                <circle cx="14.8" cy="21.2" r="0.7" fill="#ffffff" />
-                <circle cx="23.5" cy="22" r="2" fill="#2b1e16" />
-                <circle cx="22.8" cy="21.2" r="0.7" fill="#ffffff" />
-                <polygon points="19.5,23.2 17.7,26 21.3,26" fill="#e67e3c" />
-                <ellipse cx="12.8" cy="25.2" rx="2.3" ry="1.3" fill="#f7a8a0" opacity="0.88" />
-                <ellipse cx="26.2" cy="25.2" rx="2.3" ry="1.3" fill="#f7a8a0" opacity="0.88" />
-                <g id="birdAccessory"></g>
+              <svg id="birdSvg" class="mascot-bird" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+                <!-- 蓬鬆長尾 -->
+                <path d="M32 29 L43 22 L41 28 L33 32 Z" fill="#4a372c" />
+                <path d="M33 30 L43 25 L42 28 L34 32 Z" fill="#ffffff" />
+                <!-- 圓身體 -->
+                <ellipse cx="22" cy="27" rx="12.5" ry="11.5" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
+                <!-- 翅膀 -->
+                <path d="M25 25 Q32.5 26 30.5 32.5 Q25 32.5 24 28 Z" fill="#8b6f5e" />
+                <!-- 眼睛與橘嘴 -->
+                <circle cx="16.8" cy="24" r="1.9" fill="#2b1e16" />
+                <circle cx="16.1" cy="23.2" r="0.65" fill="#ffffff" />
+                <circle cx="24.2" cy="24" r="1.9" fill="#2b1e16" />
+                <circle cx="23.5" cy="23.2" r="0.65" fill="#ffffff" />
+                <polygon points="20.5,25.2 18.8,27.8 22.2,27.8" fill="#e67e3c" />
+                <!-- 粉紅腮紅 -->
+                <ellipse cx="14.2" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
+                <ellipse cx="26.8" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
+
+                <!-- 三個獨立圖層：角色造型 / 季節裝飾 / 雨天配件 -->
+                <g id="birdRoleBadge"></g>
+                <g id="birdSeasonBadge"></g>
+                <g id="birdWeatherBadge"></g>
               </svg>
             </div>
             <div id="mascotBubble" class="mascot-bubble">啾！點我跳下一站</div>
@@ -684,7 +693,13 @@
         API_TOKEN: 'trip_pwa_api_token'
       };
 
-      // 第一層：季節外觀（純函數，不修改資料）
+      const VALID_TYPES = [
+        'flight', 'train', 'bus', 'ship',
+        'shrine', 'nature', 'museum', 'meal',
+        'cafe', 'shop', 'onsen', 'hotel'
+      ];
+
+      // 1. 季節判斷：當日日期優先，出發日期為備援（純函數，不修改資料）
       function detectSeasonLeaf(dateStr, fallbackStart) {
         const target = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr))
           ? dateStr
@@ -696,34 +711,26 @@
         return 'winter';
       }
 
-      const SEASON_HEAD_SVG = {
-        spring: '<circle cx="20" cy="9" r="3" fill="#f9a8b8" /><circle cx="15" cy="11" r="2.5" fill="#fbc4cf" /><circle cx="25" cy="11" r="2.5" fill="#fbc4cf" /><circle cx="20" cy="9" r="1.1" fill="#e05a78" />',
-        summer: '<path d="M20 13 Q27 6 33 10 Q26 14 20 13 Z" fill="#4f9652" /><path d="M20 13 Q13 7 8 11 Q14 14 20 13 Z" fill="#74b36a" />',
-        autumn: '<path d="M20 4 L22 9.5 L26.5 8.5 L23.2 12 L24.6 15 L20 13 L15.4 15 L16.8 12 L13.5 8.5 L18 9.5 Z" fill="#c8372d" />',
-        winter: '<path d="M20 4.5 V14.5 M15 9.5 H25 M16.5 6 L23.5 13 M23.5 6 L16.5 13" stroke="#6aa9d9" stroke-width="1.8" stroke-linecap="round" />'
-      };
-
-      const ROLE_HEAD_SVG = {
-        conductor: '<path d="M13 12 H27 L25 8 H15 Z" fill="#2d4263" /><rect x="12" y="12" width="16" height="2" rx="1" fill="#1e2d44" /><circle cx="20" cy="10" r="1.2" fill="#f3c86b" />',
-        onigiri: '<polygon points="20,4.5 13,14 27,14" fill="#ffffff" stroke="#5a4336" stroke-width="1.4" stroke-linejoin="round" /><rect x="17.5" y="10.5" width="5" height="3.5" rx="0.8" fill="#2f221b" />',
-        onsen: '<rect x="14" y="9" width="12" height="4.5" rx="1.2" fill="#fffdf9" stroke="#8c6852" stroke-width="1.2" /><path d="M17 7 Q18 5 17 3.5 M22 7 Q23 5 22 3.5" stroke="#8cb4d9" stroke-width="1.3" fill="none" />',
-        umbrella: '<path d="M11.5 12 Q20 4 28.5 12 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.3" /><line x1="20" y1="12" x2="20" y2="15" stroke="#7c5318" stroke-width="1.5" />',
-        sleep: '<path d="M14 12 Q20 6.5 26 12 L24 14 L16 14 Z" fill="#78a6d4" /><circle cx="26" cy="7.5" r="1.9" fill="#f7d87c" />'
-      };
-
-      // 第二層：12 大通用活動分類（純函數：標籤優先 -> 關鍵字其次 -> 預設）
+      // 2. 活動分類：有效 #標籤 優先 -> 既有 icon/category 其次 -> 完整詞組關鍵字 -> default（不含 transport_mode）
       function classifyActivityType(item) {
         if (!item || typeof item !== 'object') return 'default';
-        const rawIcon = String(item.icon || item.category || '').toLowerCase().trim();
+
+        const normalizeType = (val) => {
+          const v = String(val || '').toLowerCase().trim();
+          if (!v) return '';
+          if (v === 'view') return 'nature';
+          return VALID_TYPES.indexOf(v) !== -1 ? v : '';
+        };
+
         const noteStr = String(item.note || '').toLowerCase();
         const tagMatch = noteStr.match(/#([a-z_]+)/);
-        const explicit = rawIcon || (tagMatch ? tagMatch[1] : '');
+        const tagType = tagMatch ? normalizeType(tagMatch[1]) : '';
+        if (tagType) return tagType;
 
-        const VALID_TYPES = ['flight', 'train', 'bus', 'ship', 'meal', 'cafe', 'shrine', 'nature', 'museum', 'shop', 'onsen', 'hotel'];
-        if (VALID_TYPES.indexOf(explicit) !== -1) return explicit;
+        const fieldType = normalizeType(item.icon) || normalizeType(item.category);
+        if (fieldType) return fieldType;
 
-        const text = `${item.title_zh || ''} ${item.title_jp || ''} ${item.transport_mode || ''} ${item.note || ''}`.toLowerCase();
-
+        const text = `${item.title_zh || ''} ${item.title_jp || ''} ${item.note || ''}`.toLowerCase();
         if (/航班|機場|搭機|登機|報到|flight|airport/.test(text)) return 'flight';
         if (/新幹線|特急|電車|地鐵|鐵道|haruka|rapi:t|jr|列車|小火車/.test(text)) return 'train';
         if (/巴士|公車|自駕|開車|計程車|包車|bus|car/.test(text)) return 'bus';
@@ -732,14 +739,46 @@
         if (/飯店|旅館|入住|退房|寄放行李|民宿|hotel|check-in|check-out/.test(text)) return 'hotel';
         if (/咖啡|抹茶|甜點|下午茶|茶寮|星巴克|cafe|coffee|tea/.test(text)) return 'cafe';
         if (/午餐|晚餐|早餐|拉麵|烏龍麵|壽司|海鮮|懷石|燒肉|炸豬排|漢堡排|大阪燒|串炸|定食|釜飯|水炊鍋|美食|餐廳/.test(text)) return 'meal';
-        if (/神社|寺|院|宮|城|鳥居|大社|神宮|古蹟/.test(text)) return 'shrine';
-        if (/公園|山|湖|海|川|溪|峽|展望|竹林|庭園|苔|賞楓|賞櫻|銀杏|花海|自然/.test(text)) return 'nature';
+        if (/神社|寺廟|寺院|鳥居|大社|神宮|古蹟/.test(text)) return 'shrine';
+        if (/展望台|觀景台|賞楓|賞櫻|銀杏|花海|竹林|苔庭|森林|公園|湖畔|海岸|自然/.test(text)) return 'nature';
         if (/博物館|美術館|紀念館|水族館|動物園|展覽|體驗|見學|museum/.test(text)) return 'museum';
         if (/百貨|商店街|購物|採買|藥妝|市場|outlet|mall|伴手禮/.test(text)) return 'shop';
+
         return 'default';
       }
 
-      // 第三層：組合 12 類通用小圖示（未知類型安全退回當季自然小圖示）
+      // 雨天戶外曝雨判斷：只在 rain 且明確戶外景點時為 'outdoor'，其餘一律 'sheltered'（不看 transport_mode）
+      function detectRainExposure(item, type, weatherMode) {
+        if (weatherMode !== 'rain' || !item) return 'sheltered';
+        if (type === 'nature') return 'outdoor';
+        const text = `${item.title_zh || ''} ${item.title_jp || ''} ${item.note || ''}`.toLowerCase();
+        if (/展望台|觀景台|賞楓|賞櫻|銀杏|花海|竹林|苔庭|森林|公園|湖畔|海岸|戶外/.test(text)) {
+          return 'outdoor';
+        }
+        return 'sheltered';
+      }
+
+      const ROLE_BADGE_SVG = {
+        conductor: '<path d="M15 14 H29 L27.2 10 H16.8 Z" fill="#2d4263" /><rect x="14" y="14" width="16" height="1.8" rx="0.9" fill="#1e2d44" /><circle cx="22" cy="12" r="1.1" fill="#f3c86b" />',
+        onigiri: '<polygon points="22,6.5 15.5,15.5 28.5,15.5" fill="#ffffff" stroke="#5a4336" stroke-width="1.3" stroke-linejoin="round" /><rect x="19.8" y="12.2" width="4.4" height="3.3" rx="0.7" fill="#2f221b" />',
+        onsen: '<rect x="16" y="10.5" width="12" height="4.2" rx="1.1" fill="#fffdf9" stroke="#8c6852" stroke-width="1.2" /><path d="M19.5 8.5 Q20.5 6.8 19.5 5.2 M24.5 8.5 Q25.5 6.8 24.5 5.2" stroke="#8cb4d9" stroke-width="1.2" fill="none" />',
+        hotel: '<rect x="16.5" y="10" width="11" height="5" rx="1.2" fill="#b87344" stroke="#5a3822" stroke-width="1.2" />',
+        museum: '<polygon points="15.5,14.5 22,10.5 28.5,14.5" fill="#7c685a" />',
+        sleep: '<path d="M16 14 Q22 9 28 14 L26.2 15.8 L17.8 15.8 Z" fill="#78a6d4" />'
+      };
+
+      const SEASON_BADGE_SVG = {
+        spring: '<circle cx="8" cy="10" r="2.6" fill="#f9a8b8" /><circle cx="11" cy="8" r="2.2" fill="#fbc4cf" /><circle cx="8" cy="10" r="0.9" fill="#e05a78" />',
+        summer: '<path d="M7 12 Q11 7 14 10 Q10 13 7 12 Z" fill="#5e9e54" />',
+        autumn: '<path d="M8.5 5.5 L9.8 8.8 L12.5 8.2 L10.6 10.3 L11.4 12.2 L8.5 11 L5.6 12.2 L6.4 10.3 L4.5 8.2 L7.2 8.8 Z" fill="#c8372d" />',
+        winter: '<path d="M8.5 6 V12 M5.5 9 H11.5 M6.4 6.9 L10.6 11.1 M10.6 6.9 L6.4 11.1" stroke="#6aa9d9" stroke-width="1.5" stroke-linecap="round" />'
+      };
+
+      const WEATHER_BADGE_SVG = {
+        rain_outdoor: '<path d="M31 11 Q36.5 5.5 42 11 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.2" /><line x1="36.5" y1="11" x2="36.5" y2="15" stroke="#7c5318" stroke-width="1.4" />'
+      };
+
+      // 3. 組合卡片圖示（純函數，不寫入資料）
       function renderSpotChibi(item, season) {
         const type = classifyActivityType(item);
         const SVG_MAP = {
@@ -772,6 +811,7 @@
       let currentSchedule = null;
       let baselineStartDate = '';
       let customMealReminder = '';
+      let lastMascotContextKey = '';
       let quoteIndex = 0;
 
       function getLocalTodayIso() {
@@ -823,97 +863,145 @@
         });
       }
 
-      // 第四層：讀取既有行程狀態，依嚴格優先順序決定外觀與台詞（純函數式畫面更新，不改動任何資料）
+      // 4. 三軸智慧判斷（純前端畫面狀態更新，不修改任何資料或進度）
       function syncMascotWithSchedule(sched, cycleQuote) {
         const bubbleEl = document.getElementById('mascotBubble');
-        const accEl = document.getElementById('birdAccessory');
-        if (!bubbleEl || !accEl) return;
+        const roleEl = document.getElementById('birdRoleBadge');
+        const seasonEl = document.getElementById('birdSeasonBadge');
+        const weatherEl = document.getElementById('birdWeatherBadge');
+        if (!bubbleEl || !roleEl || !seasonEl || !weatherEl) return;
 
         const season = detectSeasonLeaf(currentDate, baselineStartDate);
-        const seasonHead = SEASON_HEAD_SVG[season] || SEASON_HEAD_SVG.autumn;
+        const weatherMode = (sched && sched.weatherMode === 'rain') ? 'rain' : 'sun';
+        seasonEl.innerHTML = SEASON_BADGE_SVG[season] || SEASON_BADGE_SVG.autumn;
 
         if (!sched || !sched.hasBaseline) {
-          accEl.innerHTML = seasonHead;
+          roleEl.innerHTML = '';
+          weatherEl.innerHTML = '';
+          const key = `${currentDate || 'none'}|empty|none|${weatherMode}|${season}|sheltered`;
+          if (key !== lastMascotContextKey) {
+            lastMascotContextKey = key;
+            quoteIndex = 0;
+          }
           bubbleEl.textContent = '啾！同步後一起出發';
           return;
         }
 
-        const st = sched.stats || { total: 0, done: 0, pending: 0, lateCount: 0 };
-        const isRain = sched.weatherMode === 'rain';
+        const st = sched.stats || { total: 0, done: 0, skipped: 0, pending: 0, lateCount: 0 };
+        const total = Number(st.total || 0);
+        const done = Number(st.done || 0);
+        const pending = Number(st.pending || 0);
+        const lateCount = Number(st.lateCount || 0);
+
         const items = sched.visibleItems || sched.items || [];
         const nextPending = items.find((i) => i.status === 'pending') || null;
         const nextType = nextPending ? classifyActivityType(nextPending) : 'default';
 
-        // 1. ended_today（今天收工）
+        let stateBucket = 'active';
+        let activeType = 'none';
+        let rainExposure = 'sheltered';
+        let lines = ['啾！點我跳到下一站～'];
+
+        // 1. stopped
         if (sched.isStopped) {
-          accEl.innerHTML = ROLE_HEAD_SVG.sleep;
-          bubbleEl.textContent = '啾～今天辛苦了，好好休息💤';
-          return;
+          stateBucket = 'stopped';
+          activeType = 'none';
+          rainExposure = 'sheltered';
+          roleEl.innerHTML = ROLE_BADGE_SVG.sleep;
+          weatherEl.innerHTML = '';
+          lines = ['啾～今天辛苦了，好好休息💤'];
+        }
+        // 2. all_done（嚴格全部完成）
+        else if (total > 0 && done === total) {
+          stateBucket = 'all_done';
+          activeType = 'none';
+          rainExposure = 'sheltered';
+          roleEl.innerHTML = '';
+          weatherEl.innerHTML = '';
+          lines = ['本日全制霸！去慶祝吧🎉'];
+        }
+        // 3. no_pending（排除 total === 0）
+        else if (total > 0 && pending === 0 && done < total) {
+          stateBucket = 'no_pending';
+          activeType = 'none';
+          rainExposure = 'sheltered';
+          roleEl.innerHTML = '';
+          weatherEl.innerHTML = '';
+          lines = ['今日行程告一段落囉～'];
+        }
+        // 4. late（前三種狀態皆不成立時才進入）
+        else if (lateCount > 0) {
+          stateBucket = 'late';
+          activeType = 'none';
+          rainExposure = 'sheltered';
+          roleEl.innerHTML = '';
+          weatherEl.innerHTML = '';
+          lines = weatherMode === 'rain'
+            ? ['雨天節奏較緊，留意時間與路滑喔']
+            : ['啾！這站時間較緊，留意節奏'];
+        }
+        // 5. active（依下一個待辦活動類型與晴雨判斷）
+        else {
+          stateBucket = 'active';
+          activeType = nextType;
+          rainExposure = detectRainExposure(nextPending, nextType, weatherMode);
+
+          if (['flight', 'train', 'bus', 'ship'].indexOf(nextType) !== -1) {
+            roleEl.innerHTML = ROLE_BADGE_SVG.conductor;
+            weatherEl.innerHTML = '';
+            lines = weatherMode === 'rain'
+              ? ['雨天移動留意轉乘與票券☂️', '下一段移動準備出發囉']
+              : ['票券與隨身行李確認好囉！', '下一段移動準備出發～'];
+          } else if (nextType === 'meal' || nextType === 'cafe') {
+            roleEl.innerHTML = ROLE_BADGE_SVG.onigiri;
+            weatherEl.innerHTML = '';
+            const tip = customMealReminder || '該補充體力啦～點餐留意忌口';
+            lines = [tip, '慢慢享用美味餐點吧🍙'];
+          } else if (nextType === 'onsen') {
+            roleEl.innerHTML = ROLE_BADGE_SVG.onsen;
+            weatherEl.innerHTML = '';
+            lines = ['泡個暖呼呼溫泉放鬆一下♨️', '毛巾與換洗衣物準備好囉'];
+          } else if (nextType === 'hotel') {
+            roleEl.innerHTML = ROLE_BADGE_SVG.hotel;
+            weatherEl.innerHTML = '';
+            lines = ['先安頓好行李再輕鬆逛～', '準備回飯店休息充電囉'];
+          } else if (nextType === 'museum') {
+            roleEl.innerHTML = ROLE_BADGE_SVG.museum;
+            weatherEl.innerHTML = '';
+            lines = weatherMode === 'rain'
+              ? ['室內展館不怕下雨，慢慢看展', '找個喜歡的角落細細欣賞～']
+              : ['慢慢逛展，享受藝文時光～', '下一站來去看看吧！'];
+          } else if (nextType === 'nature' || nextType === 'shrine') {
+            roleEl.innerHTML = '';
+            weatherEl.innerHTML = rainExposure === 'outdoor' ? WEATHER_BADGE_SVG.rain_outdoor : '';
+            lines = weatherMode === 'rain'
+              ? ['雨中賞景別有詩意，小心路滑☂️', '撐傘慢慢走，安全第一～']
+              : ['風景好舒服，慢慢拍不趕路！', '深呼吸享受當季好風光～'];
+          } else {
+            roleEl.innerHTML = '';
+            weatherEl.innerHTML = '';
+            lines = weatherMode === 'rain'
+              ? ['雨天備案啟動中，留意天氣☂️', '穩穩走，下一站見～']
+              : ['啾！點我跳到下一站～', `今天共 ${total} 站，慢慢逛不趕路`];
+          }
         }
 
-        // 2. 本日全制霸
-        if (st.total > 0 && st.done === st.total) {
-          accEl.innerHTML = seasonHead;
-          bubbleEl.textContent = '本日全制霸！去慶祝吧🎉';
-          return;
+        const contextKey = [
+          currentDate,
+          stateBucket,
+          activeType,
+          weatherMode,
+          season,
+          rainExposure
+        ].join('|');
+
+        if (contextKey !== lastMascotContextKey) {
+          lastMascotContextKey = contextKey;
+          quoteIndex = 0;
+        } else if (cycleQuote && lines.length > 1) {
+          quoteIndex = (quoteIndex + 1) % lines.length;
         }
 
-        // 3. 逾時警示
-        if (st.lateCount > 0) {
-          accEl.innerHTML = isRain ? ROLE_HEAD_SVG.umbrella : seasonHead;
-          bubbleEl.textContent = '啾！這站時間較緊，留意節奏';
-          return;
-        }
-
-        // 4. 下一站為交通移動
-        if (['flight', 'train', 'bus', 'ship'].indexOf(nextType) !== -1) {
-          accEl.innerHTML = ROLE_HEAD_SVG.conductor;
-          const lines = isRain
-            ? ['雨天轉乘預留步行時間☂️', '票券與雨具隨身確認好囉']
-            : ['票券與隨身行李確認好囉！', '下一段移動準備出發～'];
-          if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
-          bubbleEl.textContent = lines[quoteIndex % lines.length];
-          return;
-        }
-
-        // 5. 下一站為用餐／咖啡
-        if (nextType === 'meal' || nextType === 'cafe') {
-          accEl.innerHTML = ROLE_HEAD_SVG.onigiri;
-          const mealTip = customMealReminder || '該補充體力啦～點餐留意忌口';
-          const lines = [mealTip, '慢慢享用美味餐點吧🍙'];
-          if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
-          bubbleEl.textContent = lines[quoteIndex % lines.length];
-          return;
-        }
-
-        // 6. 下一站為住宿／溫泉
-        if (nextType === 'onsen' || nextType === 'hotel') {
-          accEl.innerHTML = nextType === 'onsen' ? ROLE_HEAD_SVG.onsen : ROLE_HEAD_SVG.sleep;
-          const lines = nextType === 'onsen'
-            ? ['泡個暖呼呼溫泉放鬆一下♨️', '毛巾與換洗衣物準備好囉']
-            : ['先安頓好行李再輕鬆逛～', '準備回飯店休息充電囉'];
-          if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
-          bubbleEl.textContent = lines[quoteIndex % lines.length];
-          return;
-        }
-
-        // 7. 下一站為自然／戶外（晴天季節葉片、雨天黃色小傘）
-        if (nextType === 'nature') {
-          accEl.innerHTML = isRain ? ROLE_HEAD_SVG.umbrella : seasonHead;
-          const lines = isRain
-            ? ['雨中賞景別有詩意，小心路滑☂️', '撐好小黃傘慢慢散步～']
-            : ['戶外風景好舒服，慢慢拍！', '深呼吸享受當季好風光～'];
-          if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
-          bubbleEl.textContent = lines[quoteIndex % lines.length];
-          return;
-        }
-
-        // 8. 其他活動（季節外觀／雨天小傘＋一般鼓勵台詞）
-        accEl.innerHTML = isRain ? ROLE_HEAD_SVG.umbrella : seasonHead;
-        const lines = isRain
-          ? ['雨天備案啟動中，不淋雨也開心☂️', '室內慢慢逛，節奏剛剛好']
-          : ['啾！點我跳到下一站～', '今天共 ' + st.total + ' 站，慢慢逛不趕路'];
-        if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
         bubbleEl.textContent = lines[quoteIndex % lines.length];
       }
 
@@ -988,7 +1076,6 @@
         const m = baseline.meta || {};
         baselineStartDate = m.tripStartDate || '';
 
-        // 支援從 trip_meta 讀取可選的自訂餐飲提醒（例如飲食禁忌提醒）
         const metas = Array.isArray(baseline.trip_meta) ? baseline.trip_meta : [];
         const mealMeta = metas.find((x) => /飲食|忌口|meal_tip/i.test(`${x.category || ''} ${x.title_zh || ''}`));
         customMealReminder = mealMeta ? String(mealMeta.info_text || mealMeta.title_zh || '').slice(0, 22) : '';
@@ -1027,7 +1114,6 @@
 
         const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
         currentSchedule = sched;
-        quoteIndex = 0;
         syncMascotWithSchedule(sched, false);
 
         if (!sched.hasBaseline) {
