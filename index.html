@@ -41,8 +41,8 @@
       font-family: 'Huninn', -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
       background-color: var(--bg);
       background-image:
-        radial-gradient(rgba(217, 107, 52, 0.05) 1.5px, transparent 1.5px),
-        radial-gradient(rgba(243, 200, 107, 0.07) 1.5px, transparent 1.5px);
+        radial-gradient(rgba(217, 107, 52, 0.045) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(243, 200, 107, 0.065) 1.5px, transparent 1.5px);
       background-size: 34px 34px;
       background-position: 0 0, 17px 17px;
       color: var(--text);
@@ -50,7 +50,6 @@
     }
 
     header.topbar {
-      position: relative;
       position: sticky;
       top: 0;
       z-index: 20;
@@ -65,73 +64,26 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
-      flex-wrap: nowrap;
-    }
-
-    .brand-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      flex: 1;
+      gap: 8px;
     }
 
     .topbar-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       margin: 0;
       white-space: nowrap;
     }
 
-    .mascot-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: #fffdf9;
-      color: var(--primary);
-      border: 1.5px solid #f5d6b3;
-      border-radius: 999px;
-      padding: 2px 9px 2px 4px;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(62, 47, 38, 0.14);
-      transition: transform 0.15s ease;
-      min-width: 0;
-      max-width: 190px;
-    }
-
-    .mascot-pill span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .mascot-pill:active {
-      transform: scale(0.94) rotate(-3deg);
-    }
-
-    .mascot-bird {
-      flex-shrink: 0;
-      animation: bird-bob 2.8s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-
-    @keyframes bird-bob {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-2px) rotate(-3deg); }
-    }
-
     .badge-net {
       font-size: 11px;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 999px;
       background: rgba(255, 250, 242, 0.2);
       border: 1px solid rgba(255, 250, 242, 0.38);
+      color: #fffaf2;
       white-space: nowrap;
-      flex-shrink: 0;
+      cursor: pointer;
     }
 
     .sync-popover {
@@ -145,7 +97,7 @@
       border: 1.5px solid var(--border);
       border-radius: 14px;
       padding: 8px 12px;
-      font-size: 11.5px;
+      font-size: 11px;
       line-height: 1.6;
       box-shadow: 0 6px 18px rgba(62, 47, 38, 0.18);
       text-align: left;
@@ -180,8 +132,23 @@
       margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 9px;
       box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
+    }
+
+    .controls-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .controls-left {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+      min-width: 0;
     }
 
     .controls-line {
@@ -189,6 +156,71 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 7px;
+    }
+
+    /* 放大版長尾山雀旅伴＋對話氣泡 */
+    .mascot-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 118px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .mascot-bird-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fff9ee 0%, #f7ebd7 100%);
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(122, 74, 42, 0.1);
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .mascot-stage:active .mascot-bird-wrap {
+      transform: scale(0.92) rotate(-4deg);
+    }
+
+    .mascot-bird {
+      animation: bird-bob 2.8s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+
+    @keyframes bird-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-2.5px) rotate(-2.5deg); }
+    }
+
+    .mascot-bubble {
+      position: relative;
+      margin-top: 5px;
+      background: #fffaf2;
+      border: 1.5px dashed var(--dash);
+      border-radius: 11px;
+      padding: 4px 7px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: #4a3527;
+      text-align: center;
+      width: 100%;
+    }
+
+    .mascot-bubble::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+      background: #fffaf2;
+      border-top: 1.5px dashed var(--dash);
+      border-left: 1.5px dashed var(--dash);
     }
 
     select, input[type="text"], input[type="number"], textarea {
@@ -337,8 +369,8 @@
     .item-title-row {
       display: flex;
       align-items: center;
-      gap: 7px;
-      margin: 5px 0 2px 0;
+      gap: 8px;
+      margin: 6px 0 3px 0;
     }
     .item-title {
       font-size: 16.5px;
@@ -358,10 +390,10 @@
     }
     .spot-chibi {
       flex-shrink: 0;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 10px;
-      background: #fbf3e4;
+      background: #fbf2e2;
       border: 1px solid #e6cfb0;
       display: inline-flex;
       align-items: center;
@@ -519,25 +551,9 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" style="position:relative;">
     <div class="topbar-row">
-      <div class="brand-left">
-        <h1 class="topbar-title">京阪手帳</h1>
-        <button type="button" id="mascotBtn" class="mascot-pill" title="點我跳到下一站並換台詞">
-          <svg id="birdSvg" class="mascot-bird" width="22" height="22" viewBox="0 0 40 40" aria-hidden="true">
-            <path d="M29 25 L38 19 L36 24 L30 28 Z" fill="#4a372c" />
-            <ellipse cx="19" cy="23" rx="12" ry="11" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-            <path d="M22 21 Q29 22 27 28 Q22 28 21 24 Z" fill="#8b6f5e" />
-            <circle cx="14" cy="20" r="1.8" fill="#2b1e16" />
-            <circle cx="21.5" cy="20" r="1.8" fill="#2b1e16" />
-            <polygon points="17.8,21 16.2,23.5 19.4,23.5" fill="#e67e3c" />
-            <ellipse cx="11.5" cy="22.8" rx="2" ry="1.1" fill="#f7a8a0" opacity="0.85" />
-            <ellipse cx="24" cy="22.8" rx="2" ry="1.1" fill="#f7a8a0" opacity="0.85" />
-            <g id="birdAccessory"></g>
-          </svg>
-          <span id="mascotQuote">啾！跳下一站</span>
-        </button>
-      </div>
+      <h1 class="topbar-title">🍁 京阪秋楓手帳</h1>
       <button type="button" id="netBadge" class="badge-net" title="點我看底稿版本與同步時間">檢查中</button>
     </div>
     <div id="syncMetaBar" class="sync-popover">
@@ -551,12 +567,43 @@
     <!-- 分頁 1：每日行程 -->
     <section id="tab-schedule" class="tab-page active">
       <div class="controls-card">
-        <div class="controls-line">
-          <label for="dateSelect"><strong>📅 日期：</strong></label>
-          <select id="dateSelect"></select>
+        <div class="controls-top">
+          <div class="controls-left">
+            <div class="controls-line">
+              <label for="dateSelect"><strong>📅 日期：</strong></label>
+              <select id="dateSelect"></select>
+            </div>
+            <div class="controls-line">
+              <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
+              <button id="btnToggleStop" class="btn-sm btn-warn">今天就到這裡</button>
+            </div>
+          </div>
 
-          <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
-          <button id="btnToggleStop" class="btn-sm btn-warn">今天就到這裡</button>
+          <div id="mascotStage" class="mascot-stage" title="點我換台詞並跳到下一站">
+            <div class="mascot-bird-wrap">
+              <svg id="birdSvg" class="mascot-bird" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+                <!-- 蓬鬆長尾 -->
+                <path d="M31 27 L41 20 L39 26 L32 30 Z" fill="#4a372c" />
+                <path d="M32 28 L41 23 L40 26 L33 30 Z" fill="#ffffff" />
+                <!-- 圓身體 -->
+                <ellipse cx="21" cy="25" rx="13" ry="12" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
+                <!-- 翅膀 -->
+                <path d="M24 23 Q32 24 30 31 Q24 31 23 26 Z" fill="#8b6f5e" />
+                <!-- 眼睛與橘嘴 -->
+                <circle cx="15.5" cy="22" r="2" fill="#2b1e16" />
+                <circle cx="14.8" cy="21.2" r="0.7" fill="#ffffff" />
+                <circle cx="23.5" cy="22" r="2" fill="#2b1e16" />
+                <circle cx="22.8" cy="21.2" r="0.7" fill="#ffffff" />
+                <polygon points="19.5,23.2 17.7,26 21.3,26" fill="#e67e3c" />
+                <!-- 粉紅腮紅 -->
+                <ellipse cx="12.8" cy="25.2" rx="2.3" ry="1.3" fill="#f7a8a0" opacity="0.88" />
+                <ellipse cx="26.2" cy="25.2" rx="2.3" ry="1.3" fill="#f7a8a0" opacity="0.88" />
+                <!-- 頭飾群組 -->
+                <g id="birdAccessory"></g>
+              </svg>
+            </div>
+            <div id="mascotBubble" class="mascot-bubble">啾！點我跳下一站</div>
+          </div>
         </div>
         <div id="dayStats" class="stats-bar"></div>
       </div>
@@ -645,19 +692,46 @@
       };
 
       const HEADDRESS_MAP = {
-        maple: '<path d="M18 5 L19.6 9.5 L23.5 8.5 L20.8 11.5 L22 14 L18 12.2 L14 14 L15.2 11.5 L12.5 8.5 L16.4 9.5 Z" fill="#c8372d" />',
-        bamboo: '<path d="M18 12 Q24 5 30 9 Q23 14 18 12 Z" fill="#4f9652" /><path d="M18 12 Q12 6 8 10 Q13 14 18 12 Z" fill="#74b36a" />',
-        moss: '<path d="M13 12 Q18 7 23 12 Z" fill="#5e9e54" /><circle cx="22" cy="8.5" r="2.2" fill="#e26a4f" />',
-        gull: '<path d="M12 9 Q15 6 18 9 Q21 6 24 9" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" fill="none" />',
-        ginkgo: '<path d="M18 13 L13 8 Q18 4 23 8 Z" fill="#f2b830" stroke="#9e6d12" stroke-width="1" />',
-        tower: '<rect x="16.5" y="5" width="3" height="8" rx="1.2" fill="#f7d87c" /><circle cx="18" cy="5" r="1.5" fill="#c8372d" />',
-        umbrella: '<path d="M11 11 Q18 4 25 11 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.2" /><line x1="18" y1="11" x2="18" y2="14" stroke="#7c5318" stroke-width="1.5" />',
-        sleep: '<path d="M13 11 Q18 7 23 11 L21 13 L15 13 Z" fill="#8cb4d9" />'
+        maple: '<path d="M20 4 L22 9.5 L26.5 8.5 L23.2 12 L24.6 15 L20 13 L15.4 15 L16.8 12 L13.5 8.5 L18 9.5 Z" fill="#c8372d" />',
+        bamboo: '<path d="M20 13 Q28 5 35 10 Q27 15 20 13 Z" fill="#4f9652" /><path d="M20 13 Q13 6 7 11 Q14 15 20 13 Z" fill="#74b36a" />',
+        moss: '<path d="M13.5 13 Q20 7 26.5 13 Z" fill="#5e9e54" /><circle cx="25" cy="9" r="2.6" fill="#d95338" />',
+        gull: '<path d="M12 10 Q16 6.5 20 10 Q24 6.5 28 10" stroke="#4d7ea8" stroke-width="2.3" stroke-linecap="round" fill="none" />',
+        ginkgo: '<path d="M20 14 L13.5 8 Q20 3.5 26.5 8 Z" fill="#f2b830" stroke="#9e6d12" stroke-width="1.1" />',
+        tower: '<rect x="18.2" y="4.5" width="3.6" height="9" rx="1.4" fill="#e59a24" /><circle cx="20" cy="4.5" r="1.8" fill="#c8372d" />',
+        umbrella: '<path d="M12 12 Q20 4 28 12 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.3" /><line x1="20" y1="12" x2="20" y2="15" stroke="#7c5318" stroke-width="1.5" />',
+        sleep: '<path d="M14 12 Q20 7 26 12 L24 14 L16 14 Z" fill="#78a6d4" /><circle cx="25.5" cy="8" r="1.8" fill="#f7d87c" />'
+      };
+
+      const ZONE_LINES = {
+        arashiyama: {
+          sun: ['渡月橋晨風好舒服～', '祐齋亭水鏡倒影超美！', '竹林小徑慢慢走不趕路'],
+          rain: ['天龍寺迴廊看雨楓最棒', '雨天嵐山人少，慢慢拍']
+        },
+        rakuhoku: {
+          sun: ['瑠璃光院光影好夢幻！', '三千院小地藏在苔庭等～', '山區微涼，外套穿好喔'],
+          rain: ['實相院床紅葉雨天更有味', '苔庭石階微滑，走路小心']
+        },
+        amanohashidate: {
+          sun: ['準備搭船餵海鷗囉！', '飛龍觀跨下看天橋立～', '晚上溫泉懷石好期待'],
+          rain: ['智恩寺求個扇子籤吧', '丹後織布工藝館室內逛逛']
+        },
+        gion_kyoto: {
+          sun: ['永觀堂夜楓點燈好浪漫', '南禪寺水路閣紅磚配楓紅', '金閣寺順光閃閃發亮'],
+          rain: ['建仁寺看風神雷神圖最愜意', '花見小路石板反光很有fu']
+        },
+        station: {
+          sun: ['車票與行李先確認好～', '先寄放行李再輕裝出發'],
+          rain: ['京都車站室內不怕淋雨', '拉麵小路與地下街逛起來']
+        },
+        osaka: {
+          sun: ['大阪城銀杏大道金黃一片', '記得點豬肉海鮮，不加牛筋'],
+          rain: ['室內商場一路逛到飽！', '黑門市場邊走邊吃海鮮']
+        }
       };
 
       let currentDate = '';
       let currentSchedule = null;
-      let quoteToggle = 0;
+      let quoteIndex = 0;
 
       function getLocalTodayIso() {
         const now = new Date();
@@ -692,22 +766,53 @@
       function renderSpotChibi(titleZh, area) {
         const t = String(titleZh || '');
         const a = String(area || '');
+
+        if (t.indexOf('機場') !== -1 || t.indexOf('搭機') !== -1 || t.indexOf('星宇') !== -1) {
+          return '<span class="spot-chibi" title="航班移動"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 13 L10 11 L15 5 L18 5 L15 11 L20 11 L22 8.5 L24 8.5 L22.5 12.5 L24 16.5 L22 16.5 L20 14 L15 14 L18 20 L15 20 L10 14 L4 15 Z" fill="#4d7ea8"/></svg></span>';
+        }
+        if (t.indexOf('HARUKA') !== -1 || t.indexOf('特急') !== -1 || t.indexOf('JR') !== -1 || t.indexOf('Rapi:t') !== -1 || t.indexOf('地鐵') !== -1) {
+          return '<span class="spot-chibi" title="鐵道列車"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="13" rx="4" fill="#2c7a47"/><rect x="8.5" y="7" width="7" height="4.5" rx="1.5" fill="#fffdf9"/><circle cx="9.5" cy="14.5" r="1.2" fill="#f3c86b"/><circle cx="14.5" cy="14.5" r="1.2" fill="#f3c86b"/><line x1="8" y1="20" x2="16" y2="20" stroke="#7c685a" stroke-width="1.6"/></svg></span>';
+        }
+        if (t.indexOf('飯店') !== -1 || t.indexOf('行李') !== -1 || t.indexOf('退房') !== -1) {
+          return '<span class="spot-chibi" title="行李住宿"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="2.5" fill="#b87344" stroke="#5a3822" stroke-width="1.3"/><path d="M9 8 V5.5 H15 V8" stroke="#5a3822" stroke-width="1.5" fill="none"/><line x1="9.5" y1="8" x2="9.5" y2="19" stroke="#5a3822" stroke-width="1.2"/><line x1="14.5" y1="8" x2="14.5" y2="19" stroke="#5a3822" stroke-width="1.2"/></svg></span>';
+        }
+        if (t.indexOf('溫泉') !== -1) {
+          return '<span class="spot-chibi" title="溫泉旅館"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 13 H19 L17.5 19 H6.5 Z" fill="#d98a4e" stroke="#6e3f1d" stroke-width="1.3"/><path d="M9 9 Q10.5 7 9 5" stroke="#8cb4d9" stroke-width="1.5" fill="none"/><path d="M14 9 Q15.5 7 14 5" stroke="#8cb4d9" stroke-width="1.5" fill="none"/></svg></span>';
+        }
+        if (t.indexOf('神社') !== -1 || t.indexOf('智恩寺') !== -1) {
+          return '<span class="spot-chibi" title="神社鳥居"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 6.5 Q12 8.5 21 6.5" stroke="#c8372d" stroke-width="2.4" stroke-linecap="round" fill="none"/><line x1="5" y1="10" x2="19" y2="10" stroke="#c8372d" stroke-width="1.8"/><line x1="8" y1="7.5" x2="8" y2="20" stroke="#c8372d" stroke-width="2"/><line x1="16" y1="7.5" x2="16" y2="20" stroke="#c8372d" stroke-width="2"/></svg></span>';
+        }
         if (t.indexOf('金閣') !== -1) {
-          return '<span class="spot-chibi" title="金閣寺"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="5" y="13" width="14" height="6" rx="1" fill="#f3c54b" stroke="#7c5812" stroke-width="1.4"/><polygon points="3,13 12,7 21,13" fill="#f7d87c" stroke="#7c5812" stroke-width="1.4"/><circle cx="12" cy="5.5" r="1.6" fill="#e59a24"/></svg></span>';
+          return '<span class="spot-chibi" title="金閣寺"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="5" y="13" width="14" height="6" rx="1" fill="#f3c54b" stroke="#7c5812" stroke-width="1.3"/><polygon points="3,13 12,7 21,13" fill="#f7d87c" stroke="#7c5812" stroke-width="1.3"/><circle cx="12" cy="5.2" r="1.5" fill="#c8372d"/></svg></span>';
         }
-        if (a.indexOf('嵐山') !== -1 || t.indexOf('渡月') !== -1 || t.indexOf('祐齋') !== -1 || t.indexOf('常寂光') !== -1 || t.indexOf('天龍') !== -1) {
-          return '<span class="spot-chibi" title="嵐山賞楓"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 4 L13.8 9 L18.5 8 L15.2 11.5 L16.8 15 L12 13 L7.2 15 L8.8 11.5 L5.5 8 L10.2 9 Z" fill="#c8372d"/><path d="M4 18.5 Q8 16.5 12 18.5 T20 18.5" stroke="#5b9bd5" stroke-width="1.6" fill="none"/></svg></span>';
+        if (t.indexOf('永觀堂') !== -1 || t.indexOf('南禪寺') !== -1 || t.indexOf('祐齋') !== -1 || t.indexOf('常寂光') !== -1 || t.indexOf('賞楓') !== -1) {
+          return '<span class="spot-chibi" title="秋楓名所"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 3.5 L14 8.8 L19 7.8 L15.5 11.5 L17 15.2 L12 13 L7 15.2 L8.5 11.5 L5 7.8 L10 8.8 Z" fill="#c8372d"/><line x1="12" y1="13" x2="12" y2="20.5" stroke="#6e472b" stroke-width="1.5"/></svg></span>';
         }
-        if (a.indexOf('洛北') !== -1 || t.indexOf('瑠璃光') !== -1 || t.indexOf('三千院') !== -1 || t.indexOf('圓光') !== -1 || t.indexOf('詩仙堂') !== -1) {
-          return '<span class="spot-chibi" title="洛北苔庭"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 16 Q12 11 20 16 L20 19 L4 19 Z" fill="#68a65a"/><circle cx="15" cy="9.5" r="3.2" fill="#d95338"/></svg></span>';
+        if (t.indexOf('三千院') !== -1 || t.indexOf('瑠璃光') !== -1 || t.indexOf('實相院') !== -1 || t.indexOf('天龍寺') !== -1 || t.indexOf('竹林') !== -1) {
+          return '<span class="spot-chibi" title="苔庭竹林"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="6" y="4" width="3" height="16" rx="1.2" fill="#5e9e54"/><rect x="14" y="5" width="3" height="15" rx="1.2" fill="#74b36a"/><line x1="6" y1="10" x2="9" y2="10" stroke="#3c6e35" stroke-width="1.2"/><line x1="14" y1="13" x2="17" y2="13" stroke="#3c6e35" stroke-width="1.2"/></svg></span>';
         }
-        if (a.indexOf('天橋立') !== -1 || t.indexOf('飛龍') !== -1 || t.indexOf('傘松') !== -1) {
-          return '<span class="spot-chibi" title="天橋立"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 10 Q8.5 6.5 12 10 Q15.5 6.5 19 10" stroke="#4d7ea8" stroke-width="1.8" fill="none"/><path d="M4 16.5 Q9 14.5 12 16.5 T20 16.5" stroke="#2c7a47" stroke-width="2" fill="none"/></svg></span>';
+        if (t.indexOf('渡月橋') !== -1 || t.indexOf('飛龍') !== -1 || t.indexOf('傘松') !== -1 || t.indexOf('展望台') !== -1) {
+          return '<span class="spot-chibi" title="橋梁展望"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 15 Q12 8 21 15" stroke="#b84a27" stroke-width="2.2" fill="none"/><path d="M3 18.5 Q8 16.5 12 18.5 T21 18.5" stroke="#5b9bd5" stroke-width="1.7" fill="none"/></svg></span>';
         }
-        if (a.indexOf('大阪') !== -1 || t.indexOf('大阪城') !== -1 || t.indexOf('梅田') !== -1 || t.indexOf('難波') !== -1) {
-          return '<span class="spot-chibi" title="大阪銀杏"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17 L6 10 Q12 4 18 10 Z" fill="#f3bd38" stroke="#9e6d12" stroke-width="1.3"/><line x1="12" y1="17" x2="12" y2="20.5" stroke="#7c5812" stroke-width="1.6"/></svg></span>';
+        if (t.indexOf('海遊館') !== -1 || t.indexOf('海鮮') !== -1 || t.indexOf('壽司') !== -1) {
+          return '<span class="spot-chibi" title="海洋海鮮"><svg width="20" height="20" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="5" fill="#5b9bd5"/><polygon points="19,12 22.5,9.5 22.5,14.5" fill="#5b9bd5"/><circle cx="8.5" cy="11.2" r="1.1" fill="#ffffff"/></svg></span>';
         }
-        return '<span class="spot-chibi" title="京都散步"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 5 L13.6 9.5 L18 8.5 L15 11.8 L16.3 15 L12 13.2 L7.7 15 L9 11.8 L6 8.5 L10.4 9.5 Z" fill="#d46532"/></svg></span>';
+        if (t.indexOf('大阪城') !== -1 || t.indexOf('銀杏') !== -1) {
+          return '<span class="spot-chibi" title="銀杏天守"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17 L5.5 9.5 Q12 3.5 18.5 9.5 Z" fill="#f3bd38" stroke="#9e6d12" stroke-width="1.2"/><line x1="12" y1="17" x2="12" y2="20.5" stroke="#7c5812" stroke-width="1.6"/></svg></span>';
+        }
+        if (t.indexOf('拉麵') !== -1 || t.indexOf('水炊鍋') !== -1) {
+          return '<span class="spot-chibi" title="熱湯麵鍋"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 12 H20 C20 17 16.5 19.5 12 19.5 C7.5 19.5 4 17 4 12 Z" fill="#fffdf9" stroke="#b84a27" stroke-width="1.5"/><path d="M8 9 Q9.5 6.5 8 4.5" stroke="#d46532" stroke-width="1.4" fill="none"/><path d="M13 9 Q14.5 6.5 13 4.5" stroke="#d46532" stroke-width="1.4" fill="none"/></svg></span>';
+        }
+        if (t.indexOf('炸豬排') !== -1 || t.indexOf('漢堡排') !== -1 || t.indexOf('大阪燒') !== -1 || t.indexOf('串炸') !== -1 || t.indexOf('晚餐') !== -1 || t.indexOf('午餐') !== -1) {
+          return '<span class="spot-chibi" title="美食饗宴"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="13" r="6.5" fill="#f3c86b" stroke="#8c5319" stroke-width="1.4"/><circle cx="10" cy="11.5" r="1.2" fill="#c8372d"/><circle cx="14" cy="14" r="1.2" fill="#4f9652"/></svg></span>';
+        }
+        if (t.indexOf('百貨') !== -1 || t.indexOf('商店街') !== -1 || t.indexOf('採買') !== -1 || t.indexOf('伴手禮') !== -1 || t.indexOf('黑門') !== -1) {
+          return '<span class="spot-chibi" title="逛街採買"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="11" rx="2" fill="#f7ead7" stroke="#b84a27" stroke-width="1.4"/><path d="M9.5 8 V5.5 C9.5 4.2 14.5 4.2 14.5 5.5 V8" stroke="#b84a27" stroke-width="1.4" fill="none"/></svg></span>';
+        }
+        if (t.indexOf('博物館') !== -1 || t.indexOf('美術館') !== -1 || t.indexOf('體驗') !== -1 || a.indexOf('洛北') !== -1) {
+          return '<span class="spot-chibi" title="藝文體驗"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="4.5" y="5.5" width="15" height="13" rx="2" fill="#fffdf9" stroke="#5a4336" stroke-width="1.4"/><circle cx="9.5" cy="10.5" r="1.8" fill="#f3c86b"/><polygon points="7,16.5 12,11.5 17,16.5" fill="#68a65a"/></svg></span>';
+        }
+        return '<span class="spot-chibi" title="京都散步"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 4.5 L13.8 9.2 L18.5 8.2 L15.2 11.6 L16.6 15 L12 13 L7.4 15 L8.8 11.6 L5.5 8.2 L10.2 9.2 Z" fill="#d46532"/></svg></span>';
       }
 
       function updateNetworkBadge() {
@@ -729,52 +834,64 @@
         });
       }
 
-      function syncMascotWithSchedule(sched, cycleQuote) {
-        const quoteEl = document.getElementById('mascotQuote');
-        const accEl = document.getElementById('birdAccessory');
-        if (!quoteEl || !accEl) return;
-
+      function detectZoneKey(sched) {
         const items = (sched && sched.items) || [];
-        const firstArea = (items[0] && items[0].area) || '';
+        const activeFirst = items.find((i) => i.status === 'pending') || items[0] || {};
+        const area = String(activeFirst.area || '');
+        const title = String(activeFirst.title_zh || '');
+
+        if (area.indexOf('嵐山') !== -1 || title.indexOf('嵐山') !== -1 || title.indexOf('渡月橋') !== -1) return 'arashiyama';
+        if (area.indexOf('洛北') !== -1 || title.indexOf('瑠璃光') !== -1 || title.indexOf('三千院') !== -1 || title.indexOf('圓光') !== -1) return 'rakuhoku';
+        if (area.indexOf('天橋立') !== -1 || title.indexOf('天橋立') !== -1 || title.indexOf('傘松') !== -1) return 'amanohashidate';
+        if (area.indexOf('大阪') !== -1 || title.indexOf('大阪') !== -1 || title.indexOf('梅田') !== -1 || title.indexOf('難波') !== -1) return 'osaka';
+        if (area.indexOf('京都車站') !== -1 || title.indexOf('HARUKA') !== -1 || title.indexOf('退房') !== -1) return 'station';
+        return 'gion_kyoto';
+      }
+
+      function syncMascotWithSchedule(sched, cycleQuote) {
+        const bubbleEl = document.getElementById('mascotBubble');
+        const accEl = document.getElementById('birdAccessory');
+        if (!bubbleEl || !accEl) return;
+
+        const zone = detectZoneKey(sched);
         const st = (sched && sched.stats) || { total: 0, done: 0, pending: 0, lateCount: 0 };
+        const isRain = sched && sched.weatherMode === 'rain';
 
         let dressKey = 'maple';
         if (sched && sched.isStopped) {
           dressKey = 'sleep';
-        } else if (sched && sched.weatherMode === 'rain') {
+        } else if (isRain) {
           dressKey = 'umbrella';
-        } else if (firstArea.indexOf('嵐山') !== -1) {
+        } else if (zone === 'arashiyama') {
           dressKey = 'bamboo';
-        } else if (firstArea.indexOf('洛北') !== -1) {
+        } else if (zone === 'rakuhoku') {
           dressKey = 'moss';
-        } else if (firstArea.indexOf('天橋立') !== -1) {
+        } else if (zone === 'amanohashidate') {
           dressKey = 'gull';
-        } else if (firstArea.indexOf('大阪') !== -1) {
+        } else if (zone === 'osaka') {
           dressKey = 'ginkgo';
-        } else if (firstArea.indexOf('京都車站') !== -1) {
+        } else if (zone === 'station') {
           dressKey = 'tower';
         }
         accEl.innerHTML = HEADDRESS_MAP[dressKey] || HEADDRESS_MAP.maple;
 
         if (sched && sched.isStopped) {
-          quoteEl.textContent = '啾～今日收工💤';
+          bubbleEl.textContent = '啾～今日收工💤';
           return;
         }
         if (st.total > 0 && st.done === st.total) {
-          quoteEl.textContent = '本日全制霸🍁';
+          bubbleEl.textContent = '本日全制霸🍁';
           return;
         }
         if (st.lateCount > 0) {
-          quoteEl.textContent = '啾！這站有點趕';
+          bubbleEl.textContent = '啾！這站有點趕';
           return;
         }
-        if (sched && sched.weatherMode === 'rain') {
-          quoteEl.textContent = cycleQuote ? '雨天慢慢逛☂️' : '雨天備案啟動';
-          return;
-        }
-        const idleQuotes = ['啾！跳下一站', '帶外套了嗎？', '京都慢慢逛～'];
-        if (cycleQuote) quoteToggle = (quoteToggle + 1) % idleQuotes.length;
-        quoteEl.textContent = idleQuotes[quoteToggle];
+
+        const poolObj = ZONE_LINES[zone] || ZONE_LINES.gion_kyoto;
+        const lines = isRain ? poolObj.rain : poolObj.sun;
+        if (cycleQuote) quoteIndex = (quoteIndex + 1) % lines.length;
+        bubbleEl.textContent = lines[quoteIndex % lines.length];
       }
 
       function jumpToNextPendingCard() {
@@ -786,9 +903,9 @@
         setTimeout(() => target.classList.remove('highlight-target'), 1400);
       }
 
-      const mascotBtn = document.getElementById('mascotBtn');
-      if (mascotBtn) {
-        mascotBtn.addEventListener('click', () => {
+      const mascotStage = document.getElementById('mascotStage');
+      if (mascotStage) {
+        mascotStage.addEventListener('click', () => {
           syncMascotWithSchedule(currentSchedule, true);
           jumpToNextPendingCard();
         });
@@ -878,6 +995,7 @@
 
         const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
         currentSchedule = sched;
+        quoteIndex = 0;
         syncMascotWithSchedule(sched, false);
 
         if (!sched.hasBaseline) {
