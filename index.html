@@ -6,51 +6,57 @@
   <meta name="theme-color" content="#b84a27" />
   <title>2027 京阪秋楓旅遊手帳</title>
   <link rel="manifest" href="./manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #fbf5ea;
       --card: #fffdf9;
-      --soft: #f3e4cf;
+      --soft: #f5e6d0;
       --text: #3e2f26;
       --muted: #7c685a;
       --primary: #b84a27;
-      --primary-weak: #f7ebd9;
-      --warm: #d96b34;
-      --yellow: #f6d27a;
-      --sky: #a8d3e6;
-      --bamboo: #b9daa5;
-      --ok: #246b3c;
-      --ok-bg: #e7f4ea;
+      --primary-weak: #f9efe0;
+      --warm: #de6f38;
+      --ginkgo: #f3c86b;
+      --ok: #2c7a47;
+      --ok-bg: #e7f6ec;
       --warn: #9a4a12;
       --warn-bg: #fef3c7;
       --danger: #b91c1c;
       --danger-bg: #fee2e2;
       --stamp: #c8372d;
-      --border: #e6d2b5;
-      --dash: #dec5a4;
-      --radius: 16px;
+      --border: #e6cfb0;
+      --dash: #d9be9c;
+      --radius: 20px;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 0 0 84px 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
-      background: var(--bg);
+      padding: 0 0 88px 0;
+      font-family: 'Huninn', -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(rgba(217, 107, 52, 0.08) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(243, 200, 107, 0.12) 1.5px, transparent 1.5px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
       color: var(--text);
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     header.topbar {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
+      background: linear-gradient(135deg, #b84a27 0%, #d86734 65%, #e28444 100%);
       color: #fffaf2;
-      padding: 12px 16px;
-      border-bottom: 2px dashed rgba(255, 250, 242, 0.45);
-      box-shadow: 0 2px 8px rgba(62, 47, 38, 0.14);
+      padding: 12px 16px 13px;
+      border-bottom: 2.5px dashed rgba(255, 250, 242, 0.55);
+      box-shadow: 0 4px 14px rgba(130, 62, 32, 0.18);
     }
 
     .topbar-row {
@@ -64,14 +70,16 @@
     .brand-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .topbar-title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       margin: 0;
+      letter-spacing: 0.4px;
+      text-shadow: 0 1px 2px rgba(62, 47, 38, 0.2);
     }
 
     .mascot-pill {
@@ -80,33 +88,48 @@
       gap: 6px;
       background: #fffdf9;
       color: var(--primary);
-      border: 2px solid #f5d6b3;
+      border: 2px solid #f7d8b4;
       border-radius: 999px;
-      padding: 2px 10px 2px 5px;
-      font-size: 12px;
+      padding: 3px 12px 3px 6px;
+      font-size: 12.5px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(62, 47, 38, 0.16);
-      transition: transform 0.14s ease;
+      box-shadow: 0 3px 8px rgba(62, 47, 38, 0.18);
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .mascot-pill:hover {
+      transform: translateY(-1px);
     }
 
     .mascot-pill:active {
-      transform: scale(0.94) rotate(-3deg);
+      transform: scale(0.92) rotate(-4deg);
+    }
+
+    .mascot-bird {
+      animation: bird-bob 2.8s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+
+    @keyframes bird-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-2px) rotate(-3deg); }
     }
 
     .badge-net {
       font-size: 12px;
-      padding: 3px 9px;
+      font-weight: 700;
+      padding: 4px 11px;
       border-radius: 999px;
-      background: rgba(255, 250, 242, 0.2);
-      border: 1px solid rgba(255, 250, 242, 0.35);
+      background: rgba(255, 250, 242, 0.22);
+      border: 1.5px solid rgba(255, 250, 242, 0.45);
       white-space: nowrap;
     }
 
     .sub-info {
       font-size: 12px;
-      opacity: 0.94;
-      margin-top: 5px;
+      opacity: 0.95;
+      margin-top: 6px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -115,32 +138,32 @@
     main {
       max-width: 780px;
       margin: 0 auto;
-      padding: 12px;
+      padding: 14px 12px;
     }
 
     .banner {
-      padding: 10px 12px;
-      border-radius: var(--radius);
+      padding: 10px 14px;
+      border-radius: 16px;
       margin-bottom: 12px;
       font-size: 13px;
       display: none;
     }
     .banner.show { display: block; }
     .banner.info { background: var(--primary-weak); color: var(--primary); border: 1.5px dashed var(--dash); }
-    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #86efac; }
-    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
-    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1px solid #fca5a5; }
+    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1.5px solid #96dfb0; }
+    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1.5px solid #fcd34d; }
+    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1.5px solid #fca5a5; }
 
     .controls-card {
       background: var(--card);
-      border: 1.5px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 3px 10px rgba(122, 74, 42, 0.05);
+      box-shadow: 0 4px 14px rgba(122, 74, 42, 0.06);
     }
 
     .controls-line {
@@ -153,9 +176,9 @@
     select, input[type="text"], input[type="number"], textarea {
       font-family: inherit;
       font-size: 14px;
-      padding: 7px 10px;
+      padding: 7px 12px;
       border: 1.5px solid var(--dash);
-      border-radius: 10px;
+      border-radius: 12px;
       background: #fffaf2;
       color: var(--text);
     }
@@ -163,72 +186,107 @@
     button {
       font-family: inherit;
       font-size: 13px;
-      font-weight: 600;
-      padding: 7px 12px;
-      border-radius: 10px;
+      font-weight: 700;
+      padding: 7px 13px;
+      border-radius: 999px;
       border: 1.5px solid var(--dash);
       background: var(--soft);
       color: var(--text);
       cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
-    button:active { transform: scale(0.99); }
-    button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); }
-    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-    button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); }
+    button:active { transform: scale(0.96); }
+    button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); box-shadow: 0 2px 6px rgba(184, 74, 39, 0.22); }
+    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); box-shadow: 0 2px 6px rgba(44, 122, 71, 0.22); }
+    button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); box-shadow: 0 2px 6px rgba(222, 111, 56, 0.22); }
     button.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-    button.btn-sm { padding: 5px 9px; font-size: 12px; }
+    button.btn-sm { padding: 6px 11px; font-size: 12.5px; }
 
     .stats-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--muted);
       border-top: 1.5px dashed var(--dash);
-      padding-top: 8px;
+      padding-top: 10px;
     }
     .pill {
       background: var(--primary-weak);
-      border: 1px dashed var(--dash);
-      padding: 3px 8px;
+      border: 1.5px dashed var(--dash);
+      padding: 3px 10px;
       border-radius: 999px;
       color: var(--text);
     }
-    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
-    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; }
+    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; border-style: solid; }
+    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; border-style: solid; }
 
+    /* 手帳卡片＋頂部和紙膠帶裝飾 */
     .timeline-item {
       position: relative;
-      overflow: hidden;
       background: var(--card);
-      border: 1.5px solid var(--border);
-      border-left: 5px solid var(--primary);
+      border: 2px solid var(--border);
+      border-left: 6px solid var(--primary);
       border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 10px;
-      box-shadow: 0 3px 10px rgba(122, 74, 42, 0.05);
+      padding: 16px 14px 13px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(122, 74, 42, 0.06);
     }
-    .timeline-item.status-done { border-left-color: var(--ok); opacity: 0.88; }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 22px;
+      width: 68px;
+      height: 15px;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(243, 200, 107, 0.55),
+        rgba(243, 200, 107, 0.55) 6px,
+        rgba(232, 148, 92, 0.45) 6px,
+        rgba(232, 148, 92, 0.45) 12px
+      );
+      border-left: 1px dashed rgba(184, 74, 39, 0.25);
+      border-right: 1px dashed rgba(184, 74, 39, 0.25);
+      transform: rotate(-2deg);
+      pointer-events: none;
+    }
+    .timeline-item:nth-child(even)::before {
+      left: auto;
+      right: 64px;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(232, 132, 107, 0.48),
+        rgba(232, 132, 107, 0.48) 6px,
+        rgba(250, 214, 150, 0.55) 6px,
+        rgba(250, 214, 150, 0.55) 12px
+      );
+      transform: rotate(2.5deg);
+    }
+
+    .timeline-item.status-done { border-left-color: var(--ok); background: #fcfbf7; }
     .timeline-item.status-done::after {
       content: "済";
       position: absolute;
-      top: 10px;
-      right: 12px;
-      width: 40px;
-      height: 40px;
+      top: 12px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
       border-radius: 999px;
-      border: 2px solid rgba(200, 55, 45, 0.78);
-      color: rgba(200, 55, 45, 0.88);
+      border: 2.5px solid rgba(200, 55, 45, 0.8);
+      box-shadow: inset 0 0 0 1.5px rgba(200, 55, 45, 0.35);
+      color: rgba(200, 55, 45, 0.9);
       font-weight: 800;
-      font-size: 18px;
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: rotate(-14deg);
-      background: rgba(200, 55, 45, 0.06);
+      transform: rotate(-15deg);
+      background: radial-gradient(circle, rgba(200, 55, 45, 0.08) 0%, rgba(200, 55, 45, 0.02) 70%);
       pointer-events: none;
     }
-    .timeline-item.status-skipped { border-left-color: #9ca3af; opacity: 0.72; border-style: dashed; }
+    .timeline-item.status-skipped { border-left-color: #b5a89e; opacity: 0.72; border-style: dashed; }
     .timeline-item.is-late { border-left-color: var(--danger); }
 
     .item-top {
@@ -236,29 +294,53 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 8px;
-      padding-right: 44px;
+      padding-right: 48px;
     }
     .item-time {
       font-size: 13px;
       font-weight: 700;
       color: var(--primary);
+      background: var(--primary-weak);
+      padding: 2px 9px;
+      border-radius: 999px;
+      display: inline-block;
     }
     .item-title {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
-      margin: 3px 0 2px 0;
+      margin: 6px 0 3px 0;
+      color: #2f221b;
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--ginkgo);
+      color: #4a3219;
+      font-size: 12px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: 1px;
     }
     .item-sub {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
+    }
+    .note-bubble {
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: #fff9ee;
+      border: 1.5px dashed var(--dash);
+      border-radius: 12px;
+      font-size: 12.5px;
+      color: #5c493c;
     }
     .tag {
       display: inline-block;
-      font-size: 11px;
-      padding: 2px 7px;
+      font-size: 11.5px;
+      padding: 2px 8px;
       border-radius: 999px;
       margin-right: 4px;
-      margin-top: 4px;
+      margin-top: 5px;
       background: var(--primary-weak);
       color: var(--text);
       border: 1px dashed var(--dash);
@@ -270,7 +352,7 @@
     .alert-box {
       margin-top: 8px;
       padding: 7px 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 12px;
       background: var(--danger-bg);
       color: var(--danger);
@@ -278,7 +360,7 @@
     .warn-box {
       margin-top: 8px;
       padding: 7px 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 12px;
       background: var(--warn-bg);
       color: var(--warn);
@@ -286,7 +368,7 @@
 
     .item-actions {
       margin-top: 10px;
-      padding-top: 8px;
+      padding-top: 9px;
       border-top: 1.5px dashed var(--dash);
       display: flex;
       flex-wrap: wrap;
@@ -298,7 +380,7 @@
       padding: 10px;
       background: var(--primary-weak);
       border: 1.5px dashed var(--dash);
-      border-radius: 10px;
+      border-radius: 12px;
       display: none;
     }
     .edit-panel.open { display: block; }
@@ -325,7 +407,7 @@
 
     .section-card {
       background: var(--card);
-      border: 1.5px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: var(--radius);
       padding: 14px;
       margin-bottom: 12px;
@@ -333,10 +415,10 @@
     }
     .section-card h3 {
       margin: 0 0 8px 0;
-      font-size: 15px;
+      font-size: 15.5px;
     }
     .muted-note {
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--muted);
       margin: 4px 0 10px 0;
     }
@@ -351,15 +433,16 @@
       right: 0;
       z-index: 30;
       background: var(--card);
-      border-top: 1.5px solid var(--border);
+      border-top: 2px solid var(--border);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
+      box-shadow: 0 -3px 12px rgba(122, 74, 42, 0.08);
     }
     nav.bottom-nav button {
       border: none;
       border-radius: 0;
       padding: 10px 4px;
-      font-size: 12px;
+      font-size: 12.5px;
       background: transparent;
       color: var(--muted);
     }
@@ -373,7 +456,7 @@
       text-align: center;
       padding: 32px 16px;
       background: var(--card);
-      border: 1.5px dashed var(--dash);
+      border: 2px dashed var(--dash);
       border-radius: var(--radius);
       color: var(--muted);
     }
@@ -383,15 +466,28 @@
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand-left">
-        <h1 class="topbar-title">家庭旅遊離線電子手帳</h1>
-        <button type="button" id="mascotBtn" class="mascot-pill" title="點我聽長尾山雀說悄悄話">
-          <svg width="22" height="22" viewBox="0 0 36 36" aria-hidden="true">
-            <ellipse cx="18" cy="20" rx="11" ry="10" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-            <path d="M9 17 Q18 11 27 17 L25 20 Q18 16 11 20 Z" fill="#5a4336" />
-            <circle cx="14.5" cy="18.5" r="1.7" fill="#2b1e16" />
-            <circle cx="21.5" cy="18.5" r="1.7" fill="#2b1e16" />
-            <polygon points="18,19.5 16.5,22 19.5,22" fill="#e07a3f" />
-            <path d="M16 7 L18 10.5 L20 7 L18 8.8 Z" fill="#c8372d" />
+        <h1 class="topbar-title">🍁 家庭旅遊離線電子手帳</h1>
+        <button type="button" id="mascotBtn" class="mascot-pill" title="點我聽雪之妖精說悄悄話">
+          <!-- 圓滾滾銀喉長尾山雀 SVG -->
+          <svg class="mascot-bird" width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
+            <!-- 蓬鬆長尾巴 -->
+            <path d="M29 25 L38 19 L36 24 L30 28 Z" fill="#4a372c" />
+            <path d="M30 26 L38 22 L37 25 L31 28 Z" fill="#ffffff" />
+            <!-- 圓身體 -->
+            <ellipse cx="19" cy="23" rx="12" ry="11" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
+            <!-- 小翅膀 -->
+            <path d="M22 21 Q29 22 27 28 Q22 28 21 24 Z" fill="#8b6f5e" />
+            <!-- 豆豆眼與橘色小嘴 -->
+            <circle cx="14" cy="20" r="1.9" fill="#2b1e16" />
+            <circle cx="13.4" cy="19.3" r="0.6" fill="#ffffff" />
+            <circle cx="21.5" cy="20" r="1.9" fill="#2b1e16" />
+            <circle cx="20.9" cy="19.3" r="0.6" fill="#ffffff" />
+            <polygon points="17.8,21 16.2,23.5 19.4,23.5" fill="#e67e3c" />
+            <!-- 粉紅腮紅 -->
+            <ellipse cx="11.5" cy="22.8" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.85" />
+            <ellipse cx="24" cy="22.8" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.85" />
+            <!-- 頭頂小楓葉 -->
+            <path d="M18 6 L19.5 10 L23 9 L20.5 11.8 L21.5 14 L18 12.2 L14.5 14 L15.5 11.8 L13 9 L16.5 10 Z" fill="#c8372d" />
           </svg>
           <span id="mascotQuote">啾！賞楓出發～</span>
         </button>
@@ -410,7 +506,7 @@
     <section id="tab-schedule" class="tab-page active">
       <div class="controls-card">
         <div class="controls-line">
-          <label for="dateSelect"><strong>日期：</strong></label>
+          <label for="dateSelect"><strong>📅 日期：</strong></label>
           <select id="dateSelect"></select>
 
           <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
@@ -425,7 +521,7 @@
     <!-- 分頁 2：備選口袋 -->
     <section id="tab-pocket" class="tab-page">
       <div class="section-card">
-        <h3>插入備選景點至當日行程</h3>
+        <h3>🎒 插入備選景點至當日行程</h3>
         <p class="muted-note">插入後將保存完整景點快照、停留／交通設定與錨點位置；若錨點活動日後被雲端刪除，將自動改接至當日末端且不刪除。</p>
         <div class="controls-line">
           <label for="insertAnchorSelect"><strong>插入位置：</strong></label>
@@ -443,7 +539,7 @@
     <!-- 分頁 4：設定、資料管理與備份 -->
     <section id="tab-settings" class="tab-page">
       <div class="section-card">
-        <h3>雲端同步設定（單向：雲端 → 手機）</h3>
+        <h3>☁️ 雲端同步設定（單向：雲端 → 手機）</h3>
         <p class="muted-note">輸入 GAS Web App <code>/exec</code> 網址與 <code>API_TOKEN</code> 後，可手動同步最新底稿；離線或同步失敗時保留既有本機底稿不動。</p>
         <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
           <input id="apiUrlInput" type="text" placeholder="GAS Web App 網址（https://script.google.com/macros/s/.../exec）" />
@@ -456,7 +552,7 @@
       </div>
 
       <div class="section-card">
-        <h3>行程資料管理</h3>
+        <h3>🧹 行程資料管理</h3>
         <p class="muted-note">
           - <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
           - 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
@@ -465,7 +561,7 @@
       </div>
 
       <div class="section-card">
-        <h3>備份匯出／匯入</h3>
+        <h3>💾 備份匯出／匯入</h3>
         <p class="muted-note">匯出或還原完整四個資料區（<code>baseline</code>、<code>local_overrides</code>、<code>runtime_state</code>、<code>removed_history</code>）。匯入時會驗證版本與結構，並依備份完整覆蓋本機狀態。</p>
         <div class="controls-line">
           <button id="btnExportBackup">匯出備份 JSON</button>
@@ -475,7 +571,7 @@
       </div>
 
       <div class="section-card">
-        <h3>已移除項目歷史紀錄（removed_history）</h3>
+        <h3>🗂️ 已移除項目歷史紀錄（removed_history）</h3>
         <p class="muted-note">雲端底稿移除但本機曾有欄位修改的活動會保留在此，供查閱或一鍵清空。</p>
         <div style="margin-bottom:8px;">
           <button id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
@@ -486,45 +582,30 @@
   </main>
 
   <nav class="bottom-nav">
-    <button class="active" data-tab="tab-schedule">每日行程</button>
-    <button data-tab="tab-pocket">備選口袋</button>
-    <button data-tab="tab-meta">住宿航班</button>
-    <button data-tab="tab-settings">設定備份</button>
+    <button class="active" data-tab="tab-schedule">🍁 每日行程</button>
+    <button data-tab="tab-pocket">🎒 備選口袋</button>
+    <button data-tab="tab-meta">🏨 住宿航班</button>
+    <button data-tab="tab-settings">⚙️ 設定備份</button>
   </nav>
 
   <script src="./idbStore.js"></script>
   <script src="./syncService.js"></script>
   <script src="./scheduleEngine.js"></script>
-  <script src="./tripEngine.js"></script>
   <script>
     (() => {
       const PREF_KEYS = {
         API_URL: 'trip_pwa_api_url',
         API_TOKEN: 'trip_pwa_api_token',
-        SELECTED_DATE: 'trip_pwa_selected_date',
-        FALLBACK_STATE: 'trip_pwa_fallback_state'
+        SELECTED_DATE: 'trip_pwa_selected_date'
       };
 
-      const FALLBACK_SAMPLE = {
-        meta: { dataVersion: 'SAMPLE-9D', tripStartDate: '2027-11-25', tripEndDate: '2027-12-03' },
-        itinerary: [
-          { slot_id: 'SLOT-0003', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'fixed', start_time: '11:45', deadline_time: '12:15', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 80, buffer_min: 15, transport_mode: '特急/新幹線', area: '關西機場', sort_order: 10, activity_id: 'ACT-0004', title_zh: '關西機場入境與搭乘HARUKA', title_jp: '関西国際空港', address_jp: '大阪府泉佐野市泉州空港北1', note: '星宇航空抵達後領行李與兌換車票' },
-          { slot_id: 'SLOT-0004', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '14:30', dwell_min: 45, travel_min: 20, buffer_min: 10, transport_mode: '巴士', area: '京都車站', sort_order: 20, activity_id: 'ACT-0005', title_zh: '京都車站飯店寄放行李', title_jp: '京都駅', address_jp: '京都市下京区東塩小路釜殿町', note: '先寄放行李再輕裝出門' },
-          { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'sun', time_type: 'flexible', start_time: '16:30', dwell_min: 90, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '祇園河原町', sort_order: 30, activity_id: 'ACT-0006', title_zh: '永觀堂紅葉夜間點燈', title_jp: '禅林寺 永観堂', address_jp: '京都市左京区永観堂町48', note: '楓葉季夜楓名所' },
-          { slot_id: 'SLOT-0005', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'rain', time_type: 'flexible', start_time: '16:30', dwell_min: 90, travel_min: 5, buffer_min: 5, transport_mode: '步行', area: '京都車站', sort_order: 30, activity_id: 'ACT-0007', title_zh: '京都車站大階梯光影與拉麵小路', title_jp: '京都駅ビル', address_jp: '京都市下京区烏丸通塩小路下ル東塩小路町901', note: '雨天室內備案' },
-          { slot_id: 'SLOT-0006', trip_date: '2027-11-25', day_label: 'Day 1', weather_mode: 'all', time_type: 'flexible', start_time: '18:30', dwell_min: 90, travel_min: 0, buffer_min: 0, transport_mode: '', area: '祇園河原町', sort_order: 40, activity_id: 'ACT-0008', title_zh: '先斗町京都豚骨與炸豬排晚餐', title_jp: '先斗町', address_jp: '京都市中京区先斗町通', note: '避開牛肉、牛油與肥腸' },
-          { slot_id: 'SLOT-0007', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'sun', time_type: 'flexible', start_time: '08:30', dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: '步行', area: '嵐山', sort_order: 10, activity_id: 'ACT-0009', title_zh: '渡月橋與桂川河畔晨間散步', title_jp: '渡月橋', address_jp: '京都市右京区嵯峨中ノ島町', note: '避開人潮拍攝晨景' },
-          { slot_id: 'SLOT-0008', trip_date: '2027-11-26', day_label: 'Day 2', weather_mode: 'all', time_type: 'fixed', start_time: '10:00', deadline_time: '10:20', deadline_type: 'arrive_by', dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: '步行', area: '嵐山', sort_order: 20, activity_id: 'ACT-0011', title_zh: '嵐山祐齋亭預約賞楓', title_jp: '嵐山 祐斎亭', address_jp: '京都市右京区嵯峨亀ノ尾町6', note: '需事先官網預約' }
-        ],
-        pocket_spots: [
-          { pocket_id: 'PK-0002', area: '嵐山', indoor_outdoor: 'outdoor', default_dwell_min: 60, default_travel_min: 15, transport_mode: '步行', title_zh: '寶嚴院獅子吼庭園', title_jp: '宝厳院', address_jp: '京都市右京区嵯峨天龍寺芒ノ馬場町36', note: '紅葉迴遊式庭園' }
-        ],
-        trip_meta: [
-          { meta_id: 'META-0002', trip_date: '2027-11-25', category: 'flight', title_zh: '星宇航空 JX820 桃園→關西', title_jp: 'スターラックス航空 JX820', address_jp: '関西国際空港 第1ターミナル', info_text: '07:40 桃園起飛 / 11:10 抵達關西' }
-        ]
-      };
-
-      const mascotQuotes = ['啾！賞楓出發～', '今天也要慢慢逛！', '帶好保暖外套了嗎？', '離線也能看行程唷～'];
+      const mascotQuotes = [
+        '啾！賞楓出發～',
+        '帶好保暖外套了嗎？',
+        '慢慢散步不趕路唷！',
+        '下午來杯熱茶或點心吧～',
+        '離線也能看行程，安心玩！'
+      ];
       let mascotIdx = 0;
       const mascotBtn = document.getElementById('mascotBtn');
       const mascotQuote = document.getElementById('mascotQuote');
@@ -537,17 +618,6 @@
 
       let currentDate = '';
       let currentSchedule = null;
-      let hasIdbBaseline = false;
-      let fallbackRt = (() => {
-        try {
-          return Object.assign({ status: {}, weather: {} }, JSON.parse(localStorage.getItem(PREF_KEYS.FALLBACK_STATE) || '{}'));
-        } catch (_) {
-          return { status: {}, weather: {} };
-        }
-      })();
-      const saveFallbackRt = () => {
-        try { localStorage.setItem(PREF_KEYS.FALLBACK_STATE, JSON.stringify(fallbackRt)); } catch (_) {}
-      };
 
       function showBanner(type, text) {
         const el = document.getElementById('globalBanner');
@@ -566,7 +636,7 @@
       function updateNetworkBadge() {
         const badge = document.getElementById('netBadge');
         const online = navigator.onLine;
-        badge.textContent = online ? '線上' : '離線模式';
+        badge.textContent = online ? '🟢 線上' : '🟠 離線模式';
         badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.7)';
       }
 
@@ -607,73 +677,18 @@
         return Array.from(set).sort();
       }
 
-      function buildFallbackDay(dateStr) {
-        const mode = fallbackRt.weather[dateStr] || 'sun';
-        if (typeof TripEngine !== 'undefined' && TripEngine && typeof TripEngine.buildDayRoute === 'function') {
-          const route = TripEngine.buildDayRoute(FALLBACK_SAMPLE.itinerary, dateStr, mode);
-          const tl = TripEngine.computeTimeline(route, { status: fallbackRt.status });
-          return {
-            hasBaseline: false,
-            isFallback: true,
-            tripDate: dateStr,
-            weatherMode: mode,
-            isStopped: false,
-            items: [],
-            visibleItems: tl.map((r) => ({
-              activity_id: r.activityId,
-              title_zh: r.titleZh,
-              title_jp: r.titleJp,
-              address_jp: r.addressJp,
-              area: r.area,
-              note: r.note,
-              status: r.status,
-              _sourceType: 'baseline',
-              _hasOverrides: false,
-              _overriddenFields: [],
-              estArrive: r.startFormatted.text,
-              estArriveNextDay: r.startFormatted.isNextDay,
-              estDepart: r.departFormatted.text,
-              estDepartNextDay: r.departFormatted.isNextDay,
-              nextArrive: r.nextArrivalFormatted.text,
-              nextArriveNextDay: r.nextArrivalFormatted.isNextDay,
-              transport_mode: r.transportMode,
-              dwell_min: r.dwellMin,
-              effectiveTravelMin: r.travelUsed,
-              effectiveBufferMin: r.bufferUsed,
-              isLastOfDay: r.isLastStop,
-              isLate: Boolean(r.deadlineAlert && r.deadlineAlert.isLate),
-              lateReason: (r.deadlineAlert && r.deadlineAlert.isLate)
-                ? `預計 ${r.deadlineAlert.actualFormatted} 晚於截止 ${r.deadlineAlert.deadlineTime}（+${r.deadlineAlert.diffMin} 分）`
-                : ''
-            })),
-            stats: {
-              total: tl.length,
-              done: tl.filter((x) => x.status === 'done').length,
-              skipped: tl.filter((x) => x.status === 'skipped').length,
-              pending: tl.filter((x) => x.status === 'pending').length,
-              lateCount: tl.filter((x) => x.deadlineAlert && x.deadlineAlert.isLate).length
-            }
-          };
-        }
-        return { hasBaseline: false, isFallback: true, tripDate: dateStr, weatherMode: mode, isStopped: false, items: [], visibleItems: [], stats: { total: 0, done: 0, skipped: 0, pending: 0, lateCount: 0 } };
-      }
-
       async function renderHeaderAndDates() {
         const baseline = await TripIdbStore.getBaseline();
         const metaBar = document.getElementById('syncMetaBar');
         const dateSel = document.getElementById('dateSelect');
 
         if (!baseline) {
-          hasIdbBaseline = false;
-          metaBar.innerHTML = '<span>尚未同步雲端底稿（目前顯示內建範例，請至「設定備份」同步）</span>';
-          const fDates = enumerateDates(FALLBACK_SAMPLE.meta.tripStartDate, FALLBACK_SAMPLE.meta.tripEndDate, FALLBACK_SAMPLE.itinerary);
-          const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
-          currentDate = (savedDate && fDates.indexOf(savedDate) !== -1) ? savedDate : (fDates[0] || '');
-          dateSel.innerHTML = fDates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('');
+          metaBar.innerHTML = '<span>尚未同步雲端底稿（請至「設定備份」同步）</span>';
+          dateSel.innerHTML = '<option value="">無可用日期</option>';
+          currentDate = '';
           return null;
         }
 
-        hasIdbBaseline = true;
         const m = baseline.meta || {};
         const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
         metaBar.innerHTML =
@@ -708,15 +723,18 @@
           return;
         }
 
-        const sched = hasIdbBaseline
-          ? await TripScheduleEngine.buildDaySchedule(currentDate)
-          : buildFallbackDay(currentDate);
+        const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
         currentSchedule = sched;
+
+        if (!sched.hasBaseline) {
+          statsEl.innerHTML = '';
+          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿。</div>';
+          return;
+        }
 
         btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
         btnS.textContent = sched.isStopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
         btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
-        btnS.style.display = hasIdbBaseline ? '' : 'none';
 
         const st = sched.stats;
         statsEl.innerHTML =
@@ -734,20 +752,20 @@
           return;
         }
 
-        listEl.innerHTML = sched.visibleItems.map((it) => {
+        listEl.innerHTML = sched.visibleItems.map((it, idx) => {
           const statusClass = 'status-' + (it.status || 'pending');
           const lateClass = it.isLate ? ' is-late' : '';
           const timeRange = it.isLastOfDay
-            ? `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，當日最後一站）`
-            : `${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`;
+            ? `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，當日最後一站）`
+            : `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`;
 
           const statusBadge = it.status === 'done'
-            ? '<span class="tag" style="background:#e7f4ea;color:#246b3c;border-color:transparent;">已完成</span>'
+            ? '<span class="tag" style="background:#e7f6ec;color:#2c7a47;border-color:transparent;">✅ 已完成</span>'
             : (it.status === 'skipped'
-              ? '<span class="tag" style="background:#e5e7eb;color:#374151;border-color:transparent;">已跳過</span>'
+              ? '<span class="tag" style="background:#e5e7eb;color:#374151;border-color:transparent;">⏭️ 已跳過</span>'
               : '<span class="tag">待執行</span>');
 
-          const isBaseline = hasIdbBaseline && it._sourceType === 'baseline';
+          const isBaseline = it._sourceType === 'baseline';
           const actKey = encodeURIComponent(it.activity_id);
 
           return `
@@ -756,12 +774,12 @@
                 <div class="item-time">${escapeHtml(timeRange)}</div>
                 <div>${statusBadge}</div>
               </div>
-              <div class="item-title">${escapeHtml(it.title_zh)}</div>
+              <div class="item-title"><span class="step-badge">第 ${idx + 1} 站</span>${escapeHtml(it.title_zh)}</div>
               <div class="item-sub">
-                ${it.title_jp ? escapeHtml(it.title_jp) + '｜' : ''}${escapeHtml(it.area || '')}
-                ${it.address_jp ? '<br>地址：' + escapeHtml(it.address_jp) : ''}
-                ${it.note ? '<br>備註：' + escapeHtml(it.note) : ''}
+                ${it.title_jp ? '🇯🇵 ' + escapeHtml(it.title_jp) + '｜' : ''}${escapeHtml(it.area || '')}
+                ${it.address_jp ? '<br>📍 ' + escapeHtml(it.address_jp) : ''}
               </div>
+              ${it.note ? `<div class="note-bubble">📝 ${escapeHtml(it.note)}</div>` : ''}
               <div>
                 ${it._sourceType === 'inserted' ? '<span class="tag inserted">本機插入備選</span>' : ''}
                 ${it._hasOverrides ? '<span class="tag override">已微調：' + escapeHtml((it._overriddenFields || []).join(', ')) + '</span>' : ''}
@@ -771,10 +789,10 @@
               ${it._anchorMissing ? `<div class="warn-box">原插入錨點（${escapeHtml(it._afterActivityId)}）已不存在，已自動接在當日行程末端。</div>` : ''}
 
               <div class="item-actions">
-                <button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">完成</button>
-                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">跳過</button>
+                <button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>
+                <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>
                 <button class="btn-sm" onclick="window.__app.onSetStatus('${actKey}', 'pending')">改待執行</button>
-                ${isBaseline ? `<button class="btn-sm" onclick="window.__app.onToggleEdit('${actKey}')">微調／單欄還原</button>` : ''}
+                ${isBaseline ? `<button class="btn-sm" onclick="window.__app.onToggleEdit('${actKey}')">✏️ 微調／單欄還原</button>` : ''}
                 ${it._sourceType === 'inserted' ? `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>` : ''}
               </div>
 
@@ -829,17 +847,14 @@
         const anchorSel = document.getElementById('insertAnchorSelect');
         const listEl = document.getElementById('pocketList');
         const baseline = await TripIdbStore.getBaseline();
-        const spots = (baseline && Array.isArray(baseline.pocket_spots))
-          ? baseline.pocket_spots
-          : FALLBACK_SAMPLE.pocket_spots;
 
         if (!currentDate) {
           anchorSel.innerHTML = '<option value="TOP">當日最前面</option>';
-          listEl.innerHTML = '<div class="empty-state">無備選口袋資料。</div>';
+          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，無備選口袋資料。</div>';
           return;
         }
 
-        const sched = currentSchedule || (hasIdbBaseline ? await TripScheduleEngine.buildDaySchedule(currentDate) : buildFallbackDay(currentDate));
+        const sched = currentSchedule || await TripScheduleEngine.buildDaySchedule(currentDate);
         const anchorOptions = ['<option value="TOP">當日最前面</option>'];
         (sched.items || []).forEach((it) => {
           if (it._sourceType === 'baseline') {
@@ -848,24 +863,25 @@
         });
         anchorSel.innerHTML = anchorOptions.join('');
 
+        const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
         if (spots.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">尚無備選口袋景點。</div>';
+          listEl.innerHTML = '<div class="empty-state">底稿中尚無備選口袋景點。</div>';
           return;
         }
 
         listEl.innerHTML = spots.map((sp, idx) => `
           <div class="section-card">
-            <div class="item-top">
+            <div class="item-top" style="padding-right:0;">
               <div>
                 <strong>${escapeHtml(sp.title_zh)}</strong>
                 <div class="item-sub">
-                  ${sp.title_jp ? escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
+                  ${sp.title_jp ? '🇯🇵 ' + escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
                   <br>預設停留 ${sp.default_dwell_min} 分｜建議交通 ${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
-                  ${sp.address_jp ? '<br>地址：' + escapeHtml(sp.address_jp) : ''}
-                  ${sp.note ? '<br>備註：' + escapeHtml(sp.note) : ''}
+                  ${sp.address_jp ? '<br>📍 ' + escapeHtml(sp.address_jp) : ''}
                 </div>
+                ${sp.note ? `<div class="note-bubble">📝 ${escapeHtml(sp.note)}</div>` : ''}
               </div>
-              ${hasIdbBaseline ? `<button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">插入本日</button>` : ''}
+              <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">＋ 插入本日</button>
             </div>
           </div>
         `).join('');
@@ -874,9 +890,7 @@
       async function renderMetaTab() {
         const listEl = document.getElementById('metaList');
         const baseline = await TripIdbStore.getBaseline();
-        const metas = (baseline && Array.isArray(baseline.trip_meta))
-          ? baseline.trip_meta
-          : FALLBACK_SAMPLE.trip_meta;
+        const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
 
         if (metas.length === 0) {
           listEl.innerHTML = '<div class="empty-state">尚無住宿與航班資料。</div>';
@@ -888,10 +902,10 @@
             <div class="item-time">${escapeHtml(m.trip_date || '通用')} ・ ${escapeHtml(m.category || '')}</div>
             <div class="item-title">${escapeHtml(m.title_zh)}</div>
             <div class="item-sub">
-              ${m.title_jp ? escapeHtml(m.title_jp) + '<br>' : ''}
-              ${m.address_jp ? '地址：' + escapeHtml(m.address_jp) + '<br>' : ''}
-              ${m.info_text ? escapeHtml(m.info_text) : ''}
+              ${m.title_jp ? '🇯🇵 ' + escapeHtml(m.title_jp) + '<br>' : ''}
+              ${m.address_jp ? '📍 ' + escapeHtml(m.address_jp) + '<br>' : ''}
             </div>
+            ${m.info_text ? `<div class="note-bubble">${escapeHtml(m.info_text)}</div>` : ''}
           </div>
         `).join('');
       }
@@ -904,7 +918,7 @@
           return;
         }
         el.innerHTML = list.map((r) => `
-          <div style="padding:8px; border:1px solid var(--border); border-radius:8px; margin-bottom:6px; font-size:12px;">
+          <div style="padding:8px; border:1.5px dashed var(--dash); border-radius:10px; margin-bottom:6px; font-size:12px;">
             <strong>${escapeHtml(r.title_zh || r.activity_id)}</strong>（${escapeHtml(r.activity_id)}｜${escapeHtml(r.trip_date || '')}）
             <div>移除時間：${escapeHtml(r.removedAt || '')}</div>
             <div>本機曾修改欄位：<code>${escapeHtml(JSON.stringify(r.overrideFields || {}))}</code></div>
@@ -924,12 +938,7 @@
       window.__app = {
         async onSetStatus(encodedId, status) {
           const actId = decodeURIComponent(encodedId);
-          if (hasIdbBaseline) {
-            await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
-          } else {
-            fallbackRt.status[actId] = status;
-            saveFallbackRt();
-          }
+          await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
           await renderScheduleTab();
         },
         onToggleEdit(encodedId) {
@@ -969,7 +978,7 @@
           await renderScheduleTab();
         },
         async onInsertSpot(spotIdx) {
-          if (!currentDate || !hasIdbBaseline) return;
+          if (!currentDate) return;
           const baseline = await TripIdbStore.getBaseline();
           const spots = (baseline && baseline.pocket_spots) || [];
           const spot = spots[spotIdx];
@@ -981,7 +990,7 @@
           await renderScheduleTab();
         },
         async onRemoveInserted(insertId) {
-          if (!currentDate || !hasIdbBaseline) return;
+          if (!currentDate) return;
           await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
           showBanner('info', '已移除本機插入站點');
           await renderScheduleTab();
@@ -1010,17 +1019,12 @@
 
       document.getElementById('btnToggleWeather').addEventListener('click', async () => {
         if (!currentDate) return;
-        if (hasIdbBaseline) {
-          await TripScheduleEngine.toggleWeather(currentDate);
-        } else {
-          fallbackRt.weather[currentDate] = (fallbackRt.weather[currentDate] === 'rain') ? 'sun' : 'rain';
-          saveFallbackRt();
-        }
+        await TripScheduleEngine.toggleWeather(currentDate);
         await renderScheduleTab();
       });
 
       document.getElementById('btnToggleStop').addEventListener('click', async () => {
-        if (!currentDate || !hasIdbBaseline) return;
+        if (!currentDate) return;
         await TripScheduleEngine.toggleDayStop(currentDate);
         await renderScheduleTab();
       });
@@ -1045,8 +1049,6 @@
         const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
         if (!ok) return;
         await TripScheduleEngine.restoreAllToBaseline();
-        fallbackRt = { status: {}, weather: {} };
-        saveFallbackRt();
         showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
         await refreshAll();
       });
