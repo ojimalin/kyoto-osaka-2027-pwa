@@ -29,16 +29,20 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      padding: 0 0 84px 0;
+      padding: 0;
+      min-height: 100%;
       background: var(--bg-paper);
       color: var(--ink-main);
       font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
       line-height: 1.5;
     }
 
-    /* 頂部標題列 */
+    body {
+      padding-bottom: 84px;
+    }
+
     .app-header {
       background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
       color: #fffaf2;
@@ -118,7 +122,6 @@
       gap: 12px;
     }
 
-    /* 主容器 */
     .container {
       max-width: 860px;
       margin: 0 auto;
@@ -130,7 +133,7 @@
       border-radius: 14px;
       margin-bottom: 12px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       border: 1.5px dashed var(--line-dash);
       display: none;
     }
@@ -156,7 +159,6 @@
       color: var(--ink-main);
     }
 
-    /* 控制面板 */
     .panel-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border-soft);
@@ -174,7 +176,7 @@
       margin-bottom: 10px;
     }
 
-    select, input[type="text"], input[type="number"], textarea {
+    select, input[type="text"], input[type="number"] {
       font-family: inherit;
       font-size: 14px;
       color: var(--ink-main);
@@ -255,7 +257,6 @@
       border-color: #ecc788;
     }
 
-    /* 行程卡片 */
     .itinerary-card {
       position: relative;
       overflow: hidden;
@@ -364,7 +365,6 @@
       color: var(--warn-text);
     }
 
-    /* 微調面板 */
     .editor-box {
       margin-top: 10px;
       padding: 12px;
@@ -392,7 +392,6 @@
       width: 100%;
     }
 
-    /* 分頁區塊與底部導覽 */
     .tab-pane {
       display: none;
     }
@@ -406,11 +405,12 @@
       left: 0;
       right: 0;
       bottom: 0;
+      height: 54px;
       background: #fffdf9;
       border-top: 1.5px solid var(--border-soft);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      z-index: 30;
+      z-index: 999;
       box-shadow: 0 -4px 14px rgba(62, 47, 38, 0.08);
     }
 
@@ -419,9 +419,10 @@
       border-radius: 0;
       background: transparent;
       color: var(--ink-muted);
-      padding: 10px 4px;
-      font-size: 12px;
+      padding: 0 4px;
+      font-size: 13px;
       font-weight: 700;
+      height: 100%;
     }
 
     .nav-btn.active {
@@ -468,7 +469,6 @@
   <main class="container">
     <div id="statusBanner" class="banner"></div>
 
-    <!-- 分頁 1：每日行程 -->
     <section id="tab-itinerary" class="tab-pane active">
       <div class="panel-card">
         <div class="controls-row">
@@ -482,7 +482,6 @@
       <div id="scheduleList"></div>
     </section>
 
-    <!-- 分頁 2：備選口袋 -->
     <section id="tab-pocket" class="tab-pane">
       <div class="panel-card">
         <h3 style="margin:0 0 8px;">備選口袋景點</h3>
@@ -490,7 +489,6 @@
       </div>
     </section>
 
-    <!-- 分頁 3：住宿航班 -->
     <section id="tab-meta" class="tab-pane">
       <div class="panel-card">
         <h3 style="margin:0 0 8px;">住宿與航班資訊</h3>
@@ -498,7 +496,6 @@
       </div>
     </section>
 
-    <!-- 分頁 4：設定備份 -->
     <section id="tab-settings" class="tab-pane">
       <div class="panel-card">
         <h3 style="margin:0 0 10px;">雲端同步連線設定</h3>
@@ -508,7 +505,7 @@
         </div>
         <div class="editor-field" style="margin-bottom:10px;">
           <label for="apiTokenInput">API_TOKEN</label>
-          <input id="apiTokenInput" type="text" placeholder="貼上 setupApiToken() 產出的 Token" />
+          <input id="apiTokenInput" type="text" placeholder="貼上 API Token" />
         </div>
         <div class="controls-row">
           <button type="button" id="saveConnBtn">儲存連線設定</button>
@@ -547,7 +544,21 @@
   <script src="./scheduleEngine.js"></script>
   <script>
     (() => {
-      // 1. 雪之妖精小語互動
+      const bannerEl = document.getElementById('statusBanner');
+      function showBanner(type, msg) {
+        if (!bannerEl) return;
+        bannerEl.className = 'banner show ' + type;
+        bannerEl.textContent = msg;
+      }
+
+      window.addEventListener('error', (ev) => {
+        showBanner('err', '前端腳本錯誤：' + (ev.message || '未知錯誤'));
+      });
+      window.addEventListener('unhandledrejection', (ev) => {
+        const reason = ev.reason && ev.reason.message ? ev.reason.message : String(ev.reason || 'Promise 錯誤');
+        showBanner('err', '非同步錯誤：' + reason);
+      });
+
       const quotes = [
         '啾！今天也要開心賞楓～',
         '帶好相機跟保暖外套了嗎？',
@@ -565,12 +576,10 @@
         });
       }
 
-      // 2. Service Worker 註冊
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }
 
-      // 3. 網路狀態徽章
       const netBadge = document.getElementById('netBadge');
       function updateNetBadge() {
         const online = navigator.onLine;
@@ -581,21 +590,19 @@
       window.addEventListener('offline', updateNetBadge);
       updateNetBadge();
 
-      // 4. 分頁切換
       const navBtns = document.querySelectorAll('.nav-btn');
       const panes = document.querySelectorAll('.tab-pane');
+      function switchTab(target) {
+        navBtns.forEach((b) => b.classList.toggle('active', b.getAttribute('data-tab') === target));
+        panes.forEach((p) => p.classList.toggle('active', p.id === 'tab-' + target));
+      }
       navBtns.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const target = btn.getAttribute('data-tab');
-          navBtns.forEach((b) => b.classList.toggle('active', b === btn));
-          panes.forEach((p) => p.classList.toggle('active', p.id === 'tab-' + target));
-        });
+        btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
       });
 
-      const bannerEl = document.getElementById('statusBanner');
-      function showBanner(type, msg) {
-        bannerEl.className = 'banner show ' + type;
-        bannerEl.textContent = msg;
+      if (!window.TripIdbStore || !window.TripScheduleEngine) {
+        showBanner('err', '找不到 idbStore.js 或 scheduleEngine.js，請確認檔案路徑與載入順序。');
+        return;
       }
 
       const dateSelect = document.getElementById('dateSelect');
@@ -630,7 +637,7 @@
           metaRangeEl.textContent = '行程：--';
           dateSelect.innerHTML = '';
           statsRow.innerHTML = '';
-          scheduleList.innerHTML = '<div class="panel-card">尚未同步雲端底稿，請先至「設定備份」輸入網址與 Token 並同步。</div>';
+          scheduleList.innerHTML = '<div class="panel-card">尚未同步雲端底稿，請切至下方「設定備份」輸入網址與 Token 並同步。</div>';
           pocketList.innerHTML = '';
           metaList.innerHTML = '';
           await renderRemovedHistory();
@@ -826,7 +833,6 @@
         `).join('');
       }
 
-      // 暴露給按鈕的事件處理
       window.__setStatus = async (activityId, status, dateStr) => {
         await TripIdbStore.setActivityStatus(activityId, status, { trip_date: dateStr });
         await renderDay(dateStr);
@@ -865,10 +871,10 @@
       window.__insertPocket = async (pocketId) => {
         if (!currentDate) return;
         const baseline = await TripIdbStore.getBaseline();
-        const spot = (baseline && baseline.data && baseline.data.pocket_spots || []).find((x) => x.pocket_id === pocketId);
+        const spot = ((baseline && baseline.data && baseline.data.pocket_spots) || []).find((x) => x.pocket_id === pocketId);
         if (!spot) return;
         await TripScheduleEngine.insertPocketSpot(currentDate, spot, 'END');
-        navBtns[0].click();
+        switchTab('itinerary');
         await renderDay(currentDate);
         showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate}`);
       };
@@ -893,31 +899,42 @@
         await renderDay(currentDate);
       });
 
-      // 設定備份事件
       const gasUrlInput = document.getElementById('gasUrlInput');
       const apiTokenInput = document.getElementById('apiTokenInput');
 
       async function loadConnSettings() {
-        const cfg = await TripIdbStore.getSyncConfig();
-        if (cfg) {
-          gasUrlInput.value = cfg.url || '';
-          apiTokenInput.value = cfg.token || '';
+        if (typeof TripIdbStore.getSyncConfig === 'function') {
+          const cfg = await TripIdbStore.getSyncConfig();
+          if (cfg) {
+            gasUrlInput.value = cfg.url || '';
+            apiTokenInput.value = cfg.token || '';
+          }
         }
       }
 
       document.getElementById('saveConnBtn').addEventListener('click', async () => {
-        await TripIdbStore.setSyncConfig({
-          url: gasUrlInput.value.trim(),
-          token: apiTokenInput.value.trim()
-        });
-        showBanner('ok', '已儲存連線設定');
+        if (typeof TripIdbStore.setSyncConfig === 'function') {
+          await TripIdbStore.setSyncConfig({
+            url: gasUrlInput.value.trim(),
+            token: apiTokenInput.value.trim()
+          });
+          showBanner('ok', '已儲存連線設定');
+        } else {
+          showBanner('err', 'idbStore.js 缺少 setSyncConfig 方法');
+        }
       });
 
       document.getElementById('syncNowBtn').addEventListener('click', async () => {
-        await TripIdbStore.setSyncConfig({
-          url: gasUrlInput.value.trim(),
-          token: apiTokenInput.value.trim()
-        });
+        if (!window.TripSyncService || typeof TripSyncService.syncNow !== 'function') {
+          showBanner('err', '找不到 TripSyncService.syncNow');
+          return;
+        }
+        if (typeof TripIdbStore.setSyncConfig === 'function') {
+          await TripIdbStore.setSyncConfig({
+            url: gasUrlInput.value.trim(),
+            token: apiTokenInput.value.trim()
+          });
+        }
         showBanner('info', '正在同步雲端底稿...');
         const res = await TripSyncService.syncNow();
         if (res && res.ok) {
@@ -936,4 +953,44 @@
         showBanner('ok', '已全部還原至雲端底稿');
       });
 
-      document.getElementById
+      document.getElementById('exportBackupBtn').addEventListener('click', async () => {
+        const pack = await TripIdbStore.exportAllBackup();
+        const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kyoto-osaka-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showBanner('ok', '已匯出備份 JSON');
+      });
+
+      const importFileInput = document.getElementById('importFileInput');
+      document.getElementById('importBackupBtn').addEventListener('click', () => {
+        importFileInput.value = '';
+        importFileInput.click();
+      });
+
+      importFileInput.addEventListener('change', async (ev) => {
+        const file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+          const res = await TripIdbStore.importAllBackup(parsed);
+          if (res && res.ok) {
+            await refreshAll(currentDate);
+            showBanner('ok', '已匯入備份檔');
+          } else {
+            showBanner('err', '匯入已拒絕（未覆蓋原有資料）：' + (res && res.message ? res.message : '格式無效'));
+          }
+        } catch (err) {
+          showBanner('err', '匯入已拒絕（未覆蓋原有資料）：JSON 解析失敗');
+        }
+      });
+
+      loadConnSettings().then(() => refreshAll());
+    })();
+  </script>
+</body>
+</html>
