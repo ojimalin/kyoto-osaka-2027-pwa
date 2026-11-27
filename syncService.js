@@ -6,9 +6,9 @@
  *   1. syncFromCloud()：呼叫 GAS GET 同步底稿（baseline），處理移除項目移入 removed_history，
  *      並回傳最新底稿與雲端 liveState 摘要。
  *   2. pullLiveState()：拉取雲端共享進度快照（liveState），比對 baselineVersion（不同則先同步底稿），
- *      若有未發布修改則先徵求確認再單一交易覆蓋。
+ *      若有未發布修改則先徵求確認再單一交易覆蓋，並清除 hasUnpublished 旗標避免重複誤判。
  *   3. pushLiveState() 與 10 秒延遲自動發布（scheduleAutoPublish / clearAutoPublishTimer）：
- *      以 text/plain POST 送出發布請求，處理 VERSION_MISMATCH 與 HOST_MISMATCH（支援確認接手或取消切回瀏覽模式）。
+ *      以 text/plain POST 送出發布請求，完成後透過 onAutoPublishDone 通知 UI 即時刷新紅點與版號。
  *   4. 同步工作鎖（IDLE / AUTO_PUBLISH / MANUAL_PUBLISH / PULL）：
  *      防止自動發布與手動拉取同時進行造成狀態交錯，並於 finally 嚴格釋放鎖定。
  * ============================================================================
@@ -81,7 +81,7 @@ const TripSyncService = (() => {
   }
 
   /**
-   * 讀取或更新本機記錄的共享版號與主控者中繼資訊。
+   * 讀取本機記錄的共享版號、主控者中繼資訊與未發布旗標。
    * @return {Object}
    */
   function getLiveSyncMeta() {
@@ -136,12 +136,15 @@ const TripSyncService = (() => {
   }
 
   /**
-   * 排程 10 秒延遲自動發布（debounce：若在 10 秒內再次修改則重新計時）。
+   * 排程 10 秒延遲自動發布（debounce：若在 10 秒內再次修改則重新計時），
+   * 完成後若呼叫端提供 onAutoPublishDone 回呼則立即通知更新 UI。
    * @param {Object} opts
    */
   function scheduleAutoPublish(opts) {
     clearAutoPublishTimer();
-    const snapshotOpts = Object.assign({}, opts || {}, {
+    const baseOpts = opts || {};
+    const onDone = (typeof baseOpts.onAutoPublishDone === 'function') ? baseOpts.onAutoPublishDone : null;
+    const snapshotOpts = Object.assign({}, baseOpts, {
       isAuto: true,
       allowHostTakeover: false
     });
@@ -151,6 +154,9 @@ const TripSyncService = (() => {
       const resolver = pendingAutoPublishResolver;
       pendingAutoPublishResolver = null;
       const res = await pushLiveState(snapshotOpts);
+      if (onDone) {
+        await onDone(res);
+      }
       if (typeof resolver === 'function') {
         resolver(res);
       }
@@ -354,8 +360,8 @@ const TripSyncService = (() => {
   /**
    * 拉取雲端共享進度快照（liveState）：
    * 1. 先取得遠端底稿與 liveState；若雲端 baselineVersion 與本機不同，先同步底稿。
-   * 2. 若本機有未發布修改，先呼叫 confirmOverwrite 徵求使用者確認；取消則完全不動本機資料。
-   * 3. 確認後以單一 readwrite 交易覆蓋本機 local_overrides 與 runtime_state。
+   * 2. 僅在「本機確實有尚未發布之本地變更」時才呼叫 confirmOverwrite 徵求確認；取消則完全不動本機資料。
+   * 3. 確認後以單一 readwrite 交易覆蓋本機 local_overrides 與 runtime_state，並明確將 hasUnpublished 設為 false。
    * @param {{endpointUrl: string, token: string, timeoutMs?: number, confirmOverwrite?: Function}} opts
    * @return {Promise<Object>}
    */
