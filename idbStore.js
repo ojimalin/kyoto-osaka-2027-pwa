@@ -403,11 +403,18 @@ const TripIdbStore = (() => {
   // --- 多機共享狀態輔助（未發布檢查與單一交易覆蓋） ---
 
   /**
-   * 檢查本機是否有任何欄位覆寫或執行/插入/晴雨/收工狀態，
-   * 供拉取雲端共享進度前判斷是否需跳出覆蓋確認。
+   * 檢查本機是否有尚未發布或尚未被雲端進度對齊的本地修改。
+   * 若 trip_pwa_has_unpublished 明確為 '0'，代表本機狀態已與雲端發布版對齊，直接回傳 false；
+   * 僅在旗標為 '1' 或尚未建立旗標時才掃描 local_overrides 與 runtime_state。
    * @return {Promise<boolean>}
    */
   async function hasUnpublishedChanges() {
+    if (typeof localStorage !== 'undefined') {
+      const flag = localStorage.getItem('trip_pwa_has_unpublished');
+      if (flag === '0') return false;
+      if (flag === '1') return true;
+    }
+
     const [overrides, runtimeItems] = await Promise.all([
       getAllOverrides(),
       getAllRuntimeItems()
