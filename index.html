@@ -658,7 +658,7 @@
   </style>
 </head>
 <body>
-  <!-- 頂部列：左側標題；右側整合角色徽章、發布/拉取按鈕與線上狀態 -->
+  <!-- 頂部列：左側標題；右側整合角色發布按鈕、拉取按鈕與線上狀態 -->
   <header class="topbar" style="position:relative;">
     <div class="topbar-row">
       <h1 class="topbar-title">🍁 家庭旅遊手帳</h1>
@@ -842,7 +842,9 @@
      *   1. 管理本機裝置固定識別碼（deviceId）、裝置顯示名稱（deviceName）、操作模式（host / family）
      *      與雙 Token（READ_TOKEN / PUBLISH_TOKEN）之儲存與安全驗證。
      *   2. 頂部列整合角色按鈕（主控「☁️ 發布」＋未發布紅點、家人「🔄 拉取」）與主控資訊彈窗。
-     *   3. 渲染每日行程、備選口袋、住宿航班、設定備份四個分頁，所有動態文字均經 escapeHtml() 跳脫。
+     *   3. 串接 TripSyncService：主控端修改後 10 秒自動發布，完成後透過 handlePublishResult()
+     *      立即清除未發布紅點並重繪右上角狀態彈窗（無需手動重新整理網頁）。
+     *   4. 渲染每日行程、備選口袋、住宿航班、設定備份四個分頁，所有動態文字均經 escapeHtml() 跳脫。
      * ============================================================================
      */
     (() => {
@@ -897,7 +899,7 @@
       }
 
       /**
-       * 組合傳給 TripSyncService 的完整連線與裝置設定物件。
+       * 組合傳給 TripSyncService 的完整連線與裝置設定物件（含 10 秒自動發布完成後之 UI 刷新回呼）。
        * @return {Object}
        */
       function buildSyncContextOptions() {
@@ -908,7 +910,8 @@
           role: getCurrentRole(),
           deviceId: getOrCreateDeviceId(),
           deviceName: String(localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '').trim(),
-          onHostMismatch: promptHostTakeoverModal
+          onHostMismatch: promptHostTakeoverModal,
+          onAutoPublishDone: handlePublishResult
         };
       }
 
@@ -950,7 +953,7 @@
       }
 
       /**
-       * 更新頂部「發布」按鈕顯示、未發布紅點與主控資訊摘要。
+       * 更新頂部「發布」按鈕顯示與未發布紅點狀態。
        */
       function updateLiveSyncIndicators() {
         const role = getCurrentRole();
@@ -978,11 +981,16 @@
 
       /**
        * 執行手動或自動發布後的統一介面回饋處理。
+       * 無論任何結果，先確保發布成功時清除 hasUnpublished 旗標並重繪紅點與右上角彈窗，再顯示提示橫幅。
        * @param {Object} res
        */
-      function handlePublishResult(res) {
+      async function handlePublishResult(res) {
+        if (res && res.ok) {
+          TripSyncService.saveLiveSyncMeta({ hasUnpublished: false });
+        }
         updateLiveSyncIndicators();
-        renderHeaderAndDates();
+        await renderHeaderAndDates();
+
         if (!res) return;
         if (res.ok) {
           showBanner('ok', res.message);
@@ -992,6 +1000,7 @@
           localStorage.setItem(PREF_KEYS.ROLE, 'family');
           loadPrefsToInputs();
           updateLiveSyncIndicators();
+          await renderHeaderAndDates();
           showBanner('info', '已取消發布並將本機切回「瀏覽模式」');
           return;
         }
@@ -1785,7 +1794,7 @@
           isAuto: false,
           allowHostTakeover: false
         }));
-        handlePublishResult(res);
+        await handlePublishResult(res);
       });
 
       document.getElementById('btnPullLive').addEventListener('click', async () => {
