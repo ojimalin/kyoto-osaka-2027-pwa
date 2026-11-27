@@ -55,7 +55,7 @@
       z-index: 20;
       background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
       color: #fffaf2;
-      padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+      padding: calc(7px + env(safe-area-inset-top, 0px)) 10px 7px;
       border-bottom: 2px dashed rgba(255, 250, 242, 0.45);
       box-shadow: 0 2px 10px rgba(120, 58, 30, 0.14);
     }
@@ -64,20 +64,54 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
     }
 
     .topbar-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       margin: 0;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .top-chip-btn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 250, 242, 0.42);
+      background: rgba(255, 250, 242, 0.18);
+      color: #fffaf2;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .top-chip-btn.publish {
+      background: #fff3d6;
+      color: #8c2f12;
+      border-color: #ffe2a8;
+    }
+    .top-chip-btn.pull {
+      background: rgba(36, 107, 60, 0.72);
+      color: #fffaf2;
+      border-color: rgba(187, 247, 208, 0.65);
     }
 
     .badge-net {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
-      padding: 3px 9px;
+      padding: 3px 8px;
       border-radius: 999px;
       background: rgba(255, 250, 242, 0.2);
       border: 1px solid rgba(255, 250, 242, 0.38);
@@ -86,22 +120,32 @@
       cursor: pointer;
     }
 
+    .dirty-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #dc2626;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+      vertical-align: middle;
+    }
+
     .sync-popover {
       display: none;
       position: absolute;
       top: calc(100% + 4px);
-      right: 12px;
+      right: 10px;
       z-index: 40;
       background: #fffdf9;
       color: var(--text);
       border: 1.5px solid var(--border);
       border-radius: 14px;
       padding: 8px 12px;
-      font-size: 11px;
-      line-height: 1.6;
+      font-size: 11.5px;
+      line-height: 1.65;
       box-shadow: 0 6px 18px rgba(62, 47, 38, 0.18);
       text-align: left;
-      max-width: 290px;
+      max-width: 300px;
     }
     .sync-popover.open { display: block; }
 
@@ -156,53 +200,6 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 7px;
-    }
-
-    .live-sync-strip {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      padding: 6px 9px;
-      background: #faf1e4;
-      border: 1px dashed var(--dash);
-      border-radius: 12px;
-      font-size: 11.5px;
-    }
-
-    .live-host-info {
-      color: var(--text);
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .role-pill {
-      font-size: 10.5px;
-      padding: 1.5px 7px;
-      border-radius: 999px;
-      background: #e7f6ec;
-      color: var(--ok);
-      border: 1px solid #96dfb0;
-    }
-    .role-pill.family {
-      background: #eef2ff;
-      color: #3730a3;
-      border-color: #c7d2fe;
-    }
-
-    .dirty-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #dc2626;
-      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.22);
-      margin-right: 4px;
-      vertical-align: middle;
     }
 
     .mascot-stage {
@@ -573,6 +570,7 @@
       background: #faf1e4;
       padding: 4px 8px;
       border-radius: 8px;
+      word-break: break-all;
     }
 
     /* 主控交接確認對話框 */
@@ -660,10 +658,17 @@
   </style>
 </head>
 <body>
+  <!-- 頂部列：左側標題；右側整合角色徽章、發布/拉取按鈕與線上狀態 -->
   <header class="topbar" style="position:relative;">
     <div class="topbar-row">
-      <h1 class="topbar-title">🍁 家庭旅遊離線電子手帳</h1>
-      <button type="button" id="netBadge" class="badge-net" title="點我看底稿版本與共享同步狀態">檢查中</button>
+      <h1 class="topbar-title">🍁 家庭旅遊手帳</h1>
+      <div class="topbar-actions">
+        <button type="button" id="btnPublishLive" class="top-chip-btn publish" style="display:none;" title="發布本機進度">
+          <span id="unpublishedDot" class="dirty-dot" style="display:none;"></span>☁️ 發布
+        </button>
+        <button type="button" id="btnPullLive" class="top-chip-btn pull" title="拉取雲端最新進度">🔄 拉取</button>
+        <button type="button" id="netBadge" class="badge-net" title="點我看主控者、版號與連線狀態">檢查中</button>
+      </div>
     </div>
     <div id="syncMetaBar" class="sync-popover">
       <div>尚未同步雲端底稿</div>
@@ -712,17 +717,6 @@
           </div>
         </div>
 
-        <!-- 家庭共享進度同步列（主控發布 / 家人拉取 / 雲端主控者狀態） -->
-        <div class="live-sync-strip">
-          <div id="liveHostStatus" class="live-host-info">雲端主控：尚未同步</div>
-          <div class="controls-line">
-            <button type="button" id="btnPublishLive" class="btn-sm btn-primary" style="display:none;">
-              <span id="unpublishedDot" class="dirty-dot" style="display:none;"></span>☁️ 發布進度
-            </button>
-            <button type="button" id="btnPullLive" class="btn-sm btn-ok">🔄 拉取進度</button>
-          </div>
-        </div>
-
         <div id="dayStats" class="stats-bar"></div>
       </div>
 
@@ -752,8 +746,8 @@
       <div class="section-card">
         <h3>📱 本機角色與雲端同步設定</h3>
         <p class="muted-note">
-          - <strong>主控模式</strong>：負責在旅途中勾選完成、微調時間或插入備選景點，修改後 10 秒自動發布（亦可手動立即發布）。<br />
-          - <strong>瀏覽模式</strong>：家人手機預設模式，僅顯示「拉取進度」按鈕，避免誤發覆蓋主控進度；必要時可隨時切為主控接手。
+          - <strong>主控模式</strong>：負責在旅途中勾選完成、微調時間或插入備選景點，修改後 10 秒自動發布（亦可點上方「☁️ 發布」立即發布）。<br />
+          - <strong>瀏覽模式</strong>：家人手機預設模式，僅顯示「🔄 拉取」按鈕，避免誤發覆蓋主控進度；必要時可隨時切為主控接手。
         </p>
         <div class="form-stack">
           <div class="form-field">
@@ -847,9 +841,8 @@
      * 整體功能說明：
      *   1. 管理本機裝置固定識別碼（deviceId）、裝置顯示名稱（deviceName）、操作模式（host / family）
      *      與雙 Token（READ_TOKEN / PUBLISH_TOKEN）之儲存與安全驗證。
-     *   2. 渲染每日行程、備選口袋、住宿航班、設定備份四個分頁，所有動態文字均經 escapeHtml() 跳脫。
-     *   3. 串接 TripSyncService：主控端修改行程後自動標記未發布紅點並觸發 10 秒延遲自動發布；
-     *      遇 HOST_MISMATCH 時彈出主控交接視窗供確認接手或一鍵切回瀏覽模式。
+     *   2. 頂部列整合角色按鈕（主控「☁️ 發布」＋未發布紅點、家人「🔄 拉取」）與主控資訊彈窗。
+     *   3. 渲染每日行程、備選口袋、住宿航班、設定備份四個分頁，所有動態文字均經 escapeHtml() 跳脫。
      * ============================================================================
      */
     (() => {
@@ -878,10 +871,9 @@
       function getOrCreateDeviceId() {
         let id = String(localStorage.getItem(PREF_KEYS.DEVICE_ID) || '').trim();
         if (!id) {
-          const rand = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+          id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
             ? crypto.randomUUID()
             : ('dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
-          id = rand;
           localStorage.setItem(PREF_KEYS.DEVICE_ID, id);
         }
         return id;
@@ -892,8 +884,7 @@
        * @return {string}
        */
       function getCurrentRole() {
-        const r = localStorage.getItem(PREF_KEYS.ROLE);
-        return r === 'host' ? 'host' : 'family';
+        return localStorage.getItem(PREF_KEYS.ROLE) === 'host' ? 'host' : 'family';
       }
 
       /**
@@ -902,8 +893,7 @@
        */
       function getStoredReadToken() {
         const t = String(localStorage.getItem(PREF_KEYS.READ_TOKEN) || '').trim();
-        if (t) return t;
-        return String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
+        return t || String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
       }
 
       /**
@@ -960,14 +950,11 @@
       }
 
       /**
-       * 更新頂部與行程頁的「雲端主控者、版號、角色徽章與未發布紅點」顯示。
+       * 更新頂部「發布」按鈕顯示、未發布紅點與主控資訊摘要。
        */
       function updateLiveSyncIndicators() {
         const role = getCurrentRole();
-        const myDeviceId = getOrCreateDeviceId();
         const liveMeta = TripSyncService.getLiveSyncMeta();
-
-        const hostStatusEl = document.getElementById('liveHostStatus');
         const btnPublish = document.getElementById('btnPublishLive');
         const dirtyDot = document.getElementById('unpublishedDot');
 
@@ -976,25 +963,6 @@
         }
         if (dirtyDot) {
           dirtyDot.style.display = liveMeta.hasUnpublished ? 'inline-block' : 'none';
-        }
-
-        if (hostStatusEl) {
-          const roleBadgeHtml = role === 'host'
-            ? '<span class="role-pill">🧭 主控模式</span>'
-            : '<span class="role-pill family">👀 瀏覽模式</span>';
-
-          let hostText = '雲端進度：尚未發布';
-          if (liveMeta.revision > 0) {
-            const isMe = liveMeta.publishedByDeviceId && liveMeta.publishedByDeviceId === myDeviceId;
-            const ownerLabel = (liveMeta.publishedByName || '主控端') + (isMe ? '（本機）' : '');
-            hostText = `主控：${escapeHtml(ownerLabel)} (v${liveMeta.revision})`;
-          }
-
-          const dirtyLabel = liveMeta.hasUnpublished
-            ? ' <span style="color:#b91c1c;">• 待發布</span>'
-            : '';
-
-          hostStatusEl.innerHTML = `${roleBadgeHtml}<span>${hostText}</span>${dirtyLabel}`;
         }
       }
 
@@ -1014,10 +982,10 @@
        */
       function handlePublishResult(res) {
         updateLiveSyncIndicators();
+        renderHeaderAndDates();
         if (!res) return;
         if (res.ok) {
           showBanner('ok', res.message);
-          renderHeaderAndDates();
           return;
         }
         if (res.switchToFamily) {
@@ -1370,6 +1338,7 @@
         localStorage.setItem(PREF_KEYS.PUBLISH_TOKEN, publishToken);
 
         updateLiveSyncIndicators();
+        renderHeaderAndDates();
         showBanner('ok', role === 'host'
           ? `已儲存設定（主控模式｜裝置：${deviceName}）`
           : '已儲存設定（瀏覽模式）');
@@ -1405,11 +1374,18 @@
         const metaBar = document.getElementById('syncMetaBar');
         const dateSel = document.getElementById('dateSelect');
         const liveMeta = TripSyncService.getLiveSyncMeta();
+        const role = getCurrentRole();
+        const myDeviceId = getOrCreateDeviceId();
+
+        const roleLine = `<div>本機模式：${role === 'host' ? '🧭 主控模式' : '👀 瀏覽模式'}${liveMeta.hasUnpublished ? '（有未發布變更）' : ''}</div>`;
+        const hostLine = liveMeta.revision > 0
+          ? `<div>雲端主控：${escapeHtml((liveMeta.publishedByName || '主控端') + (liveMeta.publishedByDeviceId === myDeviceId ? '（本機）' : ''))} (v${liveMeta.revision})</div>`
+          : '<div>雲端主控：尚未發布</div>';
 
         if (!baseline) {
           baselineStartDate = '';
           customMealReminder = '';
-          metaBar.innerHTML = '<div>尚未同步雲端底稿</div>';
+          metaBar.innerHTML = roleLine + hostLine + '<div>尚未同步雲端底稿</div>';
           dateSel.innerHTML = '<option value="">無可用日期</option>';
           currentDate = '';
           updateLiveSyncIndicators();
@@ -1424,14 +1400,12 @@
         customMealReminder = mealMeta ? String(mealMeta.info_text || mealMeta.title_zh || '').slice(0, 22) : '';
 
         const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
-        const liveInfoLine = liveMeta.revision > 0
-          ? `<div>共享進度：v${liveMeta.revision}（${escapeHtml(liveMeta.publishedByName || '主控端')}）</div>`
-          : '<div>共享進度：尚未發布</div>';
 
         metaBar.innerHTML =
+          roleLine +
+          hostLine +
           `<div>底稿版本：${escapeHtml(m.dataVersion || '-')}</div>` +
-          `<div>底稿同步：${escapeHtml(syncedStr)}</div>` +
-          liveInfoLine;
+          `<div>底稿同步：${escapeHtml(syncedStr)}</div>`;
 
         const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
         const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
@@ -1804,7 +1778,6 @@
         await renderScheduleTab();
       });
 
-      // 手動發布進度按鈕（主控模式）
       document.getElementById('btnPublishLive').addEventListener('click', async () => {
         const ctx = buildSyncContextOptions();
         showBanner('info', '正在發布共享進度至雲端...');
@@ -1815,7 +1788,6 @@
         handlePublishResult(res);
       });
 
-      // 拉取最新進度按鈕（家人端與主控端皆可使用）
       document.getElementById('btnPullLive').addEventListener('click', async () => {
         const ctx = buildSyncContextOptions();
         showBanner('info', '正在從雲端拉取最新共享進度...');
