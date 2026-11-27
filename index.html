@@ -161,6 +161,7 @@
       margin-bottom: 10px;
       font-size: 12.5px;
       display: none;
+      word-break: break-word;
     }
     .banner.show { display: block; }
     .banner.info { background: var(--primary-weak); color: var(--primary); border: 1.5px dashed var(--dash); }
@@ -785,8 +786,8 @@
           </div>
         </div>
         <div class="controls-line">
-          <button id="btnSaveConfig" class="btn-primary">儲存連線與角色設定</button>
-          <button id="btnSyncNow" class="btn-ok">同步雲端底稿（Sheets → 手機）</button>
+          <button type="button" id="btnSaveConfig" class="btn-primary">儲存連線與角色設定</button>
+          <button type="button" id="btnSyncNow" class="btn-ok">同步雲端底稿（Sheets → 手機）</button>
         </div>
       </div>
 
@@ -796,15 +797,15 @@
           - <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
           - 若需取得雲端最新版本，請先按「同步雲端底稿」，再執行全部還原。
         </p>
-        <button id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
+        <button type="button" id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
       </div>
 
       <div class="section-card">
         <h3>💾 備份匯出／匯入</h3>
         <p class="muted-note">匯出或還原完整四個資料區（<code>baseline</code>、<code>local_overrides</code>、<code>runtime_state</code>、<code>removed_history</code>）。匯入時會驗證版本與結構，並依備份完整覆蓋本機狀態。</p>
         <div class="controls-line">
-          <button id="btnExportBackup">匯出備份 JSON</button>
-          <button id="btnTriggerImport">匯入備份 JSON</button>
+          <button type="button" id="btnExportBackup">匯出備份 JSON</button>
+          <button type="button" id="btnTriggerImport">匯入備份 JSON</button>
           <input id="importFileInput" type="file" accept="application/json,.json" style="display:none;" />
         </div>
       </div>
@@ -813,7 +814,7 @@
         <h3>🗂️ 已移除項目歷史紀錄（removed_history）</h3>
         <p class="muted-note">雲端底稿移除但本機曾有欄位修改的活動會保留在此，供查閱或一鍵清空。</p>
         <div style="margin-bottom:8px;">
-          <button id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
+          <button type="button" id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
         </div>
         <div id="removedHistoryList"></div>
       </div>
@@ -856,10 +857,10 @@
   </div>
 
   <nav class="bottom-nav">
-    <button class="active" data-tab="tab-schedule">🍁 每日行程</button>
-    <button data-tab="tab-pocket">🎒 備選口袋</button>
-    <button data-tab="tab-meta">🏨 住宿航班</button>
-    <button data-tab="tab-settings">⚙️ 設定備份</button>
+    <button type="button" class="active" data-tab="tab-schedule">🍁 每日行程</button>
+    <button type="button" data-tab="tab-pocket">🎒 備選口袋</button>
+    <button type="button" data-tab="tab-meta">🏨 住宿航班</button>
+    <button type="button" data-tab="tab-settings">⚙️ 設定備份</button>
   </nav>
 
   <script src="./idbStore.js"></script>
@@ -880,6 +881,8 @@
         DEFAULT_START_TIME: 'trip_pwa_default_start_time'
       };
 
+      const FALLBACK_DEFAULT_START = '07:30';
+
       const FIELD_LABELS_ZH = {
         dwell_min: '停留',
         travel_min: '交通',
@@ -895,10 +898,48 @@
         'cafe', 'shop', 'onsen', 'hotel'
       ];
 
-      // 確保預設每日出發時間初始化即有明確值 '07:30'
-      if (!localStorage.getItem(PREF_KEYS.DEFAULT_START_TIME)) {
-        localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, TripScheduleEngine.DEFAULT_START_TIME);
+      function showBanner(type, text) {
+        const el = document.getElementById('globalBanner');
+        if (!el) return;
+        el.className = 'banner show ' + (type || 'info');
+        el.textContent = text;
       }
+
+      // 全域未捕捉錯誤提示，避免腳本静默中斷讓人無從排查
+      window.addEventListener('error', (ev) => {
+        const msg = ev && ev.message ? ev.message : '未知腳本錯誤';
+        showBanner('err', '⚠️ 頁面腳本發生異常：' + msg + '（請確認三個檔案皆已更新並重新整理）');
+      });
+
+      window.addEventListener('unhandledrejection', (ev) => {
+        const reason = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : '非同步操作失敗';
+        showBanner('err', '⚠️ 操作執行失敗：' + reason);
+      });
+
+      // 安全讀取設定與核心模組，避免舊快取殘留導致啟動中斷
+      function safeGetDefaultStartTime() {
+        try {
+          if (typeof TripScheduleEngine !== 'undefined' &&
+              typeof TripScheduleEngine.getConfiguredDefaultStartTime === 'function') {
+            return TripScheduleEngine.getConfiguredDefaultStartTime();
+          }
+        } catch (e) {}
+        const saved = String(localStorage.getItem(PREF_KEYS.DEFAULT_START_TIME) || '').trim();
+        return /^([01]\d|2[0-3]):([0-5]\d)$/.test(saved) ? saved : FALLBACK_DEFAULT_START;
+      }
+
+      function safeIsValidHHMM(val) {
+        return /^([01]\d|2[0-3]):([0-5]\d)$/.test(String(val || '').trim());
+      }
+
+      try {
+        if (!localStorage.getItem(PREF_KEYS.DEFAULT_START_TIME)) {
+          const initDef = (typeof TripScheduleEngine !== 'undefined' && TripScheduleEngine.DEFAULT_START_TIME)
+            ? TripScheduleEngine.DEFAULT_START_TIME
+            : FALLBACK_DEFAULT_START;
+          localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, initDef);
+        }
+      } catch (e) {}
 
       function formatOverriddenFieldsZh(fields) {
         if (!Array.isArray(fields) || fields.length === 0) return '';
@@ -915,23 +956,36 @@
       }
 
       function getOrCreateDeviceId() {
-        let id = String(localStorage.getItem(PREF_KEYS.DEVICE_ID) || '').trim();
-        if (!id) {
-          id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
-            ? crypto.randomUUID()
-            : ('dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
-          localStorage.setItem(PREF_KEYS.DEVICE_ID, id);
+        let id = '';
+        try {
+          id = String(localStorage.getItem(PREF_KEYS.DEVICE_ID) || '').trim();
+          if (!id) {
+            id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+              ? crypto.randomUUID()
+              : ('dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
+            localStorage.setItem(PREF_KEYS.DEVICE_ID, id);
+          }
+        } catch (e) {
+          id = 'dev-fallback-' + Date.now().toString(36);
         }
         return id;
       }
 
       function getCurrentRole() {
-        return localStorage.getItem(PREF_KEYS.ROLE) === 'host' ? 'host' : 'family';
+        try {
+          return localStorage.getItem(PREF_KEYS.ROLE) === 'host' ? 'host' : 'family';
+        } catch (e) {
+          return 'family';
+        }
       }
 
       function getStoredReadToken() {
-        const t = String(localStorage.getItem(PREF_KEYS.READ_TOKEN) || '').trim();
-        return t || String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
+        try {
+          const t = String(localStorage.getItem(PREF_KEYS.READ_TOKEN) || '').trim();
+          return t || String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
+        } catch (e) {
+          return '';
+        }
       }
 
       function buildSyncContextOptions() {
@@ -981,7 +1035,9 @@
 
       function updateLiveSyncIndicators() {
         const role = getCurrentRole();
-        const liveMeta = TripSyncService.getLiveSyncMeta();
+        const liveMeta = (typeof TripSyncService !== 'undefined' && TripSyncService.getLiveSyncMeta)
+          ? TripSyncService.getLiveSyncMeta()
+          : { hasUnpublished: false };
         const btnPublish = document.getElementById('btnPublishLive');
         const dirtyDot = document.getElementById('unpublishedDot');
 
@@ -995,12 +1051,14 @@
 
       function handleLocalDataChanged() {
         const ctx = buildSyncContextOptions();
-        TripSyncService.notifyLocalChange(ctx);
+        if (typeof TripSyncService !== 'undefined' && TripSyncService.notifyLocalChange) {
+          TripSyncService.notifyLocalChange(ctx);
+        }
         updateLiveSyncIndicators();
       }
 
       async function handlePublishResult(res) {
-        if (res && res.ok) {
+        if (res && res.ok && typeof TripSyncService !== 'undefined') {
           TripSyncService.saveLiveSyncMeta({ hasUnpublished: false });
         }
         updateLiveSyncIndicators();
@@ -1137,12 +1195,6 @@
       let quoteIndex = 0;
       let copyTargetAnchorId = 'TOP';
 
-      function showBanner(type, text) {
-        const el = document.getElementById('globalBanner');
-        el.className = 'banner show ' + (type || 'info');
-        el.textContent = text;
-      }
-
       function escapeHtml(str) {
         return String(str === null || str === undefined ? '' : str)
           .replace(/&/g, '&amp;')
@@ -1153,6 +1205,7 @@
 
       function updateNetworkBadge() {
         const badge = document.getElementById('netBadge');
+        if (!badge) return;
         const online = navigator.onLine;
         badge.textContent = online ? '🟢 線上' : '🟠 離線';
         badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.72)';
@@ -1312,51 +1365,65 @@
       }
 
       function loadPrefsToInputs() {
-        const devId = getOrCreateDeviceId();
-        document.getElementById('defaultStartTimeInput').value = TripScheduleEngine.getConfiguredDefaultStartTime();
-        document.getElementById('roleSelect').value = getCurrentRole();
-        document.getElementById('deviceNameInput').value = localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '';
-        document.getElementById('deviceIdHint').textContent = '本機固定識別碼：' + devId;
-        document.getElementById('apiUrlInput').value = localStorage.getItem(PREF_KEYS.API_URL) || '';
-        document.getElementById('readTokenInput').value = getStoredReadToken();
-        document.getElementById('publishTokenInput').value = localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '';
+        try {
+          const devId = getOrCreateDeviceId();
+          const defInput = document.getElementById('defaultStartTimeInput');
+          if (defInput) defInput.value = safeGetDefaultStartTime();
+          const roleSel = document.getElementById('roleSelect');
+          if (roleSel) roleSel.value = getCurrentRole();
+          const devNameInput = document.getElementById('deviceNameInput');
+          if (devNameInput) devNameInput.value = localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '';
+          const devHint = document.getElementById('deviceIdHint');
+          if (devHint) devHint.textContent = '本機固定識別碼：' + devId;
+          const apiInput = document.getElementById('apiUrlInput');
+          if (apiInput) apiInput.value = localStorage.getItem(PREF_KEYS.API_URL) || '';
+          const readInput = document.getElementById('readTokenInput');
+          if (readInput) readInput.value = getStoredReadToken();
+          const pubInput = document.getElementById('publishTokenInput');
+          if (pubInput) pubInput.value = localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '';
+        } catch (err) {
+          showBanner('err', '讀取本機設定失敗：' + (err && err.message ? err.message : String(err)));
+        }
       }
 
       function savePrefsFromInputs() {
-        const rawDefaultStart = document.getElementById('defaultStartTimeInput').value.trim();
-        const defaultStart = (TripScheduleEngine.timeToMinutes(rawDefaultStart) !== null)
-          ? rawDefaultStart
-          : TripScheduleEngine.DEFAULT_START_TIME;
-        document.getElementById('defaultStartTimeInput').value = defaultStart;
-        localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, defaultStart);
+        try {
+          const rawDefaultStart = (document.getElementById('defaultStartTimeInput').value || '').trim();
+          const defaultStart = safeIsValidHHMM(rawDefaultStart) ? rawDefaultStart : FALLBACK_DEFAULT_START;
+          document.getElementById('defaultStartTimeInput').value = defaultStart;
+          localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, defaultStart);
 
-        const role = document.getElementById('roleSelect').value === 'host' ? 'host' : 'family';
-        const deviceName = document.getElementById('deviceNameInput').value.trim();
-        const url = document.getElementById('apiUrlInput').value.trim();
-        const readToken = document.getElementById('readTokenInput').value.trim();
-        const publishToken = document.getElementById('publishTokenInput').value.trim();
+          const role = document.getElementById('roleSelect').value === 'host' ? 'host' : 'family';
+          const deviceName = (document.getElementById('deviceNameInput').value || '').trim();
+          const url = (document.getElementById('apiUrlInput').value || '').trim();
+          const readToken = (document.getElementById('readTokenInput').value || '').trim();
+          const publishToken = (document.getElementById('publishTokenInput').value || '').trim();
 
-        if (role === 'host' && !deviceName) {
-          showBanner('err', '切換為「主控模式」時，請務必填寫裝置顯示名稱（例如：啟明手機 或 心怡手機）');
-          document.getElementById('deviceNameInput').focus();
+          if (role === 'host' && !deviceName) {
+            showBanner('err', '切換為「主控模式」時，請務必填寫裝置顯示名稱（例如：啟明手機 或 心怡手機）');
+            document.getElementById('deviceNameInput').focus();
+            return false;
+          }
+
+          getOrCreateDeviceId();
+          document.getElementById('deviceNameInput').value = deviceName;
+          localStorage.setItem(PREF_KEYS.ROLE, role);
+          localStorage.setItem(PREF_KEYS.DEVICE_NAME, deviceName);
+          localStorage.setItem(PREF_KEYS.API_URL, url);
+          localStorage.setItem(PREF_KEYS.READ_TOKEN, readToken);
+          localStorage.setItem(PREF_KEYS.PUBLISH_TOKEN, publishToken);
+
+          updateLiveSyncIndicators();
+          renderHeaderAndDates().catch(() => {});
+          renderScheduleTab().catch(() => {});
+          showBanner('ok', role === 'host'
+            ? `已儲存設定（主控模式｜裝置：${deviceName}｜預設出發 ${defaultStart}）`
+            : `已儲存設定（瀏覽模式｜預設出發 ${defaultStart}）`);
+          return true;
+        } catch (err) {
+          showBanner('err', '儲存設定失敗（請確認瀏覽器未封鎖本機儲存）：' + (err && err.message ? err.message : String(err)));
           return false;
         }
-
-        getOrCreateDeviceId();
-        document.getElementById('deviceNameInput').value = deviceName;
-        localStorage.setItem(PREF_KEYS.ROLE, role);
-        localStorage.setItem(PREF_KEYS.DEVICE_NAME, deviceName);
-        localStorage.setItem(PREF_KEYS.API_URL, url);
-        localStorage.setItem(PREF_KEYS.READ_TOKEN, readToken);
-        localStorage.setItem(PREF_KEYS.PUBLISH_TOKEN, publishToken);
-
-        updateLiveSyncIndicators();
-        renderHeaderAndDates();
-        renderScheduleTab();
-        showBanner('ok', role === 'host'
-          ? `已儲存設定（主控模式｜裝置：${deviceName}｜預設出發 ${defaultStart}）`
-          : `已儲存設定（瀏覽模式｜預設出發 ${defaultStart}）`);
-        return true;
       }
 
       function enumerateDates(startIso, endIso, itinerary) {
@@ -1384,10 +1451,19 @@
       }
 
       async function renderHeaderAndDates() {
-        const baseline = await TripIdbStore.getBaseline();
         const metaBar = document.getElementById('syncMetaBar');
         const dateSel = document.getElementById('dateSelect');
-        const liveMeta = TripSyncService.getLiveSyncMeta();
+        if (!metaBar || !dateSel) return null;
+
+        if (typeof TripIdbStore === 'undefined') {
+          metaBar.innerHTML = '<div>儲存模組尚未載入，請重新整理網頁</div>';
+          return null;
+        }
+
+        const baseline = await TripIdbStore.getBaseline();
+        const liveMeta = (typeof TripSyncService !== 'undefined' && TripSyncService.getLiveSyncMeta)
+          ? TripSyncService.getLiveSyncMeta()
+          : { revision: 0, hasUnpublished: false };
         const role = getCurrentRole();
         const myDeviceId = getOrCreateDeviceId();
 
@@ -1445,11 +1521,21 @@
         const btnW = document.getElementById('btnToggleWeather');
         const btnS = document.getElementById('btnToggleStop');
         const dayStartInput = document.getElementById('dayStartInput');
+        if (!listEl || !statsEl) return;
+
+        if (dayStartInput && !dayStartInput.value) {
+          dayStartInput.value = safeGetDefaultStartTime();
+        }
 
         if (!currentDate) {
           statsEl.innerHTML = '';
           syncMascotWithSchedule(null, false);
           listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，請先切換至下方「設定備份」輸入網址與 Token 並執行同步。</div>';
+          return;
+        }
+
+        if (typeof TripScheduleEngine === 'undefined' || typeof TripScheduleEngine.buildDaySchedule !== 'function') {
+          listEl.innerHTML = '<div class="empty-state">排程引擎尚未載入，請重新整理網頁。</div>';
           return;
         }
 
@@ -1464,7 +1550,7 @@
         }
 
         if (dayStartInput) {
-          dayStartInput.value = sched.dayStartOverride || sched.effectiveStartTime || TripScheduleEngine.getConfiguredDefaultStartTime();
+          dayStartInput.value = sched.dayStartOverride || sched.effectiveStartTime || safeGetDefaultStartTime();
         }
 
         btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
@@ -1525,17 +1611,17 @@
 
           let actionButtons = '';
           if (it.status === 'pending') {
-            actionButtons += `<button class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>`;
-            actionButtons += `<button class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>`;
           } else {
-            actionButtons += `<button class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'pending')">↩️ 改待執行</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'pending')">↩️ 改待執行</button>`;
           }
           if (isBaseline) {
-            actionButtons += `<button class="btn-sm btn-ghost" onclick="window.__app.onToggleEdit('${actKey}')">編輯／還原</button>`;
-            actionButtons += `<button class="btn-sm btn-ghost" onclick="window.__app.onOpenCopyModal('${actKey}')">📋 複製加點</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-ghost" onclick="window.__app.onToggleEdit('${actKey}')">編輯／還原</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-ghost" onclick="window.__app.onOpenCopyModal('${actKey}')">📋 複製加點</button>`;
           }
           if (it._sourceType === 'inserted') {
-            actionButtons += `<button class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>`;
+            actionButtons += `<button type="button" class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>`;
           }
 
           return `
@@ -1569,28 +1655,28 @@
                       <label>停留分鐘</label>
                       <div class="field-row-inline">
                         <input type="number" min="0" id="f-dwell-${escapeHtml(it.activity_id)}" value="${it.dwell_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'dwell_min')">還原</button>
+                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'dwell_min')">還原</button>
                       </div>
                     </div>
                     <div class="field-box">
                       <label>交通分鐘</label>
                       <div class="field-row-inline">
                         <input type="number" min="0" id="f-travel-${escapeHtml(it.activity_id)}" value="${it.travel_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'travel_min')">還原</button>
+                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'travel_min')">還原</button>
                       </div>
                     </div>
                     <div class="field-box">
                       <label>交通緩衝</label>
                       <div class="field-row-inline">
                         <input type="number" min="0" id="f-buffer-${escapeHtml(it.activity_id)}" value="${it.buffer_min}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'buffer_min')">還原</button>
+                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'buffer_min')">還原</button>
                       </div>
                     </div>
                     <div class="field-box">
                       <label>交通方式</label>
                       <div class="field-row-inline">
                         <input type="text" id="f-trans-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.transport_mode || '')}" />
-                        <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'transport_mode')">還原</button>
+                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'transport_mode')">還原</button>
                       </div>
                     </div>
                   </div>
@@ -1598,10 +1684,10 @@
                     <label>隨手備註</label>
                     <div class="field-row-inline">
                       <input type="text" id="f-note-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.note || '')}" />
-                      <button class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'note')">還原</button>
+                      <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'note')">還原</button>
                     </div>
                   </div>
-                  <button class="btn-sm btn-primary" onclick="window.__app.onSaveOverride('${actKey}')">儲存本機微調</button>
+                  <button type="button" class="btn-sm btn-primary" onclick="window.__app.onSaveOverride('${actKey}')">儲存本機微調</button>
                 </div>
               ` : ''}
             </article>
@@ -1626,6 +1712,8 @@
       async function renderPocketTab() {
         const anchorSel = document.getElementById('insertAnchorSelect');
         const listEl = document.getElementById('pocketList');
+        if (!anchorSel || !listEl || typeof TripIdbStore === 'undefined') return;
+
         const baseline = await TripIdbStore.getBaseline();
 
         if (!currentDate) {
@@ -1665,7 +1753,7 @@
                 ${sp.address_jp ? `<div class="item-addr">📍 ${escapeHtml(sp.address_jp)}</div>` : ''}
                 ${sp.note ? `<div class="note-soft">📝 ${escapeHtml(sp.note)}</div>` : ''}
               </div>
-              <button class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">＋ 插入本日</button>
+              <button type="button" class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">＋ 插入本日</button>
             </div>
           </div>
         `).join('');
@@ -1673,6 +1761,7 @@
 
       async function renderMetaTab() {
         const listEl = document.getElementById('metaList');
+        if (!listEl || typeof TripIdbStore === 'undefined') return;
         const baseline = await TripIdbStore.getBaseline();
         const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
 
@@ -1694,6 +1783,7 @@
 
       async function renderRemovedHistory() {
         const el = document.getElementById('removedHistoryList');
+        if (!el || typeof TripIdbStore === 'undefined') return;
         const list = await TripIdbStore.getRemovedHistory();
         if (!list || list.length === 0) {
           el.innerHTML = '<div class="muted-note">目前沒有已移除項目歷史紀錄。</div>';
@@ -1710,11 +1800,15 @@
 
       async function refreshAll() {
         updateNetworkBadge();
-        await renderHeaderAndDates();
-        await renderScheduleTab();
-        await renderPocketTab();
-        await renderMetaTab();
-        await renderRemovedHistory();
+        try {
+          await renderHeaderAndDates();
+          await renderScheduleTab();
+          await renderPocketTab();
+          await renderMetaTab();
+          await renderRemovedHistory();
+        } catch (err) {
+          showBanner('err', '讀取行程資料失敗：' + (err && err.message ? err.message : String(err)));
+        }
       }
 
       window.__app = {
@@ -1844,7 +1938,7 @@
         const target = document.getElementById(targetId);
         if (target) target.classList.add('active');
         if (persist) {
-          localStorage.setItem(PREF_KEYS.ACTIVE_TAB, targetId);
+          try { localStorage.setItem(PREF_KEYS.ACTIVE_TAB, targetId); } catch (e) {}
         }
       }
 
@@ -1854,14 +1948,14 @@
 
       document.getElementById('dateSelect').addEventListener('change', async (e) => {
         currentDate = e.target.value;
-        localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate);
+        try { localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate); } catch (err) {}
         await renderScheduleTab();
         await renderPocketTab();
       });
 
       document.getElementById('dayStartInput').addEventListener('change', async (e) => {
         if (!currentDate) return;
-        const val = e.target.value.trim();
+        const val = (e.target.value || '').trim();
         if (!val) return;
         try {
           await TripScheduleEngine.setDayStartTimeOverride(currentDate, val);
@@ -1877,7 +1971,7 @@
         if (!currentDate) return;
         await TripScheduleEngine.setDayStartTimeOverride(currentDate, '');
         handleLocalDataChanged();
-        const defTime = TripScheduleEngine.getConfiguredDefaultStartTime();
+        const defTime = safeGetDefaultStartTime();
         showBanner('info', `已清除當日臨時出發時間，恢復預設 ${defTime} 起算`);
         await renderScheduleTab();
       });
@@ -2018,4 +2112,4 @@
     })();
   </script>
 </body>
-</html>
+  </html>
