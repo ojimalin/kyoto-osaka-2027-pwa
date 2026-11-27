@@ -1,10 +1,16 @@
 /**
- * sw.js
- * Service Worker：快取 PWA 靜態外殼，確保離線時可正常開啟並讀取 IndexedDB；
- * 絕不快取帶有 ?token= 的 GAS API 同步請求。
+ * ============================================================================
+ * 檔案名稱：sw.js
+ * 整體程式說明：
+ *   Service Worker 離線快取管理模組，負責：
+ *   1. 在 install 階段快取 PWA 靜態外殼（HTML / manifest / JS 模組），確保離線可啟動。
+ *   2. 在 activate 階段清除舊版快取（如 v1.0.0），讓 GitHub Pages 部署新版後即時生效。
+ *   3. 在 fetch 階段放行所有 GAS Web App（script.google.com）及含 token 參數之同步請求，
+ *      絕不快取動態 API 回應。
+ * ============================================================================
  */
 
-const CACHE_VERSION = 'trip-pwa-shell-v1.0.0';
+const CACHE_VERSION = 'trip-pwa-shell-v1.1.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -14,6 +20,9 @@ const STATIC_ASSETS = [
   './scheduleEngine.js'
 ];
 
+/**
+ * 安裝階段：預先快取靜態外殼檔案並立即接管。
+ */
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
@@ -22,6 +31,9 @@ self.addEventListener('install', (event) => {
   );
 });
 
+/**
+ * 啟用階段：刪除不屬於目前 CACHE_VERSION 的舊快取並接管所有開啟分頁。
+ */
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
@@ -34,13 +46,17 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+/**
+ * 請求攔截：放行非 GET 請求與 GAS 同步端點；靜態資源採 Cache-First 並提供離線回退。
+ */
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
   const urlStr = req.url || '';
-  // GAS Web App 同步端點一律走網路，不寫入靜態 Cache
-  if (urlStr.indexOf('script.google.com') !== -1 || urlStr.indexOf('token=') !== -1) {
+  if (urlStr.indexOf('script.google.com') !== -1 ||
+      urlStr.indexOf('token=') !== -1 ||
+      urlStr.indexOf('read_token=') !== -1) {
     return;
   }
 
