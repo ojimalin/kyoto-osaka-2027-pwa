@@ -101,7 +101,7 @@
       line-height: 1.6;
       box-shadow: 0 6px 18px rgba(62, 47, 38, 0.18);
       text-align: left;
-      max-width: 280px;
+      max-width: 290px;
     }
     .sync-popover.open { display: block; }
 
@@ -156,6 +156,53 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 7px;
+    }
+
+    .live-sync-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 6px 9px;
+      background: #faf1e4;
+      border: 1px dashed var(--dash);
+      border-radius: 12px;
+      font-size: 11.5px;
+    }
+
+    .live-host-info {
+      color: var(--text);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .role-pill {
+      font-size: 10.5px;
+      padding: 1.5px 7px;
+      border-radius: 999px;
+      background: #e7f6ec;
+      color: var(--ok);
+      border: 1px solid #96dfb0;
+    }
+    .role-pill.family {
+      background: #eef2ff;
+      color: #3730a3;
+      border-color: #c7d2fe;
+    }
+
+    .dirty-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #dc2626;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.22);
+      margin-right: 4px;
+      vertical-align: middle;
     }
 
     .mascot-stage {
@@ -222,7 +269,7 @@
       border-left: 1.5px dashed var(--dash);
     }
 
-    select, input[type="text"], input[type="number"], textarea {
+    select, input[type="text"], input[type="password"], input[type="number"], textarea {
       font-family: inherit;
       font-size: 13.5px;
       padding: 6px 10px;
@@ -245,6 +292,7 @@
       transition: transform 0.12s ease;
     }
     button:active { transform: scale(0.96); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
     button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); }
     button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
     button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); }
@@ -503,6 +551,68 @@
       margin: 4px 0 8px 0;
     }
 
+    .form-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .form-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .device-id-hint {
+      font-size: 11px;
+      color: var(--muted);
+      background: #faf1e4;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    /* 主控交接確認對話框 */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(43, 30, 22, 0.52);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 400px;
+      width: 100%;
+      padding: 16px;
+      box-shadow: 0 12px 32px rgba(43, 30, 22, 0.25);
+    }
+    .modal-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: var(--primary);
+    }
+    .modal-card p {
+      margin: 0 0 12px 0;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
     .tab-page { display: none; }
     .tab-page.active { display: block; }
 
@@ -553,7 +663,7 @@
   <header class="topbar" style="position:relative;">
     <div class="topbar-row">
       <h1 class="topbar-title">🍁 家庭旅遊離線電子手帳</h1>
-      <button type="button" id="netBadge" class="badge-net" title="點我看底稿版本與同步時間">檢查中</button>
+      <button type="button" id="netBadge" class="badge-net" title="點我看底稿版本與共享同步狀態">檢查中</button>
     </div>
     <div id="syncMetaBar" class="sync-popover">
       <div>尚未同步雲端底稿</div>
@@ -601,6 +711,18 @@
             <div id="mascotBubble" class="mascot-bubble">啾！點我跳下一站</div>
           </div>
         </div>
+
+        <!-- 家庭共享進度同步列（主控發布 / 家人拉取 / 雲端主控者狀態） -->
+        <div class="live-sync-strip">
+          <div id="liveHostStatus" class="live-host-info">雲端主控：尚未同步</div>
+          <div class="controls-line">
+            <button type="button" id="btnPublishLive" class="btn-sm btn-primary" style="display:none;">
+              <span id="unpublishedDot" class="dirty-dot" style="display:none;"></span>☁️ 發布進度
+            </button>
+            <button type="button" id="btnPullLive" class="btn-sm btn-ok">🔄 拉取進度</button>
+          </div>
+        </div>
+
         <div id="dayStats" class="stats-bar"></div>
       </div>
 
@@ -628,15 +750,40 @@
     <!-- 分頁 4：設定、資料管理與備份 -->
     <section id="tab-settings" class="tab-page">
       <div class="section-card">
-        <h3>☁️ 雲端同步設定（單向：雲端 → 手機）</h3>
-        <p class="muted-note">輸入 GAS Web App <code>/exec</code> 網址與 <code>API_TOKEN</code> 後，可手動同步最新底稿；離線或同步失敗時保留既有本機底稿不動。</p>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
-          <input id="apiUrlInput" type="text" placeholder="GAS Web App 網址（https://script.google.com/macros/s/.../exec）" />
-          <input id="apiTokenInput" type="text" placeholder="API_TOKEN" />
+        <h3>📱 本機角色與雲端同步設定</h3>
+        <p class="muted-note">
+          - <strong>主控模式</strong>：負責在旅途中勾選完成、微調時間或插入備選景點，修改後 10 秒自動發布（亦可手動立即發布）。<br />
+          - <strong>瀏覽模式</strong>：家人手機預設模式，僅顯示「拉取進度」按鈕，避免誤發覆蓋主控進度；必要時可隨時切為主控接手。
+        </p>
+        <div class="form-stack">
+          <div class="form-field">
+            <label for="roleSelect">操作模式</label>
+            <select id="roleSelect">
+              <option value="family">👀 瀏覽模式（家人端拉取進度）</option>
+              <option value="host">🧭 主控模式（發布進度給家人）</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="deviceNameInput">裝置顯示名稱（切換為主控模式時必填）</label>
+            <input id="deviceNameInput" type="text" maxlength="40" placeholder="例如：啟明手機 或 心怡手機" />
+            <div id="deviceIdHint" class="device-id-hint">本機固定識別碼：讀取中...</div>
+          </div>
+          <div class="form-field">
+            <label for="apiUrlInput">GAS Web App 網址</label>
+            <input id="apiUrlInput" type="text" placeholder="https://script.google.com/macros/s/.../exec" />
+          </div>
+          <div class="form-field">
+            <label for="readTokenInput">讀取權杖（READ_TOKEN，所有手機皆需填寫）</label>
+            <input id="readTokenInput" type="password" placeholder="貼上 GAS 產生的 READ_TOKEN" />
+          </div>
+          <div class="form-field">
+            <label for="publishTokenInput">發布權杖（PUBLISH_TOKEN，僅主控／臨時接手手機填寫）</label>
+            <input id="publishTokenInput" type="password" placeholder="貼上 GAS 產生的 PUBLISH_TOKEN" />
+          </div>
         </div>
         <div class="controls-line">
-          <button id="btnSaveConfig" class="btn-primary">儲存連線設定</button>
-          <button id="btnSyncNow" class="btn-ok">立即同步雲端底稿</button>
+          <button id="btnSaveConfig" class="btn-primary">儲存連線與角色設定</button>
+          <button id="btnSyncNow" class="btn-ok">同步雲端底稿（Sheets → 手機）</button>
         </div>
       </div>
 
@@ -644,7 +791,7 @@
         <h3>🧹 行程資料管理</h3>
         <p class="muted-note">
           - <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
-          - 若需取得雲端最新版本，請先按「立即同步雲端底稿」，再執行全部還原。
+          - 若需取得雲端最新版本，請先按「同步雲端底稿」，再執行全部還原。
         </p>
         <button id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
       </div>
@@ -670,6 +817,19 @@
     </section>
   </main>
 
+  <!-- 主控交接確認視窗（當雲端上一版由不同裝置發布時彈出） -->
+  <div id="takeoverModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="takeoverModalTitle">
+    <div class="modal-card">
+      <h4 id="takeoverModalTitle">⚠️ 目前雲端主控為其他手機</h4>
+      <p id="takeoverModalBody">確定要切換為本機主控並發布嗎？</p>
+      <div class="modal-actions">
+        <button type="button" id="btnConfirmTakeover" class="btn-primary">確定接手為主控並發布</button>
+        <button type="button" id="btnCancelTakeoverSwitchFamily" class="btn-warn">取消，並將本機切回「瀏覽模式」</button>
+        <button type="button" id="btnCancelTakeoverKeep" class="btn-muted">暫不發布（保留本機修改）</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
     <button class="active" data-tab="tab-schedule">🍁 每日行程</button>
     <button data-tab="tab-pocket">🎒 備選口袋</button>
@@ -681,10 +841,26 @@
   <script src="./syncService.js"></script>
   <script src="./scheduleEngine.js"></script>
   <script>
+    /**
+     * ============================================================================
+     * 前端主控制腳本（index.html 內嵌模組）
+     * 整體功能說明：
+     *   1. 管理本機裝置固定識別碼（deviceId）、裝置顯示名稱（deviceName）、操作模式（host / family）
+     *      與雙 Token（READ_TOKEN / PUBLISH_TOKEN）之儲存與安全驗證。
+     *   2. 渲染每日行程、備選口袋、住宿航班、設定備份四個分頁，所有動態文字均經 escapeHtml() 跳脫。
+     *   3. 串接 TripSyncService：主控端修改行程後自動標記未發布紅點並觸發 10 秒延遲自動發布；
+     *      遇 HOST_MISMATCH 時彈出主控交接視窗供確認接手或一鍵切回瀏覽模式。
+     * ============================================================================
+     */
     (() => {
       const PREF_KEYS = {
         API_URL: 'trip_pwa_api_url',
-        API_TOKEN: 'trip_pwa_api_token',
+        READ_TOKEN: 'trip_pwa_read_token',
+        PUBLISH_TOKEN: 'trip_pwa_publish_token',
+        LEGACY_API_TOKEN: 'trip_pwa_api_token',
+        ROLE: 'trip_pwa_role',
+        DEVICE_ID: 'trip_pwa_device_id',
+        DEVICE_NAME: 'trip_pwa_device_name',
         ACTIVE_TAB: 'trip_pwa_active_tab',
         SELECTED_DATE: 'trip_pwa_selected_date'
       };
@@ -694,6 +870,167 @@
         'shrine', 'nature', 'museum', 'meal',
         'cafe', 'shop', 'onsen', 'hotel'
       ];
+
+      /**
+       * 取得或初次產生並永久保存本機唯一識別碼（deviceId）。
+       * @return {string}
+       */
+      function getOrCreateDeviceId() {
+        let id = String(localStorage.getItem(PREF_KEYS.DEVICE_ID) || '').trim();
+        if (!id) {
+          const rand = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+            ? crypto.randomUUID()
+            : ('dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
+          id = rand;
+          localStorage.setItem(PREF_KEYS.DEVICE_ID, id);
+        }
+        return id;
+      }
+
+      /**
+       * 讀取目前本機的操作模式（'host' 或 'family'，預設 'family'）。
+       * @return {string}
+       */
+      function getCurrentRole() {
+        const r = localStorage.getItem(PREF_KEYS.ROLE);
+        return r === 'host' ? 'host' : 'family';
+      }
+
+      /**
+       * 讀取 READ_TOKEN（向下相容舊 trip_pwa_api_token）。
+       * @return {string}
+       */
+      function getStoredReadToken() {
+        const t = String(localStorage.getItem(PREF_KEYS.READ_TOKEN) || '').trim();
+        if (t) return t;
+        return String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
+      }
+
+      /**
+       * 組合傳給 TripSyncService 的完整連線與裝置設定物件。
+       * @return {Object}
+       */
+      function buildSyncContextOptions() {
+        return {
+          endpointUrl: String(localStorage.getItem(PREF_KEYS.API_URL) || '').trim(),
+          token: getStoredReadToken(),
+          publishToken: String(localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '').trim(),
+          role: getCurrentRole(),
+          deviceId: getOrCreateDeviceId(),
+          deviceName: String(localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '').trim(),
+          onHostMismatch: promptHostTakeoverModal
+        };
+      }
+
+      /**
+       * 顯示主控交接確認視窗，回傳使用者選擇：'takeover' | 'switch_family' | 'cancel'。
+       * @param {Object} info
+       * @return {Promise<string>}
+       */
+      function promptHostTakeoverModal(info) {
+        return new Promise((resolve) => {
+          const modal = document.getElementById('takeoverModal');
+          const bodyEl = document.getElementById('takeoverModalBody');
+          const btnConfirm = document.getElementById('btnConfirmTakeover');
+          const btnSwitchFamily = document.getElementById('btnCancelTakeoverSwitchFamily');
+          const btnKeep = document.getElementById('btnCancelTakeoverKeep');
+
+          const ownerName = (info && info.publishedByName) ? info.publishedByName : '其他手機';
+          const rev = (info && info.serverRevision !== undefined) ? info.serverRevision : '?';
+          const myName = (info && info.currentDeviceName) ? info.currentDeviceName : '本機';
+          const timeHint = (info && info.publishedAt) ? `（更新時間：${info.publishedAt}）` : '';
+
+          bodyEl.textContent =
+            `目前雲端主控為「${ownerName}」（進度 v${rev}）${timeHint}。` +
+            `確定要將主控權改為「${myName}」並發布為 v${Number(rev) + 1} 嗎？`;
+
+          const cleanup = (result) => {
+            modal.classList.remove('open');
+            btnConfirm.onclick = null;
+            btnSwitchFamily.onclick = null;
+            btnKeep.onclick = null;
+            resolve(result);
+          };
+
+          btnConfirm.onclick = () => cleanup('takeover');
+          btnSwitchFamily.onclick = () => cleanup('switch_family');
+          btnKeep.onclick = () => cleanup('cancel');
+          modal.classList.add('open');
+        });
+      }
+
+      /**
+       * 更新頂部與行程頁的「雲端主控者、版號、角色徽章與未發布紅點」顯示。
+       */
+      function updateLiveSyncIndicators() {
+        const role = getCurrentRole();
+        const myDeviceId = getOrCreateDeviceId();
+        const liveMeta = TripSyncService.getLiveSyncMeta();
+
+        const hostStatusEl = document.getElementById('liveHostStatus');
+        const btnPublish = document.getElementById('btnPublishLive');
+        const dirtyDot = document.getElementById('unpublishedDot');
+
+        if (btnPublish) {
+          btnPublish.style.display = (role === 'host') ? 'inline-flex' : 'none';
+        }
+        if (dirtyDot) {
+          dirtyDot.style.display = liveMeta.hasUnpublished ? 'inline-block' : 'none';
+        }
+
+        if (hostStatusEl) {
+          const roleBadgeHtml = role === 'host'
+            ? '<span class="role-pill">🧭 主控模式</span>'
+            : '<span class="role-pill family">👀 瀏覽模式</span>';
+
+          let hostText = '雲端進度：尚未發布';
+          if (liveMeta.revision > 0) {
+            const isMe = liveMeta.publishedByDeviceId && liveMeta.publishedByDeviceId === myDeviceId;
+            const ownerLabel = (liveMeta.publishedByName || '主控端') + (isMe ? '（本機）' : '');
+            hostText = `主控：${escapeHtml(ownerLabel)} (v${liveMeta.revision})`;
+          }
+
+          const dirtyLabel = liveMeta.hasUnpublished
+            ? ' <span style="color:#b91c1c;">• 待發布</span>'
+            : '';
+
+          hostStatusEl.innerHTML = `${roleBadgeHtml}<span>${hostText}</span>${dirtyLabel}`;
+        }
+      }
+
+      /**
+       * 本機發生任何行程修改或狀態變更時呼叫：
+       * 亮起未發布紅點，若為「主控模式」則啟動 10 秒延遲自動發布。
+       */
+      function handleLocalDataChanged() {
+        const ctx = buildSyncContextOptions();
+        TripSyncService.notifyLocalChange(ctx);
+        updateLiveSyncIndicators();
+      }
+
+      /**
+       * 執行手動或自動發布後的統一介面回饋處理。
+       * @param {Object} res
+       */
+      function handlePublishResult(res) {
+        updateLiveSyncIndicators();
+        if (!res) return;
+        if (res.ok) {
+          showBanner('ok', res.message);
+          renderHeaderAndDates();
+          return;
+        }
+        if (res.switchToFamily) {
+          localStorage.setItem(PREF_KEYS.ROLE, 'family');
+          loadPrefsToInputs();
+          updateLiveSyncIndicators();
+          showBanner('info', '已取消發布並將本機切回「瀏覽模式」');
+          return;
+        }
+        if (!res.silentAutoError) {
+          showBanner('warn', res.message || '尚未完成發布，變更已保留在待發布狀態');
+        }
+      }
 
       function detectSeasonLeaf(dateStr, fallbackStart) {
         const target = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr))
@@ -812,6 +1149,11 @@
         el.textContent = text;
       }
 
+      /**
+       * HTML 特殊字元安全跳脫，防止 XSS 注入。
+       * @param {*} str
+       * @return {string}
+       */
       function escapeHtml(str) {
         return String(str === null || str === undefined ? '' : str)
           .replace(/&/g, '&amp;')
@@ -988,17 +1330,50 @@
         });
       }
 
+      /**
+       * 將 localStorage 中的本機設定載入至設定頁表單。
+       */
       function loadPrefsToInputs() {
+        const devId = getOrCreateDeviceId();
+        document.getElementById('roleSelect').value = getCurrentRole();
+        document.getElementById('deviceNameInput').value = localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '';
+        document.getElementById('deviceIdHint').textContent = '本機固定識別碼：' + devId;
         document.getElementById('apiUrlInput').value = localStorage.getItem(PREF_KEYS.API_URL) || '';
-        document.getElementById('apiTokenInput').value = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
+        document.getElementById('readTokenInput').value = getStoredReadToken();
+        document.getElementById('publishTokenInput').value = localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '';
       }
 
+      /**
+       * 驗證並儲存設定頁的角色、裝置名稱、GAS 網址與雙 Token。
+       * 切換為「主控模式」時強制檢核裝置名稱必填並執行 .trim()。
+       * @return {boolean} 是否通過驗證並成功儲存。
+       */
       function savePrefsFromInputs() {
+        const role = document.getElementById('roleSelect').value === 'host' ? 'host' : 'family';
+        const deviceName = document.getElementById('deviceNameInput').value.trim();
         const url = document.getElementById('apiUrlInput').value.trim();
-        const token = document.getElementById('apiTokenInput').value.trim();
+        const readToken = document.getElementById('readTokenInput').value.trim();
+        const publishToken = document.getElementById('publishTokenInput').value.trim();
+
+        if (role === 'host' && !deviceName) {
+          showBanner('err', '切換為「主控模式」時，請務必填寫裝置顯示名稱（例如：啟明手機 或 心怡手機）');
+          document.getElementById('deviceNameInput').focus();
+          return false;
+        }
+
+        getOrCreateDeviceId();
+        document.getElementById('deviceNameInput').value = deviceName;
+        localStorage.setItem(PREF_KEYS.ROLE, role);
+        localStorage.setItem(PREF_KEYS.DEVICE_NAME, deviceName);
         localStorage.setItem(PREF_KEYS.API_URL, url);
-        localStorage.setItem(PREF_KEYS.API_TOKEN, token);
-        showBanner('ok', '已儲存 GAS 網址與 API_TOKEN 至本機');
+        localStorage.setItem(PREF_KEYS.READ_TOKEN, readToken);
+        localStorage.setItem(PREF_KEYS.PUBLISH_TOKEN, publishToken);
+
+        updateLiveSyncIndicators();
+        showBanner('ok', role === 'host'
+          ? `已儲存設定（主控模式｜裝置：${deviceName}）`
+          : '已儲存設定（瀏覽模式）');
+        return true;
       }
 
       function enumerateDates(startIso, endIso, itinerary) {
@@ -1029,6 +1404,7 @@
         const baseline = await TripIdbStore.getBaseline();
         const metaBar = document.getElementById('syncMetaBar');
         const dateSel = document.getElementById('dateSelect');
+        const liveMeta = TripSyncService.getLiveSyncMeta();
 
         if (!baseline) {
           baselineStartDate = '';
@@ -1036,6 +1412,7 @@
           metaBar.innerHTML = '<div>尚未同步雲端底稿</div>';
           dateSel.innerHTML = '<option value="">無可用日期</option>';
           currentDate = '';
+          updateLiveSyncIndicators();
           return null;
         }
 
@@ -1047,9 +1424,14 @@
         customMealReminder = mealMeta ? String(mealMeta.info_text || mealMeta.title_zh || '').slice(0, 22) : '';
 
         const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
+        const liveInfoLine = liveMeta.revision > 0
+          ? `<div>共享進度：v${liveMeta.revision}（${escapeHtml(liveMeta.publishedByName || '主控端')}）</div>`
+          : '<div>共享進度：尚未發布</div>';
+
         metaBar.innerHTML =
-          `<div>版本：${escapeHtml(m.dataVersion || '-')}</div>` +
-          `<div>同步：${escapeHtml(syncedStr)}</div>`;
+          `<div>底稿版本：${escapeHtml(m.dataVersion || '-')}</div>` +
+          `<div>底稿同步：${escapeHtml(syncedStr)}</div>` +
+          liveInfoLine;
 
         const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
         const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
@@ -1063,6 +1445,7 @@
           ? dates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('')
           : '<option value="">無日期資料</option>';
 
+        updateLiveSyncIndicators();
         return baseline;
       }
 
@@ -1319,6 +1702,7 @@
         async onSetStatus(encodedId, status) {
           const actId = decodeURIComponent(encodedId);
           await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
+          handleLocalDataChanged();
           await renderScheduleTab();
         },
         onToggleEdit(encodedId) {
@@ -1348,12 +1732,14 @@
             transport_mode: transVal,
             note: noteVal
           });
+          handleLocalDataChanged();
           showBanner('ok', '已儲存本機欄位微調');
           await renderScheduleTab();
         },
         async onResetField(encodedId, fieldName) {
           const actId = decodeURIComponent(encodedId);
           await TripScheduleEngine.resetActivityField(actId, fieldName, currentDate);
+          handleLocalDataChanged();
           showBanner('info', `已還原欄位 ${fieldName} 為雲端底稿值`);
           await renderScheduleTab();
         },
@@ -1365,6 +1751,7 @@
           if (!spot) return;
           const anchor = document.getElementById('insertAnchorSelect').value || 'TOP';
           await TripScheduleEngine.insertPocketSpot(currentDate, spot, anchor);
+          handleLocalDataChanged();
           showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate} 行程`);
           switchTab('tab-schedule');
           await renderScheduleTab();
@@ -1372,6 +1759,7 @@
         async onRemoveInserted(insertId) {
           if (!currentDate) return;
           await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
+          handleLocalDataChanged();
           showBanner('info', '已移除本機插入站點');
           await renderScheduleTab();
         }
@@ -1405,23 +1793,61 @@
       document.getElementById('btnToggleWeather').addEventListener('click', async () => {
         if (!currentDate) return;
         await TripScheduleEngine.toggleWeather(currentDate);
+        handleLocalDataChanged();
         await renderScheduleTab();
       });
 
       document.getElementById('btnToggleStop').addEventListener('click', async () => {
         if (!currentDate) return;
         await TripScheduleEngine.toggleDayStop(currentDate);
+        handleLocalDataChanged();
         await renderScheduleTab();
+      });
+
+      // 手動發布進度按鈕（主控模式）
+      document.getElementById('btnPublishLive').addEventListener('click', async () => {
+        const ctx = buildSyncContextOptions();
+        showBanner('info', '正在發布共享進度至雲端...');
+        const res = await TripSyncService.pushLiveState(Object.assign({}, ctx, {
+          isAuto: false,
+          allowHostTakeover: false
+        }));
+        handlePublishResult(res);
+      });
+
+      // 拉取最新進度按鈕（家人端與主控端皆可使用）
+      document.getElementById('btnPullLive').addEventListener('click', async () => {
+        const ctx = buildSyncContextOptions();
+        showBanner('info', '正在從雲端拉取最新共享進度...');
+        const res = await TripSyncService.pullLiveState(Object.assign({}, ctx, {
+          confirmOverwrite: async (liveState) => {
+            const owner = (liveState && liveState.publishedByName) ? liveState.publishedByName : '主控端';
+            const rev = (liveState && liveState.revision) ? liveState.revision : '?';
+            return window.confirm(
+              `本機目前有尚未發布的修改，拉取「${owner}」發布的 v${rev} 進度會覆蓋本機未發布的微調與狀態，是否確定覆蓋？`
+            );
+          }
+        }));
+        if (res.ok) {
+          showBanner('ok', res.message);
+          await refreshAll();
+        } else if (res.error === 'USER_CANCELLED') {
+          showBanner('info', res.message);
+        } else {
+          showBanner('warn', res.message);
+        }
       });
 
       document.getElementById('btnSaveConfig').addEventListener('click', savePrefsFromInputs);
 
       document.getElementById('btnSyncNow').addEventListener('click', async () => {
-        savePrefsFromInputs();
-        const url = localStorage.getItem(PREF_KEYS.API_URL) || '';
-        const token = localStorage.getItem(PREF_KEYS.API_TOKEN) || '';
+        if (!savePrefsFromInputs()) return;
+        const ctx = buildSyncContextOptions();
         showBanner('info', '正在從雲端同步底稿...');
-        const res = await TripSyncService.syncFromCloud({ endpointUrl: url, token: token });
+        const res = await TripSyncService.syncFromCloud({
+          endpointUrl: ctx.endpointUrl,
+          token: ctx.token
+        });
         if (res.ok) {
           showBanner('ok', res.message);
           await refreshAll();
@@ -1434,6 +1860,7 @@
         const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
         if (!ok) return;
         await TripScheduleEngine.restoreAllToBaseline();
+        handleLocalDataChanged();
         showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
         await refreshAll();
       });
@@ -1469,6 +1896,7 @@
           const parsed = JSON.parse(text);
           const res = await TripIdbStore.importAllBackup(parsed);
           if (res.ok) {
+            handleLocalDataChanged();
             showBanner('ok', res.message);
             await refreshAll();
           } else {
