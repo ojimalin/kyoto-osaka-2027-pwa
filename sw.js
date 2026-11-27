@@ -2,15 +2,15 @@
  * ============================================================================
  * 檔案名稱：sw.js
  * 整體程式說明：
- *   Service Worker 離線快取管理模組（v1.1.3），負責：
+ *   Service Worker 離線快取管理模組（v1.1.4），負責：
  *   1. 在 install 階段快取 PWA 靜態外殼（HTML / manifest / JS 模組），確保離線可啟動。
- *   2. 在 activate 階段清除舊版快取（如 v1.1.0 ~ v1.1.2），讓 GitHub Pages 部署新版後即時生效。
+ *   2. 在 activate 階段清除舊版快取（如 v1.1.0 ~ v1.1.3），讓 GitHub Pages 部署新版後即時生效。
  *   3. 在 fetch 階段放行所有 GAS Web App（script.google.com）及含 token 參數之同步請求，
  *      絕不快取動態 API 回應。
  * ============================================================================
  */
 
-const CACHE_VERSION = 'trip-pwa-shell-v1.1.3';
+const CACHE_VERSION = 'trip-pwa-shell-v1.1.4';
 const STATIC_ASSETS = [
   './',
   './index.html',
