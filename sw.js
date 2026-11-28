@@ -1,9 +1,12 @@
-// sw.js - Cache version v1.1.7
-const CACHE_NAME = "kyoto-osaka-pwa-v1.1.7";
+// sw.js - Cache version v1.1.8
+const CACHE_NAME = "kyoto-osaka-pwa-v1.1.8";
 const ASSETS = [
   "./",
   "./index.html",
+  "./manifest.json",
+  "./idbStore.js",
   "./scheduleEngine.js",
+  "./syncService.js",
   "./sw.js"
 ];
 

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2027 京都大阪家庭旅遊手帳</title>
+  <link rel="manifest" href="./manifest.json" />
   <style>
     :root {
       --bg: #f6f4ef;
@@ -158,9 +159,16 @@
 
   <main id="scheduleContainer"></main>
 
+  <script src="./idbStore.js"></script>
   <script src="./scheduleEngine.js"></script>
+  <script src="./syncService.js"></script>
   <script>
     const SETTINGS_DEFAULT_START_KEY = "kyoto2027_default_day_start";
+
+    const DEFAULT_DEMO_ITINERARY = [
+      { trip_date: "2027-11-26", activity_id: "ACT-0011", title_zh: "渡月橋與桂川河畔晨間散步", area: "嵐山", start_time: "08:30", time_type: "彈性", dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: "步行", note: "避開人潮拍攝晨景" },
+      { trip_date: "2027-11-26", activity_id: "ACT-0013", title_zh: "嵐山祐齋亭預約賞楓", area: "嵐山", start_time: "10:00", time_type: "固定抵達", dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: "步行", note: "需事先官網預約" }
+    ];
 
     function readSettingsDefaultStart() {
       try {
@@ -178,17 +186,24 @@
       } catch (_) {}
     }
 
+    async function deleteRuntimeKey(key) {
+      if (!window.TripIdbStore || !key) return;
+      const db = await TripIdbStore.openDb();
+      const tx = db.transaction(TripIdbStore.STORES.RUNTIME_STATE, "readwrite");
+      tx.objectStore(TripIdbStore.STORES.RUNTIME_STATE).delete(String(key));
+      await new Promise((resolve, reject) => {
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+    }
+
     const state = {
       settingsDefaultStart: readSettingsDefaultStart(),
       runtimeState: {},
       localOverrides: {},
       extraByDate: {},
-      baseByDate: {
-        "2027-11-26": [
-          { activity_id: "ACT-0011", title_zh: "渡月橋與桂川河畔晨間散步", area: "嵐山", start_time: "08:30", time_type: "彈性", dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: "步行", note: "避開人潮拍攝晨景" },
-          { activity_id: "ACT-0013", title_zh: "嵐山祐齋亭預約賞楓", area: "嵐山", start_time: "10:00", time_type: "固定抵達", dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: "步行", note: "需事先官網預約" }
-        ]
-      }
+      baseItinerary: []
     };
 
     const dateEl = document.getElementById("tripDateInput");
@@ -204,10 +219,68 @@
       return dateEl.value || "2027-11-26";
     }
 
+    async function hydrateFromIdb() {
+      if (!window.TripIdbStore) {
+        state.baseItinerary = DEFAULT_DEMO_ITINERARY;
+        return;
+      }
+      const [baseline, overrides, runtimeList] = await Promise.all([
+        TripIdbStore.getBaseline(),
+        TripIdbStore.getAllOverrides(),
+        TripIdbStore.getAllRuntimeItems()
+      ]);
+
+      state.baseItinerary = (baseline && Array.isArray(baseline.itinerary) && baseline.itinerary.length > 0)
+        ? baseline.itinerary
+        : DEFAULT_DEMO_ITINERARY;
+
+      const ovMap = {};
+      (overrides || []).forEach((ov) => {
+        if (ov && ov.activity_id) {
+          ovMap[ov.activity_id] = ov;
+        }
+      });
+      state.localOverrides = ovMap;
+
+      const rtMap = {};
+      const extraMap = {};
+      (runtimeList || []).forEach((rt) => {
+        if (!rt || !rt.key) return;
+        rtMap[rt.key] = rt;
+        if (rt.type === "inserted_spots" && rt.trip_date) {
+          extraMap[rt.trip_date] = Array.isArray(rt.items) ? rt.items : [];
+        }
+      });
+      state.runtimeState = rtMap;
+      state.extraByDate = extraMap;
+    }
+
+    function onLocalMutated() {
+      if (window.TripSyncService && typeof TripSyncService.notifyLocalChange === "function") {
+        TripSyncService.notifyLocalChange();
+      }
+    }
+
     function render() {
       const tripDate = getCurrentDate();
-      const baseItems = state.baseByDate[tripDate] || [];
+      const baseItems = state.baseItinerary.filter((it) => !it.trip_date || it.trip_date === tripDate);
       const extraItems = state.extraByDate[tripDate] || [];
+
+      const mergedOverrides = Object.assign({}, state.localOverrides);
+      Object.keys(state.runtimeState).forEach((k) => {
+        if (k.startsWith("act:")) {
+          const actId = k.slice(4);
+          const rt = state.runtimeState[k];
+          if (rt && rt.status) {
+            const prev = mergedOverrides[actId] || { fields: {} };
+            mergedOverrides[actId] = Object.assign({}, prev, {
+              status: rt.status,
+              skipped: rt.status === "skipped"
+            });
+          }
+        }
+      });
+
       const settingsDefaultStart = readSettingsDefaultStart();
       state.settingsDefaultStart = settingsDefaultStart;
       settingsDefaultStartEl.value = settingsDefaultStart;
@@ -216,7 +289,7 @@
         tripDate,
         baseItems,
         extraItems,
-        localOverrides: state.localOverrides,
+        localOverrides: mergedOverrides,
         runtimeState: state.runtimeState,
         settingsDefaultStart: settingsDefaultStart
       });
@@ -316,10 +389,6 @@
         `;
         containerEl.appendChild(card);
       });
-
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
-      }
     }
 
     function escapeHtml(s) {
@@ -336,27 +405,37 @@
       }
     });
 
-    dayStartEl.addEventListener("change", () => {
+    dayStartEl.addEventListener("change", async () => {
       const tripDate = getCurrentDate();
-      if (ScheduleEngine.isValidHHMM(dayStartEl.value)) {
-        state.runtimeState["start:" + tripDate] = {
-          time: dayStartEl.value,
-          manual: true,
-          updatedAt: new Date().toISOString()
-        };
-        render();
+      if (!ScheduleEngine.isValidHHMM(dayStartEl.value)) return;
+      const key = "start:" + tripDate;
+      const rec = {
+        key: key,
+        type: "day_start",
+        trip_date: tripDate,
+        time: dayStartEl.value,
+        manual: true
+      };
+      state.runtimeState[key] = rec;
+      if (window.TripIdbStore) {
+        await TripIdbStore.putRuntimeItem(rec);
       }
+      onLocalMutated();
+      render();
     });
 
-    resetBtn.addEventListener("click", () => {
+    resetBtn.addEventListener("click", async () => {
       const tripDate = getCurrentDate();
-      delete state.runtimeState["start:" + tripDate];
+      const key = "start:" + tripDate;
+      delete state.runtimeState[key];
+      await deleteRuntimeKey(key);
+      onLocalMutated();
       render();
     });
 
     dateEl.addEventListener("change", render);
 
-    containerEl.addEventListener("click", (e) => {
+    containerEl.addEventListener("click", async (e) => {
       const btn = e.target.closest("button[data-act]");
       if (!btn) return;
       const act = btn.getAttribute("data-act");
@@ -368,9 +447,23 @@
       } else if (act === "toggle-copy") {
         document.getElementById("copy-" + id)?.classList.toggle("open");
       } else if (act === "toggle-skip") {
-        const cur = state.localOverrides[id] || { fields: {} };
-        const nextSkipped = !cur.skipped;
-        state.localOverrides[id] = { ...cur, skipped: nextSkipped };
+        const curOv = state.localOverrides[id] || { fields: {} };
+        const currentlySkipped = curOv.skipped === true || (state.runtimeState["act:" + id] && state.runtimeState["act:" + id].status === "skipped");
+        const nextStatus = currentlySkipped ? "pending" : "skipped";
+        state.runtimeState["act:" + id] = {
+          key: "act:" + id,
+          type: "activity_status",
+          activity_id: id,
+          status: nextStatus
+        };
+        state.localOverrides[id] = Object.assign({}, curOv, {
+          status: nextStatus,
+          skipped: nextStatus === "skipped"
+        });
+        if (window.TripIdbStore) {
+          await TripIdbStore.setActivityStatus(id, nextStatus);
+        }
+        onLocalMutated();
         render();
       } else if (act === "save-edit") {
         const panel = document.getElementById("edit-" + id);
@@ -379,28 +472,41 @@
         const travelVal = Number(panel.querySelector(".inp-travel").value || 0);
         const bufferVal = Number(panel.querySelector(".inp-buffer").value || 0);
 
-        state.localOverrides[id] = {
+        const partial = {
+          start_time: startVal,
+          dwell_min: dwellVal,
+          travel_min: travelVal,
+          buffer_min: bufferVal
+        };
+        const prev = state.localOverrides[id] || { fields: {} };
+        state.localOverrides[id] = Object.assign({}, prev, {
           activity_id: id,
           trip_date: tripDate,
-          fields: {
-            start_time: startVal,
-            dwell_min: dwellVal,
-            travel_min: travelVal,
-            buffer_min: bufferVal
-          },
-          updatedAt: new Date().toISOString()
-        };
+          fields: Object.assign({}, prev.fields || {}, partial)
+        });
+        if (window.TripIdbStore) {
+          await TripIdbStore.setFieldOverrides(id, tripDate, partial);
+        }
+        onLocalMutated();
         render();
       } else if (act === "clear-start") {
-        const existing = state.localOverrides[id] || { activity_id: id, trip_date: tripDate, fields: {} };
-        state.localOverrides[id] = {
-          ...existing,
-          fields: { ...(existing.fields || {}), start_time: "" },
-          updatedAt: new Date().toISOString()
-        };
+        const prev = state.localOverrides[id] || { fields: {} };
+        state.localOverrides[id] = Object.assign({}, prev, {
+          activity_id: id,
+          trip_date: tripDate,
+          fields: Object.assign({}, prev.fields || {}, { start_time: "" })
+        });
+        if (window.TripIdbStore) {
+          await TripIdbStore.setFieldOverrides(id, tripDate, { start_time: "" });
+        }
+        onLocalMutated();
         render();
       } else if (act === "reset-card") {
         delete state.localOverrides[id];
+        if (window.TripIdbStore) {
+          await TripIdbStore.deleteOverride(id);
+        }
+        onLocalMutated();
         render();
       } else if (act === "confirm-copy") {
         const panel = document.getElementById("copy-" + id);
@@ -409,11 +515,11 @@
         const dwellMin = Number(panel.querySelector(".inp-ex-dwell").value || 30);
         const travelMin = Number(panel.querySelector(".inp-ex-travel").value || 10);
 
-        const allItems = [...(state.baseByDate[tripDate] || []), ...(state.extraByDate[tripDate] || [])];
+        const allItems = [...state.baseItinerary, ...(state.extraByDate[tripDate] || [])];
         const src = allItems.find((x) => x.activity_id === id) || {};
 
-        state.extraByDate[tripDate] = state.extraByDate[tripDate] || [];
-        state.extraByDate[tripDate].push({
+        const list = state.extraByDate[tripDate] ? [...state.extraByDate[tripDate]] : [];
+        list.push({
           activity_id: "EXTRA-" + Date.now() + "-" + extraSeq,
           trip_date: tripDate,
           title_zh: titleZh,
@@ -429,11 +535,22 @@
           _insertSeq: extraSeq++,
           _createdAt: new Date().toISOString()
         });
+        state.extraByDate[tripDate] = list;
+        if (window.TripIdbStore) {
+          await TripIdbStore.saveInsertedSpots(tripDate, list);
+        }
+        onLocalMutated();
         render();
       }
     });
 
-    render();
+    (async function init() {
+      await hydrateFromIdb();
+      render();
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
+    })();
   </script>
 </body>
 </html>

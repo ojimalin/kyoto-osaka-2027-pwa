@@ -1,6 +1,6 @@
 // scheduleEngine.js
 // Decouples day departure override (manual vs. baseline/settings default), fixed vs. flexible time handling,
-// per-card start_time override/reset, and insert-before / insert-after placement for extra stops.
+// per-card start_time override/reset, skipped state handling, and insert-before / insert-after placement.
 
 (function (global) {
   "use strict";
@@ -36,6 +36,11 @@
     return "flexible";
   }
 
+  function isItemSkipped(item) {
+    if (!item) return false;
+    return item.status === "skipped" || item.skipped === true;
+  }
+
   /**
    * Resolves manual day-start override from runtime_state map/object.
    * Key format: start:<trip_date>
@@ -53,10 +58,10 @@
     if (typeof raw === "string") {
       return isValidHHMM(raw) ? { time: raw.trim(), manual: true } : null;
     }
-    if (typeof raw === "object" && isValidHHMM(raw.time)) {
+    if (typeof raw === "object" && isValidHHMM(raw.time) && raw.manual !== false) {
       return {
         time: raw.time.trim(),
-        manual: raw.manual !== false,
+        manual: true,
         updatedAt: raw.updatedAt || null
       };
     }
@@ -66,8 +71,8 @@
   /**
    * Determines effective start time for a day without mutating baseline data:
    * 1. Manual override (start:<trip_date>) if set by user -> source: "manual_override"
-   * 2. First active item's baseline/override start_time if valid HH:MM -> source: "baseline_first_item"
-   * 3. Settings default start time (settingsDefaultStart || "07:30") -> source: "settings_default"
+   * 2. First non-skipped item's baseline/override start_time if valid HH:MM -> source: "baseline_first_item"
+   * 3. Settings page default start time (settingsDefaultStart || "07:30") -> source: "settings_default"
    */
   function resolveDayStartInfo(options) {
     const {
@@ -93,7 +98,7 @@
     }
 
     const firstWithTime = (items || []).find(
-      (it) => it && it.status !== "skipped" && isValidHHMM(it.effective_start_time ?? it.start_time)
+      (it) => it && !isItemSkipped(it) && isValidHHMM(it.effective_start_time ?? it.start_time)
     );
     if (firstWithTime) {
       const val = String(firstWithTime.effective_start_time ?? firstWithTime.start_time).trim();
@@ -166,8 +171,11 @@
   }
 
   /**
-   * Computes schedule times for a single day's items using the settings page default start time
-   * whenever neither a manual day-start override nor a first-item start_time applies.
+   * Computes schedule times for a single day's items using:
+   * - manual day start override when set
+   * - first non-skipped item's start_time when unset
+   * - settings page default start time when neither is present
+   * - separate handling for flexible vs. fixed_arrival / fixed_departure
    */
   function computeDaySchedule(options) {
     const {
@@ -189,8 +197,13 @@
       const rawStart = hasStartOverride ? fields.start_time : item.start_time;
       const effectiveStart = (typeof rawStart === "string" && isValidHHMM(rawStart)) ? rawStart.trim() : "";
 
+      const skippedFlag = item.status === "skipped" || item.skipped === true || (ov && ov.skipped === true);
+      const resolvedStatus = skippedFlag ? "skipped" : (item.status || "pending");
+
       return {
         ...item,
+        status: resolvedStatus,
+        skipped: skippedFlag,
         start_time: item.start_time || "",
         effective_start_time: effectiveStart,
         has_start_override: hasStartOverride,
@@ -215,7 +228,7 @@
 
     let isFirstActive = true;
     const scheduled = merged.map((item) => {
-      if (item.status === "skipped") {
+      if (item.skipped) {
         return {
           ...item,
           computed_start: item.effective_start_time || item.start_time || "",
@@ -312,6 +325,7 @@
     formatMinutesToHHMM,
     isValidHHMM,
     normalizeTimeType,
+    isItemSkipped,
     getManualDayStartOverride,
     resolveDayStartInfo,
     mergeDayItemsWithExtras,
