@@ -2,2114 +2,438 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#b84a27" />
-  <title>家庭旅遊離線電子手帳</title>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2027 京都大阪家庭旅遊手帳</title>
   <style>
     :root {
-      --bg: #fbf5ea;
-      --card: #fffdf9;
-      --soft: #f5e6d0;
-      --text: #3e2f26;
-      --muted: #7c685a;
-      --primary: #b84a27;
-      --primary-weak: #f7ead7;
-      --warm: #de6f38;
-      --ginkgo: #f3c86b;
-      --ok: #2c7a47;
-      --ok-bg: #e7f6ec;
-      --warn: #9a4a12;
+      --bg: #f6f4ef;
+      --card: #ffffff;
+      --ink: #1e242b;
+      --muted: #5c6672;
+      --accent: #2c5e4f;
+      --accent-soft: #e6f0ec;
+      --warn: #b45309;
       --warn-bg: #fef3c7;
-      --danger: #b91c1c;
-      --danger-bg: #fee2e2;
-      --stamp: #c8372d;
-      --border: #e6cfb0;
-      --dash: #dec5a4;
-      --radius: 18px;
-      --nav-h: 46px;
+      --late: #b91c1c;
+      --late-bg: #fee2e2;
+      --border: #dfe4e8;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      padding: 0 0 calc(100px + env(safe-area-inset-bottom, 0px)) 0;
-      font-family: 'Huninn', -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
-      background-color: var(--bg);
-      background-image:
-        radial-gradient(rgba(217, 107, 52, 0.045) 1.5px, transparent 1.5px),
-        radial-gradient(rgba(243, 200, 107, 0.065) 1.5px, transparent 1.5px);
-      background-size: 34px 34px;
-      background-position: 0 0, 17px 17px;
-      color: var(--text);
-      line-height: 1.45;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
     }
-
-    header.topbar {
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
       position: sticky;
       top: 0;
-      z-index: 20;
-      background: linear-gradient(135deg, #b84a27 0%, #d46532 100%);
-      color: #fffaf2;
-      padding: calc(7px + env(safe-area-inset-top, 0px)) 10px 7px;
-      border-bottom: 2px dashed rgba(255, 250, 242, 0.45);
-      box-shadow: 0 2px 10px rgba(120, 58, 30, 0.14);
+      z-index: 10;
     }
-
-    .topbar-row {
+    .day-start-bar {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .topbar-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .topbar-actions {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
-    .top-chip-btn {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 250, 242, 0.42);
-      background: rgba(255, 250, 242, 0.18);
-      color: #fffaf2;
-      white-space: nowrap;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .top-chip-btn.publish {
-      background: #fff3d6;
-      color: #8c2f12;
-      border-color: #ffe2a8;
-    }
-    .top-chip-btn.pull {
-      background: rgba(36, 107, 60, 0.72);
-      color: #fffaf2;
-      border-color: rgba(187, 247, 208, 0.65);
-    }
-
-    .badge-net {
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(255, 250, 242, 0.2);
-      border: 1px solid rgba(255, 250, 242, 0.38);
-      color: #fffaf2;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    .dirty-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #dc2626;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
-      vertical-align: middle;
-    }
-
-    .sync-popover {
-      display: none;
-      position: absolute;
-      top: calc(100% + 4px);
-      right: 10px;
-      z-index: 40;
-      background: #fffdf9;
-      color: var(--text);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 8px 12px;
-      font-size: 11.5px;
-      line-height: 1.65;
-      box-shadow: 0 6px 18px rgba(62, 47, 38, 0.18);
-      text-align: left;
-      max-width: 300px;
-    }
-    .sync-popover.open { display: block; }
-
-    main {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 10px 12px 12px;
-    }
-
-    .banner {
-      padding: 8px 12px;
-      border-radius: 14px;
-      margin-bottom: 10px;
-      font-size: 12.5px;
-      display: none;
-      word-break: break-word;
-    }
-    .banner.show { display: block; }
-    .banner.info { background: var(--primary-weak); color: var(--primary); border: 1.5px dashed var(--dash); }
-    .banner.ok { background: var(--ok-bg); color: var(--ok); border: 1.5px solid #96dfb0; }
-    .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1.5px solid #fcd34d; }
-    .banner.err { background: var(--danger-bg); color: var(--danger); border: 1.5px solid #fca5a5; }
-
-    .controls-card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
-    }
-
-    .controls-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
       gap: 10px;
+      margin-top: 8px;
     }
-
-    .controls-left {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .controls-line {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .mascot-stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      width: 126px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .mascot-bird-wrap {
-      width: 60px;
-      height: 60px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #fff9ee 0%, #f7ebd7 100%);
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 8px rgba(122, 74, 42, 0.1);
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .mascot-stage:active .mascot-bird-wrap {
-      transform: scale(0.92) rotate(-4deg);
-    }
-
-    .mascot-bird {
-      animation: bird-bob 2.8s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-
-    @keyframes bird-bob {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-2.5px) rotate(-2.5deg); }
-    }
-
-    .mascot-bubble {
-      position: relative;
-      margin-top: 5px;
-      background: #fffaf2;
-      border: 1.5px dashed var(--dash);
-      border-radius: 11px;
-      padding: 4px 7px;
-      font-size: 11px;
-      line-height: 1.35;
-      color: #4a3527;
-      text-align: center;
-      width: 100%;
-    }
-
-    .mascot-bubble::before {
-      content: "";
-      position: absolute;
-      top: -5px;
-      left: 50%;
-      transform: translateX(-50%) rotate(45deg);
-      width: 8px;
-      height: 8px;
-      background: #fffaf2;
-      border-top: 1.5px dashed var(--dash);
-      border-left: 1.5px dashed var(--dash);
-    }
-
-    select, input[type="text"], input[type="password"], input[type="number"], input[type="time"], textarea {
-      font-family: inherit;
-      font-size: 13.5px;
-      padding: 6px 10px;
-      border: 1.5px solid var(--dash);
-      border-radius: 11px;
-      background: #fffaf2;
-      color: var(--text);
-    }
-
-    button {
-      font-family: inherit;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1.5px solid var(--dash);
-      background: var(--soft);
-      color: var(--text);
-      cursor: pointer;
-      transition: transform 0.12s ease;
-    }
-    button:active { transform: scale(0.96); }
-    button:disabled { opacity: 0.55; cursor: not-allowed; }
-    button.btn-primary { background: var(--primary); color: #fffaf2; border-color: var(--primary); }
-    button.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-    button.btn-warn { background: var(--warm); color: #fff; border-color: var(--warm); }
-    button.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-    button.btn-muted { background: #f2ece6; color: #5f5147; border-color: #d8cdc2; }
-    button.btn-ghost { background: transparent; color: var(--muted); border-color: var(--dash); }
-    button.btn-sm { padding: 5px 10px; font-size: 12px; }
-
-    .stats-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+    .badge {
+      display: inline-block;
       font-size: 12px;
-      color: var(--muted);
-      border-top: 1px dashed var(--dash);
-      padding-top: 7px;
-    }
-
-    .dango-track {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .dango-dot {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      border: 1.5px solid #c9ad8b;
-      background: #ffffff;
-      color: var(--text);
-    }
-    .dango-dot.done {
-      background: #fde8e6;
-      border-color: var(--stamp);
-      color: var(--stamp);
-    }
-    .dango-dot.skipped {
-      background: #efece8;
-      border-style: dashed;
-      color: #8c7b70;
-      opacity: 0.75;
-    }
-
-    .stats-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      font-size: 11.5px;
-    }
-    .pill {
-      background: var(--primary-weak);
       padding: 2px 8px;
       border-radius: 999px;
-      color: var(--text);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
     }
-    .pill.late { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
-    .pill.stop { background: var(--warn-bg); color: var(--warn); font-weight: 700; }
-
-    .timeline-item {
-      position: relative;
+    .badge.manual {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .btn {
+      border: 1px solid var(--border);
       background: var(--card);
-      border: 1.5px solid var(--border);
-      border-left: 4.5px solid var(--primary);
-      border-radius: var(--radius);
-      padding: 12px 13px 11px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
-      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+      color: var(--ink);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
     }
-    .timeline-item.highlight-target {
-      box-shadow: 0 0 0 3px rgba(243, 200, 107, 0.85), 0 6px 16px rgba(184, 74, 39, 0.16);
-      border-color: var(--warm);
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
-    .timeline-item.status-done { border-left-color: var(--ok); background: #fcfbf8; }
-    .timeline-item.status-done::after {
-      content: "済";
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      border: 2px solid rgba(200, 55, 45, 0.78);
-      color: rgba(200, 55, 45, 0.88);
-      font-weight: 800;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: rotate(-14deg);
-      background: rgba(200, 55, 45, 0.05);
-      pointer-events: none;
+    main {
+      max-width: 820px;
+      margin: 16px auto;
+      padding: 0 14px 64px;
     }
-    .timeline-item.status-skipped { border-left-color: #b5a89e; opacity: 0.7; border-style: dashed; }
-    .timeline-item.is-late { border-left-color: var(--danger); }
-
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding-right: 44px;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    .item-time {
-      font-size: 12px;
-      font-weight: 700;
-      color: #8c3b20;
-      background: #f8efe2;
-      padding: 2px 9px;
-      border-radius: 999px;
-    }
-    .item-title-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 6px 0 3px 0;
-    }
-    .item-title {
-      font-size: 16.5px;
-      font-weight: 700;
-      margin: 0;
-      color: #2f221b;
-    }
-    .step-badge {
-      display: inline-block;
-      background: #fae2ae;
-      color: #56391b;
-      font-size: 11px;
-      padding: 1px 7px;
-      border-radius: 999px;
-      margin-right: 5px;
-      vertical-align: 1px;
-    }
-    .spot-chibi {
-      flex-shrink: 0;
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
-      background: #fbf2e2;
-      border: 1px solid #e6cfb0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .item-jp {
-      font-size: 12.5px;
-      color: var(--muted);
-    }
-    .item-addr {
-      font-size: 11.5px;
-      color: #938073;
-      margin-top: 1px;
-    }
-    .note-soft {
-      margin-top: 6px;
-      padding: 6px 10px;
-      background: #f5ead9;
-      border-radius: 10px;
-      font-size: 12px;
-      color: #564437;
-    }
-    .tag {
-      display: inline-block;
-      font-size: 11px;
-      padding: 1.5px 7px;
-      border-radius: 999px;
-      margin-right: 4px;
-      margin-top: 5px;
-      background: #f7ead7;
-      color: var(--text);
-    }
-    .tag.override { background: #dbeafe; color: #1d4ed8; }
-    .tag.inserted { background: #ede9fe; color: #6d28d9; }
-    .tag.late { background: var(--danger-bg); color: var(--danger); }
-    .tag.wait { background: var(--warn-bg); color: var(--warn); }
-
-    .alert-box {
-      margin-top: 7px;
-      padding: 6px 10px;
-      border-radius: 9px;
-      font-size: 12px;
-      background: var(--danger-bg);
-      color: var(--danger);
-    }
-    .warn-box {
-      margin-top: 7px;
-      padding: 6px 10px;
-      border-radius: 9px;
-      font-size: 12px;
-      background: var(--warn-bg);
-      color: var(--warn);
-    }
-
-    .item-actions {
-      margin-top: 9px;
-      padding-top: 7px;
-      border-top: 1px dashed #ead8c0;
+    .card.skipped { opacity: 0.55; }
+    .meta-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .edit-panel {
-      margin-top: 9px;
-      padding: 10px;
-      background: #f9efe0;
-      border: 1px dashed var(--dash);
-      border-radius: 12px;
-      display: none;
-    }
-    .edit-panel.open { display: block; }
-    .edit-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 8px;
-      margin-bottom: 8px;
-    }
-    .field-box label {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-    .field-row-inline {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-    .field-row-inline input, .field-row-inline select {
-      width: 100%;
-    }
-
-    .section-card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 13px;
-      margin-bottom: 11px;
-      box-shadow: 0 2px 8px rgba(122, 74, 42, 0.04);
-    }
-    .section-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 15px;
-    }
-    .muted-note {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 4px 0 8px 0;
-    }
-
-    .form-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .form-field label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .device-id-hint {
-      font-size: 11px;
-      color: var(--muted);
-      background: #faf1e4;
-      padding: 4px 8px;
-      border-radius: 8px;
-      word-break: break-all;
-    }
-
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 60;
-      background: rgba(43, 30, 22, 0.52);
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-backdrop.open { display: flex; }
-    .modal-card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      max-width: 420px;
-      width: 100%;
-      padding: 16px;
-      box-shadow: 0 12px 32px rgba(43, 30, 22, 0.25);
-    }
-    .modal-card h4 {
-      margin: 0 0 8px 0;
-      font-size: 16px;
-      color: var(--primary);
-    }
-    .modal-card p {
-      margin: 0 0 12px 0;
       font-size: 13px;
-      color: var(--text);
-      line-height: 1.55;
+      color: var(--muted);
+      margin-top: 6px;
     }
-    .modal-actions {
+    .tag-wait {
+      background: var(--warn-bg);
+      color: var(--warn);
+      padding: 1px 7px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .tag-late {
+      background: var(--late-bg);
+      color: var(--late);
+      padding: 1px 7px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .actions {
       display: flex;
-      flex-direction: column;
-      gap: 7px;
+      flex-wrap: wrap;
+      gap: 8px;
       margin-top: 10px;
     }
-
-    .tab-page { display: none; }
-    .tab-page.active { display: block; }
-
-    nav.bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 30;
-      min-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: #fffdf9;
-      border-top: 1.5px solid var(--border);
+    .panel {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      display: none;
+    }
+    .panel.open { display: block; }
+    .field-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      box-shadow: 0 -2px 10px rgba(122, 74, 42, 0.06);
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    nav.bottom-nav button {
-      border: none;
-      border-radius: 0;
-      padding: 6px 4px;
-      height: var(--nav-h);
+    label {
+      display: block;
       font-size: 12px;
-      background: transparent;
       color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
+      margin-bottom: 4px;
     }
-    nav.bottom-nav button.active {
-      color: var(--primary);
-      background: #f9efe0;
-      font-weight: 700;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 28px 16px;
-      background: var(--card);
-      border: 1.5px dashed var(--dash);
-      border-radius: var(--radius);
-      color: var(--muted);
+    input, select, textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
     }
   </style>
 </head>
 <body>
-  <header class="topbar" style="position:relative;">
-    <div class="topbar-row">
-      <h1 class="topbar-title">🍁 家庭旅遊手帳</h1>
-      <div class="topbar-actions">
-        <button type="button" id="btnPublishLive" class="top-chip-btn publish" style="display:none;" title="發布本機進度">
-          <span id="unpublishedDot" class="dirty-dot" style="display:none;"></span>☁️ 發布
-        </button>
-        <button type="button" id="btnPullLive" class="top-chip-btn pull" title="拉取雲端最新進度">🔄 拉取</button>
-        <button type="button" id="netBadge" class="badge-net" title="點我看主控者、版號與連線狀態">檢查中</button>
-      </div>
+  <header>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <strong>2027 京都大阪家庭旅遊手帳</strong>
+      <input type="date" id="tripDateInput" value="2027-11-26" style="width:auto;" />
     </div>
-    <div id="syncMetaBar" class="sync-popover">
-      <div>尚未同步雲端底稿</div>
+    <div class="day-start-bar">
+      <label for="dayStartInput" style="margin:0; font-size:13px; color:var(--ink);">⏰ 今日出發</label>
+      <input type="time" id="dayStartInput" style="width:auto;" />
+      <button type="button" class="btn" id="resetDayStartBtn">恢復預設</button>
+      <span id="dayStartStatus" class="badge">依循底稿起算</span>
+    </div>
+    <div class="day-start-bar" style="margin-top:6px;">
+      <label for="settingsDefaultStartInput" style="margin:0; font-size:12px; color:var(--muted);">⚙️ 設定頁預設出發</label>
+      <input type="time" id="settingsDefaultStartInput" style="width:auto;" />
     </div>
   </header>
 
-  <main>
-    <div id="globalBanner" class="banner"></div>
+  <main id="scheduleContainer"></main>
 
-    <!-- 分頁 1：每日行程 -->
-    <section id="tab-schedule" class="tab-page active">
-      <div class="controls-card">
-        <div class="controls-top">
-          <div class="controls-left">
-            <div class="controls-line">
-              <label for="dateSelect"><strong>📅 日期：</strong></label>
-              <select id="dateSelect"></select>
-            </div>
-            <div class="controls-line">
-              <label for="dayStartInput"><strong>⏰ 今日出發：</strong></label>
-              <input type="time" id="dayStartInput" style="padding:4px 8px; font-size:12.5px;" />
-              <button type="button" id="btnResetDayStart" class="btn-sm btn-ghost" title="清除今日臨時時間，恢復預設起算">恢復預設</button>
-            </div>
-            <div class="controls-line">
-              <button id="btnToggleWeather" class="btn-sm">晴雨：☀️ 晴天</button>
-              <button id="btnToggleStop" class="btn-sm btn-warn">今天就到這裡</button>
-            </div>
-          </div>
-
-          <div id="mascotStage" class="mascot-stage" title="點我換台詞並跳到下一站">
-            <div class="mascot-bird-wrap">
-              <svg id="birdSvg" class="mascot-bird" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
-                <path d="M32 29 L43 22 L41 28 L33 32 Z" fill="#4a372c" />
-                <path d="M33 30 L43 25 L42 28 L34 32 Z" fill="#ffffff" />
-                <ellipse cx="22" cy="27" rx="12.5" ry="11.5" fill="#ffffff" stroke="#5a4336" stroke-width="2" />
-                <path d="M25 25 Q32.5 26 30.5 32.5 Q25 32.5 24 28 Z" fill="#8b6f5e" />
-                <circle cx="16.8" cy="24" r="1.9" fill="#2b1e16" />
-                <circle cx="16.1" cy="23.2" r="0.65" fill="#ffffff" />
-                <circle cx="24.2" cy="24" r="1.9" fill="#2b1e16" />
-                <circle cx="23.5" cy="23.2" r="0.65" fill="#ffffff" />
-                <polygon points="20.5,25.2 18.8,27.8 22.2,27.8" fill="#e67e3c" />
-                <ellipse cx="14.2" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
-                <ellipse cx="26.8" cy="27" rx="2.1" ry="1.2" fill="#f7a8a0" opacity="0.88" />
-
-                <g id="birdRoleBadge"></g>
-                <g id="birdSeasonBadge"></g>
-                <g id="birdWeatherBadge"></g>
-              </svg>
-            </div>
-            <div id="mascotBubble" class="mascot-bubble">啾！點我跳下一站</div>
-          </div>
-        </div>
-
-        <div id="dayStats" class="stats-bar"></div>
-      </div>
-
-      <div id="scheduleList"></div>
-    </section>
-
-    <!-- 分頁 2：備選口袋 -->
-    <section id="tab-pocket" class="tab-page">
-      <div class="section-card">
-        <h3>🎒 插入備選景點至當日行程</h3>
-        <p class="muted-note">插入後將保存完整景點快照、停留／交通設定與錨點位置；若錨點活動日後被雲端刪除，將自動改接至當日末端且不刪除。</p>
-        <div class="controls-line">
-          <label for="insertAnchorSelect"><strong>插入位置：</strong></label>
-          <select id="insertAnchorSelect"></select>
-        </div>
-      </div>
-      <div id="pocketList"></div>
-    </section>
-
-    <!-- 分頁 3：住宿與航班 -->
-    <section id="tab-meta" class="tab-page">
-      <div id="metaList"></div>
-    </section>
-
-    <!-- 分頁 4：設定、資料管理與備份 -->
-    <section id="tab-settings" class="tab-page">
-      <div class="section-card">
-        <h3>📱 本機角色與雲端同步設定 <span style="font-size:11px;color:var(--muted);font-weight:400;">(v1.1.5)</span></h3>
-        <p class="muted-note">
-          - <strong>主控模式</strong>：負責在旅途中勾選完成、微調時間或插入備選景點，修改後 10 秒自動發布（亦可點上方「☁️ 發布」立即發布）。<br />
-          - <strong>瀏覽模式</strong>：家人手機預設模式，僅顯示「🔄 拉取」按鈕，避免誤發覆蓋主控進度；必要時可隨時切為主控接手。
-        </p>
-        <div class="form-stack">
-          <div class="form-field">
-            <label for="defaultStartTimeInput">預設每日出發時間（預設 07:30，未設定當日臨時時間時依此起算）</label>
-            <input id="defaultStartTimeInput" type="time" value="07:30" />
-          </div>
-          <div class="form-field">
-            <label for="roleSelect">操作模式</label>
-            <select id="roleSelect">
-              <option value="family">👀 瀏覽模式（家人端拉取進度）</option>
-              <option value="host">🧭 主控模式（發布進度給家人）</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="deviceNameInput">裝置顯示名稱（切換為主控模式時必填）</label>
-            <input id="deviceNameInput" type="text" maxlength="40" placeholder="例如：啟明手機 或 心怡手機" />
-            <div id="deviceIdHint" class="device-id-hint">本機固定識別碼：讀取中...</div>
-          </div>
-          <div class="form-field">
-            <label for="apiUrlInput">GAS Web App 網址</label>
-            <input id="apiUrlInput" type="text" placeholder="https://script.google.com/macros/s/.../exec" />
-          </div>
-          <div class="form-field">
-            <label for="readTokenInput">讀取權杖（READ_TOKEN，所有手機皆需填寫）</label>
-            <input id="readTokenInput" type="password" placeholder="貼上 GAS 產生的 READ_TOKEN" />
-          </div>
-          <div class="form-field">
-            <label for="publishTokenInput">發布權杖（PUBLISH_TOKEN，僅主控／臨時接手手機填寫）</label>
-            <input id="publishTokenInput" type="password" placeholder="貼上 GAS 產生的 PUBLISH_TOKEN" />
-          </div>
-        </div>
-        <div class="controls-line">
-          <button type="button" id="btnSaveConfig" class="btn-primary">儲存連線與角色設定</button>
-          <button type="button" id="btnSyncNow" class="btn-ok">同步雲端底稿（Sheets → 手機）</button>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h3>🧹 行程資料管理</h3>
-        <p class="muted-note">
-          - <strong>全部還原雲端底稿</strong>：保留目前已同步的雲端底稿（<code>baseline</code>）與已移除歷史紀錄（<code>removed_history</code>），清除所有本機欄位修改、執行狀態、晴雨選擇、停止旗標及插入景點。<br />
-          - 若需取得雲端最新版本，請先按「同步雲端底稿」，再執行全部還原。
-        </p>
-        <button type="button" id="btnRestoreAll" class="btn-danger">全部還原雲端底稿</button>
-      </div>
-
-      <div class="section-card">
-        <h3>💾 備份匯出／匯入</h3>
-        <p class="muted-note">匯出或還原完整四個資料區（<code>baseline</code>、<code>local_overrides</code>、<code>runtime_state</code>、<code>removed_history</code>）。匯入時會驗證版本與結構，並依備份完整覆蓋本機狀態。</p>
-        <div class="controls-line">
-          <button type="button" id="btnExportBackup">匯出備份 JSON</button>
-          <button type="button" id="btnTriggerImport">匯入備份 JSON</button>
-          <input id="importFileInput" type="file" accept="application/json,.json" style="display:none;" />
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h3>🗂️ 已移除項目歷史紀錄（removed_history）</h3>
-        <p class="muted-note">雲端底稿移除但本機曾有欄位修改的活動會保留在此，供查閱或一鍵清空。</p>
-        <div style="margin-bottom:8px;">
-          <button type="button" id="btnClearHistory" class="btn-sm">清空歷史紀錄</button>
-        </div>
-        <div id="removedHistoryList"></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- 主控交接確認視窗 -->
-  <div id="takeoverModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="takeoverModalTitle">
-    <div class="modal-card">
-      <h4 id="takeoverModalTitle">⚠️ 目前雲端主控為其他手機</h4>
-      <p id="takeoverModalBody">確定要切換為本機主控並發布嗎？</p>
-      <div class="modal-actions">
-        <button type="button" id="btnConfirmTakeover" class="btn-primary">確定接手為主控並發布</button>
-        <button type="button" id="btnCancelTakeoverSwitchFamily" class="btn-warn">取消，並將本機切回「瀏覽模式」</button>
-        <button type="button" id="btnCancelTakeoverKeep" class="btn-muted">暫不發布（保留本機修改）</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 複製站點加點視窗（支援同日或跨天挑一站加到目前這站後面） -->
-  <div id="copySpotModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="copySpotModalTitle">
-    <div class="modal-card">
-      <h4 id="copySpotModalTitle">📋 複製站點加入本站後面</h4>
-      <p id="copySpotModalDesc" style="margin-bottom:8px;">選擇來源日期與站點，將複製為今日行程並接在本站後面（不影響原日期底稿）。</p>
-      <div class="form-stack">
-        <div class="form-field">
-          <label for="copySourceDateSelect">來源日期</label>
-          <select id="copySourceDateSelect"></select>
-        </div>
-        <div class="form-field">
-          <label for="copySourceActSelect">選擇要複製的站點</label>
-          <select id="copySourceActSelect"></select>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" id="btnConfirmCopySpot" class="btn-primary">＋ 加入本站後面</button>
-        <button type="button" id="btnCancelCopySpot" class="btn-muted">取消</button>
-      </div>
-    </div>
-  </div>
-
-  <nav class="bottom-nav">
-    <button type="button" class="active" data-tab="tab-schedule">🍁 每日行程</button>
-    <button type="button" data-tab="tab-pocket">🎒 備選口袋</button>
-    <button type="button" data-tab="tab-meta">🏨 住宿航班</button>
-    <button type="button" data-tab="tab-settings">⚙️ 設定備份</button>
-  </nav>
-
-  <script src="./idbStore.js"></script>
-  <script src="./syncService.js"></script>
   <script src="./scheduleEngine.js"></script>
   <script>
-    (() => {
-      const PREF_KEYS = {
-        API_URL: 'trip_pwa_api_url',
-        READ_TOKEN: 'trip_pwa_read_token',
-        PUBLISH_TOKEN: 'trip_pwa_publish_token',
-        LEGACY_API_TOKEN: 'trip_pwa_api_token',
-        ROLE: 'trip_pwa_role',
-        DEVICE_ID: 'trip_pwa_device_id',
-        DEVICE_NAME: 'trip_pwa_device_name',
-        ACTIVE_TAB: 'trip_pwa_active_tab',
-        SELECTED_DATE: 'trip_pwa_selected_date',
-        DEFAULT_START_TIME: 'trip_pwa_default_start_time'
-      };
+    const SETTINGS_DEFAULT_START_KEY = "kyoto2027_default_day_start";
 
-      const FALLBACK_DEFAULT_START = '07:30';
-
-      const FIELD_LABELS_ZH = {
-        dwell_min: '停留',
-        travel_min: '交通',
-        buffer_min: '緩衝',
-        transport_mode: '交通方式',
-        note: '備註',
-        start_time: '開始時間'
-      };
-
-      const VALID_TYPES = [
-        'flight', 'train', 'bus', 'ship',
-        'shrine', 'nature', 'museum', 'meal',
-        'cafe', 'shop', 'onsen', 'hotel'
-      ];
-
-      function showBanner(type, text) {
-        const el = document.getElementById('globalBanner');
-        if (!el) return;
-        el.className = 'banner show ' + (type || 'info');
-        el.textContent = text;
-      }
-
-      // 全域未捕捉錯誤提示，避免腳本静默中斷讓人無從排查
-      window.addEventListener('error', (ev) => {
-        const msg = ev && ev.message ? ev.message : '未知腳本錯誤';
-        showBanner('err', '⚠️ 頁面腳本發生異常：' + msg + '（請確認三個檔案皆已更新並重新整理）');
-      });
-
-      window.addEventListener('unhandledrejection', (ev) => {
-        const reason = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : '非同步操作失敗';
-        showBanner('err', '⚠️ 操作執行失敗：' + reason);
-      });
-
-      // 安全讀取設定與核心模組，避免舊快取殘留導致啟動中斷
-      function safeGetDefaultStartTime() {
-        try {
-          if (typeof TripScheduleEngine !== 'undefined' &&
-              typeof TripScheduleEngine.getConfiguredDefaultStartTime === 'function') {
-            return TripScheduleEngine.getConfiguredDefaultStartTime();
-          }
-        } catch (e) {}
-        const saved = String(localStorage.getItem(PREF_KEYS.DEFAULT_START_TIME) || '').trim();
-        return /^([01]\d|2[0-3]):([0-5]\d)$/.test(saved) ? saved : FALLBACK_DEFAULT_START;
-      }
-
-      function safeIsValidHHMM(val) {
-        return /^([01]\d|2[0-3]):([0-5]\d)$/.test(String(val || '').trim());
-      }
-
+    function readSettingsDefaultStart() {
       try {
-        if (!localStorage.getItem(PREF_KEYS.DEFAULT_START_TIME)) {
-          const initDef = (typeof TripScheduleEngine !== 'undefined' && TripScheduleEngine.DEFAULT_START_TIME)
-            ? TripScheduleEngine.DEFAULT_START_TIME
-            : FALLBACK_DEFAULT_START;
-          localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, initDef);
-        }
-      } catch (e) {}
+        const v = localStorage.getItem(SETTINGS_DEFAULT_START_KEY);
+        return ScheduleEngine.isValidHHMM(v) ? v.trim() : ScheduleEngine.DEFAULT_FALLBACK_START;
+      } catch (_) {
+        return ScheduleEngine.DEFAULT_FALLBACK_START;
+      }
+    }
 
-      function formatOverriddenFieldsZh(fields) {
-        if (!Array.isArray(fields) || fields.length === 0) return '';
-        const seen = new Set();
-        const labels = [];
-        fields.forEach((f) => {
-          const label = FIELD_LABELS_ZH[f] || f;
-          if (!seen.has(label)) {
-            seen.add(label);
-            labels.push(label);
-          }
-        });
-        return labels.join('、');
+    function writeSettingsDefaultStart(hhmm) {
+      if (!ScheduleEngine.isValidHHMM(hhmm)) return;
+      try {
+        localStorage.setItem(SETTINGS_DEFAULT_START_KEY, hhmm.trim());
+      } catch (_) {}
+    }
+
+    const state = {
+      settingsDefaultStart: readSettingsDefaultStart(),
+      runtimeState: {},
+      localOverrides: {},
+      extraByDate: {},
+      baseByDate: {
+        "2027-11-26": [
+          { activity_id: "ACT-0011", title_zh: "渡月橋與桂川河畔晨間散步", area: "嵐山", start_time: "08:30", time_type: "彈性", dwell_min: 60, travel_min: 10, buffer_min: 5, transport_mode: "步行", note: "避開人潮拍攝晨景" },
+          { activity_id: "ACT-0013", title_zh: "嵐山祐齋亭預約賞楓", area: "嵐山", start_time: "10:00", time_type: "固定抵達", dwell_min: 60, travel_min: 15, buffer_min: 10, transport_mode: "步行", note: "需事先官網預約" }
+        ]
+      }
+    };
+
+    const dateEl = document.getElementById("tripDateInput");
+    const dayStartEl = document.getElementById("dayStartInput");
+    const settingsDefaultStartEl = document.getElementById("settingsDefaultStartInput");
+    const resetBtn = document.getElementById("resetDayStartBtn");
+    const statusEl = document.getElementById("dayStartStatus");
+    const containerEl = document.getElementById("scheduleContainer");
+
+    let extraSeq = 1;
+
+    function getCurrentDate() {
+      return dateEl.value || "2027-11-26";
+    }
+
+    function render() {
+      const tripDate = getCurrentDate();
+      const baseItems = state.baseByDate[tripDate] || [];
+      const extraItems = state.extraByDate[tripDate] || [];
+      const settingsDefaultStart = readSettingsDefaultStart();
+      state.settingsDefaultStart = settingsDefaultStart;
+      settingsDefaultStartEl.value = settingsDefaultStart;
+
+      const computed = ScheduleEngine.computeDaySchedule({
+        tripDate,
+        baseItems,
+        extraItems,
+        localOverrides: state.localOverrides,
+        runtimeState: state.runtimeState,
+        settingsDefaultStart: settingsDefaultStart
+      });
+
+      dayStartEl.value = computed.dayStartHHMM;
+      if (computed.isManualDayStart) {
+        statusEl.textContent = "已手動調整（" + computed.dayStartHHMM + "）";
+        statusEl.className = "badge manual";
+      } else if (computed.dayStartSource === "baseline_first_item") {
+        statusEl.textContent = "依循底稿起算（" + computed.dayStartHHMM + "）";
+        statusEl.className = "badge";
+      } else {
+        statusEl.textContent = "設定頁預設（" + computed.settingsDefaultHHMM + "）";
+        statusEl.className = "badge";
       }
 
-      function getOrCreateDeviceId() {
-        let id = '';
-        try {
-          id = String(localStorage.getItem(PREF_KEYS.DEVICE_ID) || '').trim();
-          if (!id) {
-            id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
-              ? crypto.randomUUID()
-              : ('dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
-            localStorage.setItem(PREF_KEYS.DEVICE_ID, id);
-          }
-        } catch (e) {
-          id = 'dev-fallback-' + Date.now().toString(36);
-        }
-        return id;
-      }
-
-      function getCurrentRole() {
-        try {
-          return localStorage.getItem(PREF_KEYS.ROLE) === 'host' ? 'host' : 'family';
-        } catch (e) {
-          return 'family';
-        }
-      }
-
-      function getStoredReadToken() {
-        try {
-          const t = String(localStorage.getItem(PREF_KEYS.READ_TOKEN) || '').trim();
-          return t || String(localStorage.getItem(PREF_KEYS.LEGACY_API_TOKEN) || '').trim();
-        } catch (e) {
-          return '';
-        }
-      }
-
-      function buildSyncContextOptions() {
-        return {
-          endpointUrl: String(localStorage.getItem(PREF_KEYS.API_URL) || '').trim(),
-          token: getStoredReadToken(),
-          publishToken: String(localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '').trim(),
-          role: getCurrentRole(),
-          deviceId: getOrCreateDeviceId(),
-          deviceName: String(localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '').trim(),
-          onHostMismatch: promptHostTakeoverModal,
-          onAutoPublishDone: handlePublishResult
-        };
-      }
-
-      function promptHostTakeoverModal(info) {
-        return new Promise((resolve) => {
-          const modal = document.getElementById('takeoverModal');
-          const bodyEl = document.getElementById('takeoverModalBody');
-          const btnConfirm = document.getElementById('btnConfirmTakeover');
-          const btnSwitchFamily = document.getElementById('btnCancelTakeoverSwitchFamily');
-          const btnKeep = document.getElementById('btnCancelTakeoverKeep');
-
-          const ownerName = (info && info.publishedByName) ? info.publishedByName : '其他手機';
-          const rev = (info && info.serverRevision !== undefined) ? info.serverRevision : '?';
-          const myName = (info && info.currentDeviceName) ? info.currentDeviceName : '本機';
-          const timeHint = (info && info.publishedAt) ? `（更新時間：${info.publishedAt}）` : '';
-
-          bodyEl.textContent =
-            `目前雲端主控為「${ownerName}」（進度 v${rev}）${timeHint}。` +
-            `確定要將主控權改為「${myName}」並發布為 v${Number(rev) + 1} 嗎？`;
-
-          const cleanup = (result) => {
-            modal.classList.remove('open');
-            btnConfirm.onclick = null;
-            btnSwitchFamily.onclick = null;
-            btnKeep.onclick = null;
-            resolve(result);
-          };
-
-          btnConfirm.onclick = () => cleanup('takeover');
-          btnSwitchFamily.onclick = () => cleanup('switch_family');
-          btnKeep.onclick = () => cleanup('cancel');
-          modal.classList.add('open');
-        });
-      }
-
-      function updateLiveSyncIndicators() {
-        const role = getCurrentRole();
-        const liveMeta = (typeof TripSyncService !== 'undefined' && TripSyncService.getLiveSyncMeta)
-          ? TripSyncService.getLiveSyncMeta()
-          : { hasUnpublished: false };
-        const btnPublish = document.getElementById('btnPublishLive');
-        const dirtyDot = document.getElementById('unpublishedDot');
-
-        if (btnPublish) {
-          btnPublish.style.display = (role === 'host') ? 'inline-flex' : 'none';
-        }
-        if (dirtyDot) {
-          dirtyDot.style.display = liveMeta.hasUnpublished ? 'inline-block' : 'none';
-        }
-      }
-
-      function handleLocalDataChanged() {
-        const ctx = buildSyncContextOptions();
-        if (typeof TripSyncService !== 'undefined' && TripSyncService.notifyLocalChange) {
-          TripSyncService.notifyLocalChange(ctx);
-        }
-        updateLiveSyncIndicators();
-      }
-
-      async function handlePublishResult(res) {
-        if (res && res.ok && typeof TripSyncService !== 'undefined') {
-          TripSyncService.saveLiveSyncMeta({ hasUnpublished: false });
-        }
-        updateLiveSyncIndicators();
-        await renderHeaderAndDates();
-
-        if (!res) return;
-        if (res.ok) {
-          showBanner('ok', res.message);
-          return;
-        }
-        if (res.switchToFamily) {
-          localStorage.setItem(PREF_KEYS.ROLE, 'family');
-          loadPrefsToInputs();
-          updateLiveSyncIndicators();
-          await renderHeaderAndDates();
-          showBanner('info', '已取消發布並將本機切回「瀏覽模式」');
-          return;
-        }
-        if (!res.silentAutoError) {
-          showBanner('warn', res.message || '尚未完成發布，變更已保留在待發布狀態');
-        }
-      }
-
-      function detectSeasonLeaf(dateStr, fallbackStart) {
-        const target = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr))
-          ? dateStr
-          : ((fallbackStart && /^\d{4}-\d{2}-\d{2}$/.test(fallbackStart)) ? fallbackStart : '2027-11-25');
-        const month = Number(target.split('-')[1]) || 11;
-        if (month >= 3 && month <= 5) return 'spring';
-        if (month >= 6 && month <= 8) return 'summer';
-        if (month >= 9 && month <= 11) return 'autumn';
-        return 'winter';
-      }
-
-      function classifyActivityType(item) {
-        if (!item || typeof item !== 'object') return 'default';
-
-        const normalizeType = (val) => {
-          const v = String(val || '').toLowerCase().trim();
-          if (!v) return '';
-          if (v === 'view') return 'nature';
-          return VALID_TYPES.indexOf(v) !== -1 ? v : '';
-        };
-
-        const noteStr = String(item.note || '').toLowerCase();
-        const tagMatch = noteStr.match(/#([a-z_]+)/);
-        const tagType = tagMatch ? normalizeType(tagMatch[1]) : '';
-        if (tagType) return tagType;
-
-        const fieldType = normalizeType(item.icon) || normalizeType(item.category);
-        if (fieldType) return fieldType;
-
-        const text = `${item.title_zh || ''} ${item.title_jp || ''} ${item.note || ''}`.toLowerCase();
-        if (/航班|機場|搭機|登機|報到|flight|airport/.test(text)) return 'flight';
-        if (/新幹線|特急|電車|地鐵|鐵道|haruka|rapi:t|jr|列車|小火車/.test(text)) return 'train';
-        if (/巴士|公車|自駕|開車|計程車|包車|bus|car/.test(text)) return 'bus';
-        if (/觀光船|渡船|遊船|纜車|吊車|ropeway|cruise|ship/.test(text)) return 'ship';
-        if (/溫泉|湯屋|泡湯|onsen/.test(text)) return 'onsen';
-        if (/飯店|旅館|入住|退房|寄放行李|民宿|hotel|check-in|check-out/.test(text)) return 'hotel';
-        if (/咖啡|抹茶|甜點|下午茶|茶寮|星巴克|cafe|coffee|tea/.test(text)) return 'cafe';
-        if (/午餐|晚餐|早餐|拉麵|烏龍麵|壽司|海鮮|懷石|燒肉|炸豬排|漢堡排|大阪燒|串炸|定食|釜飯|水炊鍋|美食|餐廳/.test(text)) return 'meal';
-        if (/神社|寺廟|寺院|鳥居|大社|神宮|古蹟/.test(text)) return 'shrine';
-        if (/展望台|觀景台|賞楓|賞櫻|銀杏|花海|竹林|苔庭|森林|公園|湖畔|海岸|自然/.test(text)) return 'nature';
-        if (/博物館|美術館|紀念館|水族館|動物園|展覽|體驗|見學|museum/.test(text)) return 'museum';
-        if (/百貨|商店街|購物|採買|藥妝|市場|outlet|mall|伴手禮/.test(text)) return 'shop';
-
-        return 'default';
-      }
-
-      function detectRainExposure(item, type, weatherMode) {
-        if (weatherMode !== 'rain' || !item) return 'sheltered';
-        if (type === 'nature') return 'outdoor';
-        const text = `${item.title_zh || ''} ${item.title_jp || ''} ${item.note || ''}`.toLowerCase();
-        if (/展望台|觀景台|賞楓|賞櫻|銀杏|花海|竹林|苔庭|森林|公園|湖畔|海岸|戶外/.test(text)) {
-          return 'outdoor';
-        }
-        return 'sheltered';
-      }
-
-      const ROLE_BADGE_SVG = {
-        conductor: '<path d="M15 14 H29 L27.2 10 H16.8 Z" fill="#2d4263" /><rect x="14" y="14" width="16" height="1.8" rx="0.9" fill="#1e2d44" /><circle cx="22" cy="12" r="1.1" fill="#f3c86b" />',
-        onigiri: '<polygon points="22,6.5 15.5,15.5 28.5,15.5" fill="#ffffff" stroke="#5a4336" stroke-width="1.3" stroke-linejoin="round" /><rect x="19.8" y="12.2" width="4.4" height="3.3" rx="0.7" fill="#2f221b" />',
-        onsen: '<rect x="16" y="10.5" width="12" height="4.2" rx="1.1" fill="#fffdf9" stroke="#8c6852" stroke-width="1.2" /><path d="M19.5 8.5 Q20.5 6.8 19.5 5.2 M24.5 8.5 Q25.5 6.8 24.5 5.2" stroke="#8cb4d9" stroke-width="1.2" fill="none" />',
-        hotel: '<rect x="16.5" y="10" width="11" height="5" rx="1.2" fill="#b87344" stroke="#5a3822" stroke-width="1.2" />',
-        museum: '<polygon points="15.5,14.5 22,10.5 28.5,14.5" fill="#7c685a" />',
-        sleep: '<path d="M16 14 Q22 9 28 14 L26.2 15.8 L17.8 15.8 Z" fill="#78a6d4" />'
-      };
-
-      const SEASON_BADGE_SVG = {
-        spring: '<circle cx="8" cy="10" r="2.6" fill="#f9a8b8" /><circle cx="11" cy="8" r="2.2" fill="#fbc4cf" /><circle cx="8" cy="10" r="0.9" fill="#e05a78" />',
-        summer: '<path d="M7 12 Q11 7 14 10 Q10 13 7 12 Z" fill="#5e9e54" />',
-        autumn: '<path d="M8.5 5.5 L9.8 8.8 L12.5 8.2 L10.6 10.3 L11.4 12.2 L8.5 11 L5.6 12.2 L6.4 10.3 L4.5 8.2 L7.2 8.8 Z" fill="#c8372d" />',
-        winter: '<path d="M8.5 6 V12 M5.5 9 H11.5 M6.4 6.9 L10.6 11.1 M10.6 6.9 L6.4 11.1" stroke="#6aa9d9" stroke-width="1.5" stroke-linecap="round" />'
-      };
-
-      const WEATHER_BADGE_SVG = {
-        rain_outdoor: '<path d="M31 11 Q36.5 5.5 42 11 Z" fill="#f4c95d" stroke="#7c5318" stroke-width="1.2" /><line x1="36.5" y1="11" x2="36.5" y2="15" stroke="#7c5318" stroke-width="1.4" />'
-      };
-
-      function renderSpotChibi(item, season) {
-        const type = classifyActivityType(item);
-        const SVG_MAP = {
-          flight: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 13 L10 11 L15 5 L18 5 L15 11 L20 11 L22 8.5 L24 8.5 L22.5 12.5 L24 16.5 L22.5 16.5 L20 14 L15 14 L18 20 L15 20 L10 14 L4 15 Z" fill="#4d7ea8"/></svg>',
-          train: '<svg width="20" height="20" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="13" rx="4" fill="#2c7a47"/><rect x="8.5" y="7" width="7" height="4.5" rx="1.5" fill="#fffdf9"/><circle cx="9.5" cy="14.5" r="1.2" fill="#f3c86b"/><circle cx="14.5" cy="14.5" r="1.2" fill="#f3c86b"/><line x1="8" y1="20" x2="16" y2="20" stroke="#7c685a" stroke-width="1.6"/></svg>',
-          bus: '<svg width="20" height="20" viewBox="0 0 24 24"><rect x="4.5" y="6" width="15" height="11" rx="3" fill="#de6f38"/><rect x="7" y="8.5" width="10" height="4" rx="1" fill="#fffdf9"/><circle cx="8" cy="18" r="1.8" fill="#3e2f26"/><circle cx="16" cy="18" r="1.8" fill="#3e2f26"/></svg>',
-          ship: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 14 H20 L17.5 18 H6.5 Z" fill="#4d7ea8"/><polygon points="11,6 11,13 17,13" fill="#f3c86b"/><path d="M3 19.5 Q8 18 12 19.5 T21 19.5" stroke="#78a6d4" stroke-width="1.5" fill="none"/></svg>',
-          meal: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 12 H20 C20 17 16.5 19.5 12 19.5 C7.5 19.5 4 17 4 12 Z" fill="#fffdf9" stroke="#b84a27" stroke-width="1.5"/><path d="M8.5 9 Q10 6.5 8.5 4.5 M13.5 9 Q15 6.5 13.5 4.5" stroke="#d46532" stroke-width="1.4" fill="none"/></svg>',
-          cafe: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 9 H16 V15 C16 17.5 14 19 11 19 C8 19 6 17.5 6 15 Z" fill="#8b5e3c"/><path d="M16 10.5 H18.5 C19.5 10.5 20 11.5 20 12.5 C20 13.5 19.5 14.5 18.5 14.5 H16" stroke="#8b5e3c" stroke-width="1.5" fill="none"/><path d="M9.5 6.5 Q11 4.5 9.5 3" stroke="#b5a89e" stroke-width="1.4" fill="none"/></svg>',
-          shrine: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 6.5 Q12 8.5 21 6.5" stroke="#c8372d" stroke-width="2.4" stroke-linecap="round" fill="none"/><line x1="5" y1="10" x2="19" y2="10" stroke="#c8372d" stroke-width="1.8"/><line x1="8" y1="7.5" x2="8" y2="20" stroke="#c8372d" stroke-width="2"/><line x1="16" y1="7.5" x2="16" y2="20" stroke="#c8372d" stroke-width="2"/></svg>',
-          nature: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 4 L14 9 L19 8 L15.5 11.5 L17 15.2 L12 13 L7 15.2 L8.5 11.5 L5 8 L10 9 Z" fill="#5e9e54"/><line x1="12" y1="13" x2="12" y2="20" stroke="#5a4336" stroke-width="1.5"/></svg>',
-          museum: '<svg width="20" height="20" viewBox="0 0 24 24"><polygon points="3,9 12,4 21,9" fill="#b87344"/><line x1="6.5" y1="10" x2="6.5" y2="18" stroke="#7c685a" stroke-width="2"/><line x1="12" y1="10" x2="12" y2="18" stroke="#7c685a" stroke-width="2"/><line x1="17.5" y1="10" x2="17.5" y2="18" stroke="#7c685a" stroke-width="2"/><line x1="4" y1="19" x2="20" y2="19" stroke="#5a4336" stroke-width="2"/></svg>',
-          shop: '<svg width="20" height="20" viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="11" rx="2" fill="#f7ead7" stroke="#b84a27" stroke-width="1.4"/><path d="M9.5 8 V5.5 C9.5 4.2 14.5 4.2 14.5 5.5 V8" stroke="#b84a27" stroke-width="1.4" fill="none"/></svg>',
-          onsen: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 13 H19 L17.5 19 H6.5 Z" fill="#d98a4e" stroke="#6e3f1d" stroke-width="1.3"/><path d="M9 9 Q10.5 7 9 5 M14 9 Q15.5 7 14 5" stroke="#8cb4d9" stroke-width="1.5" fill="none"/></svg>',
-          hotel: '<svg width="20" height="20" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="2.5" fill="#b87344" stroke="#5a3822" stroke-width="1.3"/><path d="M9 8 V5.5 H15 V8" stroke="#5a3822" stroke-width="1.5" fill="none"/></svg>'
-        };
-
-        const SEASON_DEFAULT_SVG = {
-          spring: '<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" fill="#f9a8b8"/><circle cx="8" cy="12" r="3.2" fill="#fbc4cf"/><circle cx="16" cy="12" r="3.2" fill="#fbc4cf"/><circle cx="12" cy="15" r="3.2" fill="#f9a8b8"/><circle cx="12" cy="11.5" r="1.6" fill="#e05a78"/></svg>',
-          summer: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 19 C6 15 6 7 12 4 C18 7 18 15 12 19 Z" fill="#5e9e54"/><line x1="12" y1="8" x2="12" y2="20" stroke="#3c6e35" stroke-width="1.5"/></svg>',
-          autumn: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 3.5 L14 8.8 L19 7.8 L15.5 11.5 L17 15.2 L12 13 L7 15.2 L8.5 11.5 L5 7.8 L10 8.8 Z" fill="#c8372d"/><line x1="12" y1="13" x2="12" y2="20.5" stroke="#6e472b" stroke-width="1.5"/></svg>',
-          winter: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 4 V20 M4 12 H20 M6.5 6.5 L17.5 17.5 M17.5 6.5 L6.5 17.5" stroke="#6aa9d9" stroke-width="1.8" stroke-linecap="round"/></svg>'
-        };
-
-        const inner = SVG_MAP[type] || SEASON_DEFAULT_SVG[season] || SEASON_DEFAULT_SVG.autumn;
-        return `<span class="spot-chibi" title="${escapeHtml(type)}">${inner}</span>`;
-      }
-
-      let currentDate = '';
-      let availableDates = [];
-      let currentSchedule = null;
-      let baselineStartDate = '';
-      let customMealReminder = '';
-      let lastMascotContextKey = '';
-      let quoteIndex = 0;
-      let copyTargetAnchorId = 'TOP';
-
-      function escapeHtml(str) {
-        return String(str === null || str === undefined ? '' : str)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-
-      function updateNetworkBadge() {
-        const badge = document.getElementById('netBadge');
-        if (!badge) return;
-        const online = navigator.onLine;
-        badge.textContent = online ? '🟢 線上' : '🟠 離線';
-        badge.style.background = online ? 'rgba(36, 107, 60, 0.55)' : 'rgba(120, 90, 60, 0.72)';
-      }
-
-      const netBadge = document.getElementById('netBadge');
-      const syncMetaBar = document.getElementById('syncMetaBar');
-      if (netBadge && syncMetaBar) {
-        netBadge.addEventListener('click', (e) => {
-          e.stopPropagation();
-          syncMetaBar.classList.toggle('open');
-        });
-        document.addEventListener('click', () => {
-          syncMetaBar.classList.remove('open');
-        });
-      }
-
-      function syncMascotWithSchedule(sched, cycleQuote) {
-        const bubbleEl = document.getElementById('mascotBubble');
-        const roleEl = document.getElementById('birdRoleBadge');
-        const seasonEl = document.getElementById('birdSeasonBadge');
-        const weatherEl = document.getElementById('birdWeatherBadge');
-        if (!bubbleEl || !roleEl || !seasonEl || !weatherEl) return;
-
-        const season = detectSeasonLeaf(currentDate, baselineStartDate);
-        const weatherMode = (sched && sched.weatherMode === 'rain') ? 'rain' : 'sun';
-        seasonEl.innerHTML = SEASON_BADGE_SVG[season] || SEASON_BADGE_SVG.autumn;
-
-        if (!sched || !sched.hasBaseline) {
-          roleEl.innerHTML = '';
-          weatherEl.innerHTML = '';
-          const key = `${currentDate || 'none'}|empty|none|${weatherMode}|${season}|sheltered`;
-          if (key !== lastMascotContextKey) {
-            lastMascotContextKey = key;
-            quoteIndex = 0;
-          }
-          bubbleEl.textContent = '啾！同步後一起出發';
-          return;
-        }
-
-        const st = sched.stats || { total: 0, done: 0, skipped: 0, pending: 0, lateCount: 0 };
-        const total = Number(st.total || 0);
-        const done = Number(st.done || 0);
-        const pending = Number(st.pending || 0);
-        const lateCount = Number(st.lateCount || 0);
-
-        const items = sched.visibleItems || sched.items || [];
-        const nextPending = items.find((i) => i.status === 'pending') || null;
-        const nextType = nextPending ? classifyActivityType(nextPending) : 'default';
-
-        let stateBucket = 'active';
-        let activeType = 'none';
-        let rainExposure = 'sheltered';
-        let lines = ['啾！點我跳到下一站～'];
-
-        if (sched.isStopped) {
-          stateBucket = 'stopped';
-          roleEl.innerHTML = ROLE_BADGE_SVG.sleep;
-          weatherEl.innerHTML = '';
-          lines = ['啾～今天辛苦了，好好休息💤'];
-        } else if (total > 0 && done === total) {
-          stateBucket = 'all_done';
-          roleEl.innerHTML = '';
-          weatherEl.innerHTML = '';
-          lines = ['本日全制霸！去慶祝吧🎉'];
-        } else if (total > 0 && pending === 0 && done < total) {
-          stateBucket = 'no_pending';
-          roleEl.innerHTML = '';
-          weatherEl.innerHTML = '';
-          lines = ['今日行程告一段落囉～'];
-        } else if (lateCount > 0) {
-          stateBucket = 'late';
-          roleEl.innerHTML = '';
-          weatherEl.innerHTML = '';
-          lines = weatherMode === 'rain'
-            ? ['雨天節奏較緊，留意時間與路滑喔']
-            : ['啾！這站時間較緊，留意節奏'];
-        } else {
-          stateBucket = 'active';
-          activeType = nextType;
-          rainExposure = detectRainExposure(nextPending, nextType, weatherMode);
-
-          if (['flight', 'train', 'bus', 'ship'].indexOf(nextType) !== -1) {
-            roleEl.innerHTML = ROLE_BADGE_SVG.conductor;
-            weatherEl.innerHTML = '';
-            lines = weatherMode === 'rain'
-              ? ['雨天移動留意轉乘與票券☂️', '下一段移動準備出發囉']
-              : ['票券與隨身行李確認好囉！', '下一段移動準備出發～'];
-          } else if (nextType === 'meal' || nextType === 'cafe') {
-            roleEl.innerHTML = ROLE_BADGE_SVG.onigiri;
-            weatherEl.innerHTML = '';
-            const tip = customMealReminder || '該補充體力啦～點餐留意忌口';
-            lines = [tip, '慢慢享用美味餐點吧🍙'];
-          } else if (nextType === 'onsen') {
-            roleEl.innerHTML = ROLE_BADGE_SVG.onsen;
-            weatherEl.innerHTML = '';
-            lines = ['泡個暖呼呼溫泉放鬆一下♨️', '毛巾與換洗衣物準備好囉'];
-          } else if (nextType === 'hotel') {
-            roleEl.innerHTML = ROLE_BADGE_SVG.hotel;
-            weatherEl.innerHTML = '';
-            lines = ['先安頓好行李再輕鬆逛～', '準備回飯店休息充電囉'];
-          } else if (nextType === 'museum') {
-            roleEl.innerHTML = ROLE_BADGE_SVG.museum;
-            weatherEl.innerHTML = '';
-            lines = weatherMode === 'rain'
-              ? ['室內展館不怕下雨，慢慢看展', '找個喜歡的角落細細欣賞～']
-              : ['慢慢逛展，享受藝文時光～', '下一站來去看看吧！'];
-          } else if (nextType === 'nature' || nextType === 'shrine') {
-            roleEl.innerHTML = '';
-            weatherEl.innerHTML = rainExposure === 'outdoor' ? WEATHER_BADGE_SVG.rain_outdoor : '';
-            lines = weatherMode === 'rain'
-              ? ['雨中賞景別有詩意，小心路滑☂️', '撐傘慢慢走，安全第一～']
-              : ['風景好舒服，慢慢拍不趕路！', '深呼吸享受當季好風光～'];
-          } else {
-            roleEl.innerHTML = '';
-            weatherEl.innerHTML = '';
-            lines = weatherMode === 'rain'
-              ? ['雨天備案啟動中，留意天氣☂️', '穩穩走，下一站見～']
-              : ['啾！點我跳到下一站～', `今天共 ${total} 站，慢慢逛不趕路`];
-          }
-        }
-
-        const contextKey = [
-          currentDate,
-          stateBucket,
-          activeType,
-          weatherMode,
-          season,
-          rainExposure
-        ].join('|');
-
-        if (contextKey !== lastMascotContextKey) {
-          lastMascotContextKey = contextKey;
-          quoteIndex = 0;
-        } else if (cycleQuote && lines.length > 1) {
-          quoteIndex = (quoteIndex + 1) % lines.length;
-        }
-
-        bubbleEl.textContent = lines[quoteIndex % lines.length];
-      }
-
-      function jumpToNextPendingCard() {
-        const cards = Array.from(document.querySelectorAll('#scheduleList .timeline-item'));
-        const target = cards.find((c) => !c.classList.contains('status-done') && !c.classList.contains('status-skipped'));
-        if (!target) return;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        target.classList.add('highlight-target');
-        setTimeout(() => target.classList.remove('highlight-target'), 1400);
-      }
-
-      const mascotStage = document.getElementById('mascotStage');
-      if (mascotStage) {
-        mascotStage.addEventListener('click', () => {
-          syncMascotWithSchedule(currentSchedule, true);
-          jumpToNextPendingCard();
-        });
-      }
-
-      function loadPrefsToInputs() {
-        try {
-          const devId = getOrCreateDeviceId();
-          const defInput = document.getElementById('defaultStartTimeInput');
-          if (defInput) defInput.value = safeGetDefaultStartTime();
-          const roleSel = document.getElementById('roleSelect');
-          if (roleSel) roleSel.value = getCurrentRole();
-          const devNameInput = document.getElementById('deviceNameInput');
-          if (devNameInput) devNameInput.value = localStorage.getItem(PREF_KEYS.DEVICE_NAME) || '';
-          const devHint = document.getElementById('deviceIdHint');
-          if (devHint) devHint.textContent = '本機固定識別碼：' + devId;
-          const apiInput = document.getElementById('apiUrlInput');
-          if (apiInput) apiInput.value = localStorage.getItem(PREF_KEYS.API_URL) || '';
-          const readInput = document.getElementById('readTokenInput');
-          if (readInput) readInput.value = getStoredReadToken();
-          const pubInput = document.getElementById('publishTokenInput');
-          if (pubInput) pubInput.value = localStorage.getItem(PREF_KEYS.PUBLISH_TOKEN) || '';
-        } catch (err) {
-          showBanner('err', '讀取本機設定失敗：' + (err && err.message ? err.message : String(err)));
-        }
-      }
-
-      function savePrefsFromInputs() {
-        try {
-          const rawDefaultStart = (document.getElementById('defaultStartTimeInput').value || '').trim();
-          const defaultStart = safeIsValidHHMM(rawDefaultStart) ? rawDefaultStart : FALLBACK_DEFAULT_START;
-          document.getElementById('defaultStartTimeInput').value = defaultStart;
-          localStorage.setItem(PREF_KEYS.DEFAULT_START_TIME, defaultStart);
-
-          const role = document.getElementById('roleSelect').value === 'host' ? 'host' : 'family';
-          const deviceName = (document.getElementById('deviceNameInput').value || '').trim();
-          const url = (document.getElementById('apiUrlInput').value || '').trim();
-          const readToken = (document.getElementById('readTokenInput').value || '').trim();
-          const publishToken = (document.getElementById('publishTokenInput').value || '').trim();
-
-          if (role === 'host' && !deviceName) {
-            showBanner('err', '切換為「主控模式」時，請務必填寫裝置顯示名稱（例如：啟明手機 或 心怡手機）');
-            document.getElementById('deviceNameInput').focus();
-            return false;
-          }
-
-          getOrCreateDeviceId();
-          document.getElementById('deviceNameInput').value = deviceName;
-          localStorage.setItem(PREF_KEYS.ROLE, role);
-          localStorage.setItem(PREF_KEYS.DEVICE_NAME, deviceName);
-          localStorage.setItem(PREF_KEYS.API_URL, url);
-          localStorage.setItem(PREF_KEYS.READ_TOKEN, readToken);
-          localStorage.setItem(PREF_KEYS.PUBLISH_TOKEN, publishToken);
-
-          updateLiveSyncIndicators();
-          renderHeaderAndDates().catch(() => {});
-          renderScheduleTab().catch(() => {});
-          showBanner('ok', role === 'host'
-            ? `已儲存設定（主控模式｜裝置：${deviceName}｜預設出發 ${defaultStart}）`
-            : `已儲存設定（瀏覽模式｜預設出發 ${defaultStart}）`);
-          return true;
-        } catch (err) {
-          showBanner('err', '儲存設定失敗（請確認瀏覽器未封鎖本機儲存）：' + (err && err.message ? err.message : String(err)));
-          return false;
-        }
-      }
-
-      function enumerateDates(startIso, endIso, itinerary) {
-        const set = new Set();
-        if (startIso && endIso && /^\d{4}-\d{2}-\d{2}$/.test(startIso) && /^\d{4}-\d{2}-\d{2}$/.test(endIso)) {
-          const [sy, sm, sd] = startIso.split('-').map(Number);
-          const [ey, em, ed] = endIso.split('-').map(Number);
-          let cur = Date.UTC(sy, sm - 1, sd);
-          const end = Date.UTC(ey, em - 1, ed);
-          let guard = 0;
-          while (cur <= end && guard < 120) {
-            const d = new Date(cur);
-            const y = d.getUTCFullYear();
-            const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(d.getUTCDate()).padStart(2, '0');
-            set.add(`${y}-${m}-${day}`);
-            cur += 86400000;
-            guard++;
-          }
-        }
-        (itinerary || []).forEach((it) => {
-          if (it.trip_date) set.add(String(it.trip_date).trim());
-        });
-        return Array.from(set).sort();
-      }
-
-      async function renderHeaderAndDates() {
-        const metaBar = document.getElementById('syncMetaBar');
-        const dateSel = document.getElementById('dateSelect');
-        if (!metaBar || !dateSel) return null;
-
-        if (typeof TripIdbStore === 'undefined') {
-          metaBar.innerHTML = '<div>儲存模組尚未載入，請重新整理網頁</div>';
-          return null;
-        }
-
-        const baseline = await TripIdbStore.getBaseline();
-        const liveMeta = (typeof TripSyncService !== 'undefined' && TripSyncService.getLiveSyncMeta)
-          ? TripSyncService.getLiveSyncMeta()
-          : { revision: 0, hasUnpublished: false };
-        const role = getCurrentRole();
-        const myDeviceId = getOrCreateDeviceId();
-
-        const roleLine = `<div>本機模式：${role === 'host' ? '🧭 主控模式' : '👀 瀏覽模式'}${liveMeta.hasUnpublished ? '（有未發布變更）' : ''}</div>`;
-        const hostLine = liveMeta.revision > 0
-          ? `<div>雲端主控：${escapeHtml((liveMeta.publishedByName || '主控端') + (liveMeta.publishedByDeviceId === myDeviceId ? '（本機）' : ''))} (v${liveMeta.revision})</div>`
-          : '<div>雲端主控：尚未發布</div>';
-
-        if (!baseline) {
-          baselineStartDate = '';
-          customMealReminder = '';
-          availableDates = [];
-          metaBar.innerHTML = roleLine + hostLine + '<div>尚未同步雲端底稿</div>';
-          dateSel.innerHTML = '<option value="">無可用日期</option>';
-          currentDate = '';
-          updateLiveSyncIndicators();
-          return null;
-        }
-
-        const m = baseline.meta || {};
-        baselineStartDate = m.tripStartDate || '';
-
-        const metas = Array.isArray(baseline.trip_meta) ? baseline.trip_meta : [];
-        const mealMeta = metas.find((x) => /飲食|忌口|meal_tip/i.test(`${x.category || ''} ${x.title_zh || ''}`));
-        customMealReminder = mealMeta ? String(mealMeta.info_text || mealMeta.title_zh || '').slice(0, 22) : '';
-
-        const syncedStr = baseline.syncedAt ? new Date(baseline.syncedAt).toLocaleString('zh-TW') : '-';
-
-        metaBar.innerHTML =
-          roleLine +
-          hostLine +
-          `<div>底稿版本：${escapeHtml(m.dataVersion || '-')}</div>` +
-          `<div>底稿同步：${escapeHtml(syncedStr)}</div>`;
-
-        const dates = enumerateDates(m.tripStartDate, m.tripEndDate, baseline.itinerary);
-        availableDates = dates;
-        const savedDate = localStorage.getItem(PREF_KEYS.SELECTED_DATE) || '';
-        if (!currentDate) {
-          currentDate = (savedDate && dates.indexOf(savedDate) !== -1) ? savedDate : (dates[0] || '');
-        } else if (dates.length > 0 && dates.indexOf(currentDate) === -1) {
-          currentDate = dates[0];
-        }
-
-        dateSel.innerHTML = dates.length > 0
-          ? dates.map((d, i) => `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}）</option>`).join('')
-          : '<option value="">無日期資料</option>';
-
-        updateLiveSyncIndicators();
-        return baseline;
-      }
-
-      async function renderScheduleTab() {
-        const listEl = document.getElementById('scheduleList');
-        const statsEl = document.getElementById('dayStats');
-        const btnW = document.getElementById('btnToggleWeather');
-        const btnS = document.getElementById('btnToggleStop');
-        const dayStartInput = document.getElementById('dayStartInput');
-        if (!listEl || !statsEl) return;
-
-        if (dayStartInput && !dayStartInput.value) {
-          dayStartInput.value = safeGetDefaultStartTime();
-        }
-
-        if (!currentDate) {
-          statsEl.innerHTML = '';
-          syncMascotWithSchedule(null, false);
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，請先切換至下方「設定備份」輸入網址與 Token 並執行同步。</div>';
-          return;
-        }
-
-        if (typeof TripScheduleEngine === 'undefined' || typeof TripScheduleEngine.buildDaySchedule !== 'function') {
-          listEl.innerHTML = '<div class="empty-state">排程引擎尚未載入，請重新整理網頁。</div>';
-          return;
-        }
-
-        const sched = await TripScheduleEngine.buildDaySchedule(currentDate);
-        currentSchedule = sched;
-        syncMascotWithSchedule(sched, false);
-
-        if (!sched.hasBaseline) {
-          statsEl.innerHTML = '';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿。</div>';
-          return;
-        }
-
-        if (dayStartInput) {
-          dayStartInput.value = sched.dayStartOverride || sched.effectiveStartTime || safeGetDefaultStartTime();
-        }
-
-        btnW.textContent = sched.weatherMode === 'rain' ? '晴雨：🌧️ 雨天' : '晴雨：☀️ 晴天';
-        btnS.textContent = sched.isStopped ? '已收工（點此恢復顯示）' : '今天就到這裡';
-        btnS.className = sched.isStopped ? 'btn-sm btn-ok' : 'btn-sm btn-warn';
-
-        const st = sched.stats;
-        const season = detectSeasonLeaf(currentDate, baselineStartDate);
-        const doneEmoji = season === 'spring' ? '🌸' : (season === 'summer' ? '🌿' : (season === 'winter' ? '❄️' : '🍁'));
-        const dangos = (sched.items || []).map((it, i) => {
-          const s = it.status || 'pending';
-          if (s === 'done') return `<span class="dango-dot done" title="第 ${i + 1} 站已完成">${doneEmoji}</span>`;
-          if (s === 'skipped') return `<span class="dango-dot skipped" title="第 ${i + 1} 站已跳過">☁️</span>`;
-          return `<span class="dango-dot" title="第 ${i + 1} 站待執行">${i + 1}</span>`;
-        }).join('');
-
-        statsEl.innerHTML =
-          `<div class="dango-track">${dangos}</div>` +
-          `<div class="stats-summary">` +
-            `<span class="pill">總 ${st.total}</span>` +
-            `<span class="pill">完 ${st.done}</span>` +
-            `<span class="pill">跳 ${st.skipped}</span>` +
-            `<span class="pill">待 ${st.pending}</span>` +
-            (st.lateCount > 0 ? `<span class="pill late">逾時 ${st.lateCount}</span>` : '') +
-            (sched.isStopped ? `<span class="pill stop">已收工</span>` : '') +
-          `</div>`;
-
-        if (!sched.visibleItems || sched.visibleItems.length === 0) {
-          listEl.innerHTML = sched.isStopped
-            ? '<div class="empty-state">今日已標記「今天就到這裡」，剩餘待執行行程已停止顯示（狀態仍維持 pending）。</div>'
-            : '<div class="empty-state">本日尚無排定行程。</div>';
-          return;
-        }
-
-        let activeStepNum = 0;
-
-        listEl.innerHTML = sched.visibleItems.map((it) => {
-          const statusClass = 'status-' + (it.status || 'pending');
-          const lateClass = it.isLate ? ' is-late' : '';
-          const isSkipped = it.status === 'skipped';
-          if (!isSkipped) activeStepNum++;
-
-          const timeRange = isSkipped
-            ? '⏭️ 已跳過（不計入時間推算）'
-            : (it.isLastOfDay
-              ? `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分，末站）`
-              : `🕒 ${it.estArrive}${it.estArriveNextDay ? ' (+1d)' : ''} ～ ${it.estDepart}${it.estDepartNextDay ? ' (+1d)' : ''}（停留 ${it.dwell_min} 分）→ 下一站 ${it.nextArrive}${it.nextArriveNextDay ? ' (+1d)' : ''}（${escapeHtml(it.transport_mode || '移動')} ${it.effectiveTravelMin}m + 緩衝 ${it.effectiveBufferMin}m）`);
-
-          const statusBadge = it.status === 'done'
-            ? '<span class="tag" style="background:#e7f6ec;color:#2c7a47;">已完成</span>'
-            : (isSkipped
-              ? '<span class="tag" style="background:#efece8;color:#6e6056;">已跳過</span>'
-              : '<span class="tag">待執行</span>');
-
-          const isBaseline = it._sourceType === 'baseline';
-          const actKey = encodeURIComponent(it.activity_id);
-          const overriddenZh = formatOverriddenFieldsZh(it._overriddenFields);
-
-          let actionButtons = '';
-          if (it.status === 'pending') {
-            actionButtons += `<button type="button" class="btn-sm btn-ok" onclick="window.__app.onSetStatus('${actKey}', 'done')">✅ 完成</button>`;
-            actionButtons += `<button type="button" class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'skipped')">⏭️ 跳過</button>`;
-          } else {
-            actionButtons += `<button type="button" class="btn-sm btn-muted" onclick="window.__app.onSetStatus('${actKey}', 'pending')">↩️ 改待執行</button>`;
-          }
-          if (isBaseline) {
-            actionButtons += `<button type="button" class="btn-sm btn-ghost" onclick="window.__app.onToggleEdit('${actKey}')">編輯／還原</button>`;
-            actionButtons += `<button type="button" class="btn-sm btn-ghost" onclick="window.__app.onOpenCopyModal('${actKey}')">📋 複製加點</button>`;
-          }
-          if (it._sourceType === 'inserted') {
-            actionButtons += `<button type="button" class="btn-sm btn-danger" onclick="window.__app.onRemoveInserted('${escapeHtml(it.activity_id)}')">移除插入站</button>`;
-          }
-
-          return `
-            <article class="timeline-item ${statusClass}${lateClass}" data-act-id="${escapeHtml(it.activity_id)}">
-              <div class="item-top">
-                <div class="item-time">${escapeHtml(timeRange)}</div>
-                <div>${statusBadge}</div>
-              </div>
-              <div class="item-title-row">
-                ${renderSpotChibi(it, season)}
-                <h3 class="item-title"><span class="step-badge">${isSkipped ? '跳過' : '第 ' + activeStepNum + ' 站'}</span>${escapeHtml(it.title_zh)}</h3>
-              </div>
-              ${it.title_jp ? `<div class="item-jp">🇯🇵 ${escapeHtml(it.title_jp)}${it.area ? '｜' + escapeHtml(it.area) : ''}</div>` : (it.area ? `<div class="item-jp">${escapeHtml(it.area)}</div>` : '')}
-              ${it.address_jp ? `<div class="item-addr">📍 ${escapeHtml(it.address_jp)}</div>` : ''}
-              ${it.note ? `<div class="note-soft">📝 ${escapeHtml(it.note)}</div>` : ''}
+      containerEl.innerHTML = "";
+      computed.items.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "card" + (item.skipped ? " skipped" : "");
+
+        const originTag = item._origin === "extra" ? '<span class="badge">臨時加點</span>' : "";
+        const waitTag = item.wait_min > 0 ? '<span class="tag-wait">提早到・等待 ' + item.wait_min + ' 分</span>' : "";
+        const lateTag = item.is_late ? '<span class="tag-late">逾時提醒</span>' : "";
+        const startOvNote = item.has_start_override ? "（已微調開始時間）" : "";
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <strong>${item.computed_start}${item.computed_end ? " – " + item.computed_end : ""}｜${escapeHtml(item.title_zh || "")}</strong>
+            <div>${originTag} ${waitTag} ${lateTag}</div>
+          </div>
+          <div class="meta-row">
+            <span>區域：${escapeHtml(item.area || "-")}</span>
+            <span>性質：${escapeHtml(item.time_type || "彈性")}</span>
+            <span>停留：${item.dwell_min} 分</span>
+            <span>下段交通：${escapeHtml(item.transport_mode || "-")}（${item.travel_min} + 緩衝 ${item.buffer_min} 分）</span>
+            <span>${startOvNote}</span>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn" data-act="toggle-edit" data-id="${escapeAttr(item.activity_id)}">編輯／還原</button>
+            <button type="button" class="btn" data-act="toggle-copy" data-id="${escapeAttr(item.activity_id)}">📋 複製加點</button>
+            <button type="button" class="btn" data-act="toggle-skip" data-id="${escapeAttr(item.activity_id)}">${item.skipped ? "取消跳過" : "跳過"}</button>
+          </div>
+
+          <div class="panel" id="edit-${escapeAttr(item.activity_id)}">
+            <div class="field-grid">
               <div>
-                ${it._sourceType === 'inserted' ? `<span class="tag inserted">${it.copied_from_id ? '本機複製加點' : '本機插入備選'}</span>` : ''}
-                ${(it._hasOverrides && overriddenZh) ? '<span class="tag override">已微調：' + escapeHtml(overriddenZh) + '</span>' : ''}
-                ${(!isSkipped && it.waitMin > 0) ? '<span class="tag wait">提早抵達，等待 ' + it.waitMin + ' 分</span>' : ''}
-                ${it.isLate ? '<span class="tag late">逾時</span>' : ''}
+                <label>開始時間（留空解除單站時間）</label>
+                <input type="time" class="inp-start" value="${escapeAttr(item.effective_start_time || "")}" />
               </div>
-              ${it.isLate ? `<div class="alert-box">${escapeHtml(it.lateReason)}</div>` : ''}
-              ${it._anchorMissing ? `<div class="warn-box">原插入錨點（${escapeHtml(it._afterActivityId)}）已不存在，已自動接在當日行程末端。</div>` : ''}
-
-              <div class="item-actions">${actionButtons}</div>
-
-              ${isBaseline ? `
-                <div id="edit-${escapeHtml(it.activity_id)}" class="edit-panel">
-                  <div class="edit-grid">
-                    <div class="field-box">
-                      <label>停留分鐘</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-dwell-${escapeHtml(it.activity_id)}" value="${it.dwell_min}" />
-                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'dwell_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通分鐘</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-travel-${escapeHtml(it.activity_id)}" value="${it.travel_min}" />
-                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'travel_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通緩衝</label>
-                      <div class="field-row-inline">
-                        <input type="number" min="0" id="f-buffer-${escapeHtml(it.activity_id)}" value="${it.buffer_min}" />
-                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'buffer_min')">還原</button>
-                      </div>
-                    </div>
-                    <div class="field-box">
-                      <label>交通方式</label>
-                      <div class="field-row-inline">
-                        <input type="text" id="f-trans-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.transport_mode || '')}" />
-                        <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'transport_mode')">還原</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="field-box" style="margin-bottom:8px;">
-                    <label>隨手備註</label>
-                    <div class="field-row-inline">
-                      <input type="text" id="f-note-${escapeHtml(it.activity_id)}" value="${escapeHtml(it.note || '')}" />
-                      <button type="button" class="btn-sm" title="還原此欄位" onclick="window.__app.onResetField('${actKey}', 'note')">還原</button>
-                    </div>
-                  </div>
-                  <button type="button" class="btn-sm btn-primary" onclick="window.__app.onSaveOverride('${actKey}')">儲存本機微調</button>
-                </div>
-              ` : ''}
-            </article>
-          `;
-        }).join('');
-      }
-
-      async function populateCopySourceActivities(sourceDate) {
-        const actSel = document.getElementById('copySourceActSelect');
-        if (!actSel) return;
-        const sched = await TripScheduleEngine.buildDaySchedule(sourceDate, { includeStoppedRemaining: true });
-        const candidates = (sched.items || []).filter((it) => it._sourceType === 'baseline');
-        if (candidates.length === 0) {
-          actSel.innerHTML = '<option value="">該日期無可用底稿站點</option>';
-          return;
-        }
-        actSel.innerHTML = candidates.map((it, i) =>
-          `<option value="${escapeHtml(it.activity_id)}">第 ${i + 1} 站｜${escapeHtml(it.title_zh)}${it.area ? '（' + escapeHtml(it.area) + '）' : ''}</option>`
-        ).join('');
-      }
-
-      async function renderPocketTab() {
-        const anchorSel = document.getElementById('insertAnchorSelect');
-        const listEl = document.getElementById('pocketList');
-        if (!anchorSel || !listEl || typeof TripIdbStore === 'undefined') return;
-
-        const baseline = await TripIdbStore.getBaseline();
-
-        if (!currentDate) {
-          anchorSel.innerHTML = '<option value="TOP">當日最前面</option>';
-          listEl.innerHTML = '<div class="empty-state">尚未同步雲端底稿，無備選口袋資料。</div>';
-          return;
-        }
-
-        const sched = currentSchedule || await TripScheduleEngine.buildDaySchedule(currentDate);
-        const anchorOptions = ['<option value="TOP">當日最前面</option>'];
-        (sched.items || []).forEach((it) => {
-          if (it._sourceType === 'baseline') {
-            anchorOptions.push(`<option value="${escapeHtml(it.activity_id)}">「${escapeHtml(it.title_zh)}」之後</option>`);
-          }
-        });
-        anchorSel.innerHTML = anchorOptions.join('');
-
-        const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
-        if (spots.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">底稿中尚無備選口袋景點。</div>';
-          return;
-        }
-
-        const season = detectSeasonLeaf(currentDate, baselineStartDate);
-        listEl.innerHTML = spots.map((sp, idx) => `
-          <div class="section-card">
-            <div class="item-top" style="padding-right:0;">
               <div>
-                <div class="item-title-row">
-                  ${renderSpotChibi(sp, season)}
-                  <strong>${escapeHtml(sp.title_zh)}</strong>
-                </div>
-                <div class="item-jp">
-                  ${sp.title_jp ? '🇯🇵 ' + escapeHtml(sp.title_jp) + '｜' : ''}${escapeHtml(sp.area || '')}｜${escapeHtml(sp.indoor_outdoor || '')}
-                  ｜停留 ${sp.default_dwell_min} 分｜${escapeHtml(sp.transport_mode || '')} ${sp.default_travel_min} 分
-                </div>
-                ${sp.address_jp ? `<div class="item-addr">📍 ${escapeHtml(sp.address_jp)}</div>` : ''}
-                ${sp.note ? `<div class="note-soft">📝 ${escapeHtml(sp.note)}</div>` : ''}
+                <label>停留分鐘</label>
+                <input type="number" class="inp-dwell" min="0" value="${item.dwell_min}" />
               </div>
-              <button type="button" class="btn-sm btn-primary" onclick="window.__app.onInsertSpot(${idx})">＋ 插入本日</button>
+              <div>
+                <label>交通分鐘</label>
+                <input type="number" class="inp-travel" min="0" value="${item.travel_min}" />
+              </div>
+              <div>
+                <label>交通緩衝（分）</label>
+                <input type="number" class="inp-buffer" min="0" value="${item.buffer_min}" />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn primary" data-act="save-edit" data-id="${escapeAttr(item.activity_id)}">儲存本機微調</button>
+              <button type="button" class="btn" data-act="clear-start" data-id="${escapeAttr(item.activity_id)}">清空開始時間</button>
+              <button type="button" class="btn" data-act="reset-card" data-id="${escapeAttr(item.activity_id)}">還原底稿值</button>
             </div>
           </div>
-        `).join('');
-      }
 
-      async function renderMetaTab() {
-        const listEl = document.getElementById('metaList');
-        if (!listEl || typeof TripIdbStore === 'undefined') return;
-        const baseline = await TripIdbStore.getBaseline();
-        const metas = (baseline && Array.isArray(baseline.trip_meta)) ? baseline.trip_meta : [];
-
-        if (metas.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">尚無住宿與航班資料。</div>';
-          return;
-        }
-
-        listEl.innerHTML = metas.map((m) => `
-          <div class="section-card">
-            <div class="item-time">${escapeHtml(m.trip_date || '通用')} ・ ${escapeHtml(m.category || '')}</div>
-            <div class="item-title" style="margin-top:5px;">${escapeHtml(m.title_zh)}</div>
-            ${m.title_jp ? `<div class="item-jp">🇯🇵 ${escapeHtml(m.title_jp)}</div>` : ''}
-            ${m.address_jp ? `<div class="item-addr">📍 ${escapeHtml(m.address_jp)}</div>` : ''}
-            ${m.info_text ? `<div class="note-soft">${escapeHtml(m.info_text)}</div>` : ''}
+          <div class="panel" id="copy-${escapeAttr(item.activity_id)}">
+            <div class="field-grid">
+              <div>
+                <label>插入位置</label>
+                <select class="sel-placement">
+                  <option value="before">插在本站前</option>
+                  <option value="after">插在本站後</option>
+                </select>
+              </div>
+              <div>
+                <label>新站點名稱</label>
+                <input type="text" class="inp-title" value="${escapeAttr((item.title_zh || "") + "（加點）")}" />
+              </div>
+              <div>
+                <label>停留分鐘</label>
+                <input type="number" class="inp-ex-dwell" min="0" value="30" />
+              </div>
+              <div>
+                <label>交通分鐘</label>
+                <input type="number" class="inp-ex-travel" min="0" value="10" />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn primary" data-act="confirm-copy" data-id="${escapeAttr(item.activity_id)}">確認加入</button>
+            </div>
           </div>
-        `).join('');
+        `;
+        containerEl.appendChild(card);
+      });
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
       }
+    }
 
-      async function renderRemovedHistory() {
-        const el = document.getElementById('removedHistoryList');
-        if (!el || typeof TripIdbStore === 'undefined') return;
-        const list = await TripIdbStore.getRemovedHistory();
-        if (!list || list.length === 0) {
-          el.innerHTML = '<div class="muted-note">目前沒有已移除項目歷史紀錄。</div>';
-          return;
-        }
-        el.innerHTML = list.map((r) => `
-          <div style="padding:8px; border:1px dashed var(--dash); border-radius:10px; margin-bottom:6px; font-size:12px;">
-            <strong>${escapeHtml(r.title_zh || r.activity_id)}</strong>（${escapeHtml(r.activity_id)}｜${escapeHtml(r.trip_date || '')}）
-            <div>移除時間：${escapeHtml(r.removedAt || '')}</div>
-            <div>本機曾修改欄位：<code>${escapeHtml(JSON.stringify(r.overrideFields || {}))}</code></div>
-          </div>
-        `).join('');
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+    function escapeAttr(s) {
+      return escapeHtml(s);
+    }
+
+    settingsDefaultStartEl.addEventListener("change", () => {
+      if (ScheduleEngine.isValidHHMM(settingsDefaultStartEl.value)) {
+        writeSettingsDefaultStart(settingsDefaultStartEl.value);
+        render();
       }
+    });
 
-      async function refreshAll() {
-        updateNetworkBadge();
-        try {
-          await renderHeaderAndDates();
-          await renderScheduleTab();
-          await renderPocketTab();
-          await renderMetaTab();
-          await renderRemovedHistory();
-        } catch (err) {
-          showBanner('err', '讀取行程資料失敗：' + (err && err.message ? err.message : String(err)));
-        }
+    dayStartEl.addEventListener("change", () => {
+      const tripDate = getCurrentDate();
+      if (ScheduleEngine.isValidHHMM(dayStartEl.value)) {
+        state.runtimeState["start:" + tripDate] = {
+          time: dayStartEl.value,
+          manual: true,
+          updatedAt: new Date().toISOString()
+        };
+        render();
       }
+    });
 
-      window.__app = {
-        async onSetStatus(encodedId, status) {
-          const actId = decodeURIComponent(encodedId);
-          await TripScheduleEngine.setActivityStatus(actId, status, currentDate);
-          handleLocalDataChanged();
-          await renderScheduleTab();
-        },
-        onToggleEdit(encodedId) {
-          const actId = decodeURIComponent(encodedId);
-          const panel = document.getElementById('edit-' + actId);
-          if (panel) panel.classList.toggle('open');
-        },
-        async onSaveOverride(encodedId) {
-          const actId = decodeURIComponent(encodedId);
-          const dwellVal = Number(document.getElementById('f-dwell-' + actId).value);
-          const travelVal = Number(document.getElementById('f-travel-' + actId).value);
-          const bufferVal = Number(document.getElementById('f-buffer-' + actId).value);
-          const transVal = document.getElementById('f-trans-' + actId).value.trim();
-          const noteVal = document.getElementById('f-note-' + actId).value;
+    resetBtn.addEventListener("click", () => {
+      const tripDate = getCurrentDate();
+      delete state.runtimeState["start:" + tripDate];
+      render();
+    });
 
-          if (!Number.isInteger(dwellVal) || dwellVal < 0 ||
-              !Number.isInteger(travelVal) || travelVal < 0 ||
-              !Number.isInteger(bufferVal) || bufferVal < 0) {
-            showBanner('err', '停留、交通與緩衝分鐘必須為 0 以上的整數');
-            return;
-          }
+    dateEl.addEventListener("change", render);
 
-          await TripScheduleEngine.updateActivityOverride(actId, currentDate, {
+    containerEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+      const act = btn.getAttribute("data-act");
+      const id = btn.getAttribute("data-id");
+      const tripDate = getCurrentDate();
+
+      if (act === "toggle-edit") {
+        document.getElementById("edit-" + id)?.classList.toggle("open");
+      } else if (act === "toggle-copy") {
+        document.getElementById("copy-" + id)?.classList.toggle("open");
+      } else if (act === "toggle-skip") {
+        const cur = state.localOverrides[id] || { fields: {} };
+        const nextSkipped = !cur.skipped;
+        state.localOverrides[id] = { ...cur, skipped: nextSkipped };
+        render();
+      } else if (act === "save-edit") {
+        const panel = document.getElementById("edit-" + id);
+        const startVal = panel.querySelector(".inp-start").value.trim();
+        const dwellVal = Number(panel.querySelector(".inp-dwell").value || 0);
+        const travelVal = Number(panel.querySelector(".inp-travel").value || 0);
+        const bufferVal = Number(panel.querySelector(".inp-buffer").value || 0);
+
+        state.localOverrides[id] = {
+          activity_id: id,
+          trip_date: tripDate,
+          fields: {
+            start_time: startVal,
             dwell_min: dwellVal,
             travel_min: travelVal,
-            buffer_min: bufferVal,
-            transport_mode: transVal,
-            note: noteVal
-          });
-          handleLocalDataChanged();
-          showBanner('ok', '已儲存本機欄位微調');
-          await renderScheduleTab();
-        },
-        async onResetField(encodedId, fieldName) {
-          const actId = decodeURIComponent(encodedId);
-          await TripScheduleEngine.resetActivityField(actId, fieldName, currentDate);
-          handleLocalDataChanged();
-          const label = FIELD_LABELS_ZH[fieldName] || fieldName;
-          showBanner('info', `已還原「${label}」為雲端底稿值`);
-          await renderScheduleTab();
-        },
-        async onInsertSpot(spotIdx) {
-          if (!currentDate) return;
-          const baseline = await TripIdbStore.getBaseline();
-          const spots = (baseline && Array.isArray(baseline.pocket_spots)) ? baseline.pocket_spots : [];
-          const spot = spots[spotIdx];
-          if (!spot) return;
-          const anchor = document.getElementById('insertAnchorSelect').value || 'TOP';
-          await TripScheduleEngine.insertPocketSpot(currentDate, spot, anchor);
-          handleLocalDataChanged();
-          showBanner('ok', `已將「${spot.title_zh}」插入 ${currentDate} 行程`);
-          switchTab('tab-schedule');
-          await renderScheduleTab();
-        },
-        async onRemoveInserted(insertId) {
-          if (!currentDate) return;
-          await TripScheduleEngine.removeInsertedSpot(currentDate, insertId);
-          handleLocalDataChanged();
-          showBanner('info', '已移除本機插入站點');
-          await renderScheduleTab();
-        },
-        async onOpenCopyModal(encodedAnchorId) {
-          if (!currentDate || availableDates.length === 0) return;
-          copyTargetAnchorId = decodeURIComponent(encodedAnchorId);
-          const modal = document.getElementById('copySpotModal');
-          const dateSel = document.getElementById('copySourceDateSelect');
-          const descEl = document.getElementById('copySpotModalDesc');
+            buffer_min: bufferVal
+          },
+          updatedAt: new Date().toISOString()
+        };
+        render();
+      } else if (act === "clear-start") {
+        const existing = state.localOverrides[id] || { activity_id: id, trip_date: tripDate, fields: {} };
+        state.localOverrides[id] = {
+          ...existing,
+          fields: { ...(existing.fields || {}), start_time: "" },
+          updatedAt: new Date().toISOString()
+        };
+        render();
+      } else if (act === "reset-card") {
+        delete state.localOverrides[id];
+        render();
+      } else if (act === "confirm-copy") {
+        const panel = document.getElementById("copy-" + id);
+        const placement = panel.querySelector(".sel-placement").value === "before" ? "before" : "after";
+        const titleZh = panel.querySelector(".inp-title").value.trim() || "新增站點";
+        const dwellMin = Number(panel.querySelector(".inp-ex-dwell").value || 30);
+        const travelMin = Number(panel.querySelector(".inp-ex-travel").value || 10);
 
-          const anchorItem = (currentSchedule && Array.isArray(currentSchedule.items))
-            ? currentSchedule.items.find((x) => String(x.activity_id) === copyTargetAnchorId)
-            : null;
-          descEl.textContent = anchorItem
-            ? `選擇來源日期與站點，將複製加在「${anchorItem.title_zh}」後面（不影響原日期底稿）。`
-            : '選擇來源日期與站點，將複製加入今日行程（不影響原日期底稿）。';
+        const allItems = [...(state.baseByDate[tripDate] || []), ...(state.extraByDate[tripDate] || [])];
+        const src = allItems.find((x) => x.activity_id === id) || {};
 
-          dateSel.innerHTML = availableDates.map((d, i) =>
-            `<option value="${escapeHtml(d)}" ${d === currentDate ? 'selected' : ''}>${escapeHtml(d)}（Day ${i + 1}${d === currentDate ? '・今日' : ''}）</option>`
-          ).join('');
-
-          await populateCopySourceActivities(currentDate);
-          const actSel = document.getElementById('copySourceActSelect');
-          if (actSel && copyTargetAnchorId) {
-            actSel.value = copyTargetAnchorId;
-          }
-          modal.classList.add('open');
-        }
-      };
-
-      document.getElementById('copySourceDateSelect').addEventListener('change', async (e) => {
-        await populateCopySourceActivities(e.target.value);
-      });
-
-      document.getElementById('btnCancelCopySpot').addEventListener('click', () => {
-        document.getElementById('copySpotModal').classList.remove('open');
-      });
-
-      document.getElementById('btnConfirmCopySpot').addEventListener('click', async () => {
-        const srcDate = document.getElementById('copySourceDateSelect').value;
-        const srcActId = document.getElementById('copySourceActSelect').value;
-        if (!currentDate || !srcDate || !srcActId) return;
-
-        const srcSched = await TripScheduleEngine.buildDaySchedule(srcDate, { includeStoppedRemaining: true });
-        const srcItem = (srcSched.items || []).find((it) => String(it.activity_id) === String(srcActId));
-        if (!srcItem) return;
-
-        await TripScheduleEngine.copyActivityAfter(currentDate, srcItem, copyTargetAnchorId);
-        document.getElementById('copySpotModal').classList.remove('open');
-        handleLocalDataChanged();
-        showBanner('ok', `已複製「${srcItem.title_zh}」加入今日行程`);
-        await renderScheduleTab();
-      });
-
-      function switchTab(tabId, persist = true) {
-        const validTabs = ['tab-schedule', 'tab-pocket', 'tab-meta', 'tab-settings'];
-        const targetId = validTabs.indexOf(tabId) !== -1 ? tabId : 'tab-schedule';
-        document.querySelectorAll('.tab-page').forEach((p) => p.classList.remove('active'));
-        document.querySelectorAll('nav.bottom-nav button').forEach((b) => {
-          b.classList.toggle('active', b.dataset.tab === targetId);
+        state.extraByDate[tripDate] = state.extraByDate[tripDate] || [];
+        state.extraByDate[tripDate].push({
+          activity_id: "EXTRA-" + Date.now() + "-" + extraSeq,
+          trip_date: tripDate,
+          title_zh: titleZh,
+          area: src.area || "",
+          time_type: "彈性",
+          dwell_min: dwellMin,
+          travel_min: travelMin,
+          buffer_min: 5,
+          transport_mode: src.transport_mode || "步行",
+          note: src.note || "",
+          _placement: placement,
+          _anchorId: id,
+          _insertSeq: extraSeq++,
+          _createdAt: new Date().toISOString()
         });
-        const target = document.getElementById(targetId);
-        if (target) target.classList.add('active');
-        if (persist) {
-          try { localStorage.setItem(PREF_KEYS.ACTIVE_TAB, targetId); } catch (e) {}
-        }
+        render();
       }
+    });
 
-      document.querySelectorAll('nav.bottom-nav button').forEach((btn) => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab, true));
-      });
-
-      document.getElementById('dateSelect').addEventListener('change', async (e) => {
-        currentDate = e.target.value;
-        try { localStorage.setItem(PREF_KEYS.SELECTED_DATE, currentDate); } catch (err) {}
-        await renderScheduleTab();
-        await renderPocketTab();
-      });
-
-      document.getElementById('dayStartInput').addEventListener('change', async (e) => {
-        if (!currentDate) return;
-        const val = (e.target.value || '').trim();
-        if (!val) return;
-        try {
-          await TripScheduleEngine.setDayStartTimeOverride(currentDate, val);
-          handleLocalDataChanged();
-          showBanner('ok', `已將 ${currentDate} 出發時間調整為 ${val}`);
-          await renderScheduleTab();
-        } catch (err) {
-          showBanner('err', err.message || '出發時間格式無效');
-        }
-      });
-
-      document.getElementById('btnResetDayStart').addEventListener('click', async () => {
-        if (!currentDate) return;
-        await TripScheduleEngine.setDayStartTimeOverride(currentDate, '');
-        handleLocalDataChanged();
-        const defTime = safeGetDefaultStartTime();
-        showBanner('info', `已清除當日臨時出發時間，恢復預設 ${defTime} 起算`);
-        await renderScheduleTab();
-      });
-
-      document.getElementById('btnToggleWeather').addEventListener('click', async () => {
-        if (!currentDate) return;
-        await TripScheduleEngine.toggleWeather(currentDate);
-        handleLocalDataChanged();
-        await renderScheduleTab();
-      });
-
-      document.getElementById('btnToggleStop').addEventListener('click', async () => {
-        if (!currentDate) return;
-        await TripScheduleEngine.toggleDayStop(currentDate);
-        handleLocalDataChanged();
-        await renderScheduleTab();
-      });
-
-      document.getElementById('btnPublishLive').addEventListener('click', async () => {
-        const ctx = buildSyncContextOptions();
-        showBanner('info', '正在發布共享進度至雲端...');
-        const res = await TripSyncService.pushLiveState(Object.assign({}, ctx, {
-          isAuto: false,
-          allowHostTakeover: false
-        }));
-        await handlePublishResult(res);
-      });
-
-      document.getElementById('btnPullLive').addEventListener('click', async () => {
-        const ctx = buildSyncContextOptions();
-        showBanner('info', '正在從雲端拉取最新共享進度...');
-        const res = await TripSyncService.pullLiveState(Object.assign({}, ctx, {
-          confirmOverwrite: async (liveState) => {
-            const owner = (liveState && liveState.publishedByName) ? liveState.publishedByName : '主控端';
-            const rev = (liveState && liveState.revision) ? liveState.revision : '?';
-            return window.confirm(
-              `本機目前有尚未發布的修改，拉取「${owner}」發布的 v${rev} 進度會覆蓋本機未發布的微調與狀態，是否確定覆蓋？`
-            );
-          }
-        }));
-        if (res.ok) {
-          showBanner('ok', res.message);
-          await refreshAll();
-        } else if (res.error === 'USER_CANCELLED') {
-          showBanner('info', res.message);
-        } else {
-          showBanner('warn', res.message);
-        }
-      });
-
-      document.getElementById('btnSaveConfig').addEventListener('click', savePrefsFromInputs);
-
-      document.getElementById('btnSyncNow').addEventListener('click', async () => {
-        if (!savePrefsFromInputs()) return;
-        const ctx = buildSyncContextOptions();
-        showBanner('info', '正在從雲端同步底稿...');
-        const res = await TripSyncService.syncFromCloud({
-          endpointUrl: ctx.endpointUrl,
-          token: ctx.token
-        });
-        if (res.ok) {
-          showBanner('ok', res.message);
-          await refreshAll();
-        } else {
-          showBanner('warn', res.message);
-        }
-      });
-
-      document.getElementById('btnRestoreAll').addEventListener('click', async () => {
-        const ok = window.confirm('確定要清除所有本機修改、執行狀態及臨時插入景點嗎？清除後將以目前已同步的雲端底稿重新顯示行程。');
-        if (!ok) return;
-        await TripScheduleEngine.restoreAllToBaseline();
-        handleLocalDataChanged();
-        showBanner('ok', '已完成全部還原雲端底稿，本機修改與執行狀態已清除');
-        await refreshAll();
-      });
-
-      document.getElementById('btnExportBackup').addEventListener('click', async () => {
-        try {
-          const backupObj = await TripIdbStore.exportAllBackup();
-          const jsonStr = JSON.stringify(backupObj, null, 2);
-          const blob = new Blob([jsonStr], { type: 'application/json' });
-          const a = document.createElement('a');
-          const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-          a.href = URL.createObjectURL(blob);
-          a.download = `trip-pwa-backup-${stamp}.json`;
-          a.click();
-          URL.revokeObjectURL(a.href);
-          showBanner('ok', '已匯出完整備份 JSON');
-        } catch (err) {
-          showBanner('err', '匯出備份失敗：' + (err && err.message ? err.message : String(err)));
-        }
-      });
-
-      document.getElementById('btnTriggerImport').addEventListener('click', () => {
-        document.getElementById('importFileInput').click();
-      });
-
-      document.getElementById('importFileInput').addEventListener('change', async (e) => {
-        const file = e.target.files && e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-
-        try {
-          const text = await file.text();
-          const parsed = JSON.parse(text);
-          const res = await TripIdbStore.importAllBackup(parsed);
-          if (res.ok) {
-            handleLocalDataChanged();
-            showBanner('ok', res.message);
-            await refreshAll();
-          } else {
-            showBanner('err', '匯入已拒絕（未覆蓋原有資料）：' + res.message);
-          }
-        } catch (err) {
-          showBanner('err', '備份檔案解析或匯入失敗（未覆蓋原有資料）：' + (err && err.message ? err.message : String(err)));
-        }
-      });
-
-      document.getElementById('btnClearHistory').addEventListener('click', async () => {
-        await TripIdbStore.clearRemovedHistory();
-        showBanner('info', '已清空已移除項目歷史紀錄');
-        await renderRemovedHistory();
-      });
-
-      window.addEventListener('online', updateNetworkBadge);
-      window.addEventListener('offline', updateNetworkBadge);
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(() => {});
-        });
-      }
-
-      loadPrefsToInputs();
-      switchTab(localStorage.getItem(PREF_KEYS.ACTIVE_TAB) || 'tab-schedule', false);
-      refreshAll();
-    })();
+    render();
   </script>
 </body>
 </html>
